@@ -81,8 +81,8 @@ export function BacktestEngine() {
     }
   }
 
-  const formatPercentage = (value: number) => `${value.toFixed(2)}%`
-  const formatNumber = (value: number) => value.toFixed(2)
+  const formatPercentage = (value: number | undefined) => `${(value ?? 0).toFixed(2)}%`
+  const formatNumber = (value: number | undefined) => (value ?? 0).toFixed(2)
 
   return (
     <div className="p-6 space-y-6">
@@ -225,7 +225,7 @@ export function BacktestEngine() {
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className={`text-lg font-semibold ${result.results.totalReturn >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                      <div className={`text-lg font-semibold ${(result.results.totalReturn ?? 0) >= 0 ? 'text-accent' : 'text-destructive'}`}>
                         {formatPercentage(result.results.totalReturn)}
                       </div>
                       <div className="text-xs text-muted-foreground">Total Return</div>
@@ -254,7 +254,7 @@ export function BacktestEngine() {
                     
                     <div className="text-center p-3 bg-muted rounded-lg">
                       <div className="text-lg font-semibold">
-                        {result.results.totalTrades}
+                        {result.results.totalTrades ?? 0}
                       </div>
                       <div className="text-xs text-muted-foreground">Total Trades</div>
                     </div>

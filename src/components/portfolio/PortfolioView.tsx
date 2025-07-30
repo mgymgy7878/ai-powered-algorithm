@@ -63,14 +63,14 @@ export function PortfolioView() {
     { name: 'Available Cash', value: 15230.25, percentage: 29 }
   ])
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
-    }).format(value)
+    }).format(value ?? 0)
   }
 
-  const formatPercentage = (value: number) => `${value.toFixed(2)}%`
+  const formatPercentage = (value: number | undefined) => `${(value ?? 0).toFixed(2)}%`
 
   return (
     <div className="p-6 space-y-6">

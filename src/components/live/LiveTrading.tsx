@@ -96,11 +96,11 @@ export function LiveTrading() {
     }
   }
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
-    }).format(value)
+    }).format(value ?? 0)
   }
 
   return (
@@ -244,14 +244,14 @@ export function LiveTrading() {
                     
                     <div className="text-center p-3 bg-muted rounded-lg">
                       <div className="text-lg font-semibold text-accent">
-                        {strategy.winRate.toFixed(1)}%
+                        {(strategy.winRate ?? 0).toFixed(1)}%
                       </div>
                       <div className="text-xs text-muted-foreground">Win Rate</div>
                     </div>
                     
                     <div className="text-center p-3 bg-muted rounded-lg">
                       <div className="text-lg font-semibold text-primary">
-                        {((strategy.pnl / strategy.allocatedCapital) * 100).toFixed(2)}%
+                        {(((strategy.pnl ?? 0) / (strategy.allocatedCapital ?? 1)) * 100).toFixed(2)}%
                       </div>
                       <div className="text-xs text-muted-foreground">ROI</div>
                     </div>

@@ -127,11 +127,11 @@ export function MarketAnalysis() {
     }
   }
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
-    }).format(value)
+    }).format(value ?? 0)
   }
 
   return (
@@ -280,14 +280,14 @@ export function MarketAnalysis() {
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span>Momentum</span>
-                    <span className={condition.momentum >= 0 ? 'text-accent' : 'text-destructive'}>
-                      {condition.momentum >= 0 ? '+' : ''}{(condition.momentum * 100).toFixed(1)}%
+                    <span className={(condition.momentum ?? 0) >= 0 ? 'text-accent' : 'text-destructive'}>
+                      {(condition.momentum ?? 0) >= 0 ? '+' : ''}{((condition.momentum ?? 0) * 100).toFixed(1)}%
                     </span>
                   </div>
                   <div className="w-full bg-secondary rounded-full h-2">
                     <div 
-                      className={`h-2 rounded-full ${condition.momentum >= 0 ? 'bg-accent' : 'bg-destructive'}`}
-                      style={{ width: `${Math.min(Math.abs(condition.momentum) * 100, 100)}%` }}
+                      className={`h-2 rounded-full ${(condition.momentum ?? 0) >= 0 ? 'bg-accent' : 'bg-destructive'}`}
+                      style={{ width: `${Math.min(Math.abs(condition.momentum ?? 0) * 100, 100)}%` }}
                     ></div>
                   </div>
                 </div>

@@ -345,9 +345,9 @@ export function StrategyGenerator() {
       // Simulate improved performance
       const improvedPerformance = {
         ...strategy.performance!,
-        winRate: Math.min(95, strategy.performance!.winRate * 1.1),
-        totalReturn: strategy.performance!.totalReturn * 1.15,
-        sharpeRatio: Math.min(3, strategy.performance!.sharpeRatio * 1.1)
+        winRate: Math.min(95, (strategy.performance!.winRate ?? 0) * 1.1),
+        totalReturn: (strategy.performance!.totalReturn ?? 0) * 1.15,
+        sharpeRatio: Math.min(3, (strategy.performance!.sharpeRatio ?? 0) * 1.1)
       }
       
       const optimizedStrategy = {
@@ -794,31 +794,31 @@ export function StrategyGenerator() {
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-3 bg-muted rounded-lg">
                         <div className="text-center">
                           <div className="text-lg font-semibold text-accent">
-                            {strategy.performance.winRate.toFixed(1)}%
+                            {(strategy.performance.winRate ?? 0).toFixed(1)}%
                           </div>
                           <div className="text-xs text-muted-foreground">Win Rate</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold text-accent">
-                            {strategy.performance.totalReturn.toFixed(1)}%
+                            {(strategy.performance.totalReturn ?? 0).toFixed(1)}%
                           </div>
                           <div className="text-xs text-muted-foreground">Total Return</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold text-accent">
-                            {strategy.performance.sharpeRatio.toFixed(2)}
+                            {(strategy.performance.sharpeRatio ?? 0).toFixed(2)}
                           </div>
                           <div className="text-xs text-muted-foreground">Sharpe Ratio</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold text-destructive">
-                            {strategy.performance.maxDrawdown.toFixed(1)}%
+                            {(strategy.performance.maxDrawdown ?? 0).toFixed(1)}%
                           </div>
                           <div className="text-xs text-muted-foreground">Max Drawdown</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {strategy.performance.totalTrades}
+                            {strategy.performance.totalTrades ?? 0}
                           </div>
                           <div className="text-xs text-muted-foreground">Total Trades</div>
                         </div>

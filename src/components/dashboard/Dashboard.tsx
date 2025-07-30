@@ -27,15 +27,15 @@ export function Dashboard() {
     { id: 3, pair: 'SOL/USDT', side: 'BUY', amount: 25, price: 98.50, pnl: 245.75, time: '10:18:42' }
   ])
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
-    }).format(value)
+    }).format(value ?? 0)
   }
 
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(2)}%`
+  const formatPercentage = (value: number | undefined) => {
+    return `${(value ?? 0).toFixed(2)}%`
   }
 
   return (
