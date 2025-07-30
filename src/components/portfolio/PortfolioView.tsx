@@ -1,7 +1,7 @@
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { ChartPieIcon, TrendingUpIcon, TrendingDownIcon } from '@heroicons/react/24/outline'
+import { ChartPieIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline'
 
 interface Position {
   symbol: string
@@ -111,9 +111,9 @@ export function PortfolioView() {
                 {portfolioData.totalPnL >= 0 ? '+' : ''}{formatCurrency(portfolioData.totalPnL)}
               </div>
               {portfolioData.totalPnL >= 0 ? (
-                <TrendingUpIcon className="h-5 w-5 text-accent" />
+                <ArrowTrendingUpIcon className="h-5 w-5 text-accent" />
               ) : (
-                <TrendingDownIcon className="h-5 w-5 text-destructive" />
+                <ArrowTrendingDownIcon className="h-5 w-5 text-destructive" />
               )}
             </div>
             <div className={`text-sm ${portfolioData.totalPnLPercent >= 0 ? 'text-accent' : 'text-destructive'}`}>
