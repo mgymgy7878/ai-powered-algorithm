@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Card } from '@/components/ui/card'
-interface ChatMessage {
-  role: 'user' | 'assistant'
-  timestamp: Date
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Bot, User, Send, Loader2 } from 'lucide-react'
+import { aiService } from '@/services/aiService'
 
 interface ChatMessage {
   id: string
@@ -22,7 +22,7 @@ export function TradingAssistant() {
   // Mesajlar güncellendiğinde scroll'u en alta kaydır
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-
+  }, [messages])
 
   // AI mesaj gönderme fonksiyonu
   const sendMessage = async () => {
@@ -30,21 +30,20 @@ export function TradingAssistant() {
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
-- Türkçe yanıtlar ü
+      role: 'user',
       content: inputMessage,
-
+      timestamp: new Date()
     }
 
     setMessages(prev => [...prev, userMessage])
-        content: aiResp
+    setInputMessage('')
     setIsLoading(true)
 
     try {
-      console.error('AI yanıt hatası:', 
       const systemPrompt = `Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
 - Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
 - Ekonomik takvimi ve haber akışını takip edip yorumlamak
-      }
+- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
 - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
 - Türkçe yanıtlar üretmek
 
@@ -54,17 +53,17 @@ Kullanıcı sorusu: ${inputMessage}`
       
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-  return (
+        role: 'assistant',
         content: aiResponse,
         timestamp: new Date()
       }
 
       setMessages(prev => [...prev, assistantMessage])
-            <div clas
+    } catch (error) {
       console.error('AI yanıt hatası:', error)
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-          )}
+        role: 'assistant',
         content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
         timestamp: new Date()
       }
@@ -72,7 +71,7 @@ Kullanıcı sorusu: ${inputMessage}`
     } finally {
       setIsLoading(false)
     }
-   
+  }
 
   // Enter tuşu ile mesaj gönderme
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -80,17 +79,15 @@ Kullanıcı sorusu: ${inputMessage}`
       e.preventDefault()
       sendMessage()
     }
-   
+  }
 
-          
-    <Card className="w-full h-full flex flex-col">
-                      minute: '2-dig
-        <h3 className="text-lg font-bold">AI Trading Yöneticisi</h3>
-            
+  return (
+    <Card className="w-full h-full flex flex-col p-4">
+      <h3 className="text-lg font-bold mb-4">AI Trading Yöneticisi</h3>
       
-          ))}
+      <ScrollArea className="flex-1 pr-2 mb-4">
         <div className="space-y-4">
-            <div className="flex gap-
+          {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
               <Bot className="w-12 h-12 mx-auto mb-2 opacity-50" />
               <p className="text-sm">
@@ -98,7 +95,7 @@ Kullanıcı sorusu: ${inputMessage}`
               </p>
             </div>
           )}
-        </
+          
           {messages.map((message) => (
             <div
               key={message.id}
@@ -108,13 +105,13 @@ Kullanıcı sorusu: ${inputMessage}`
                 className={`flex gap-3 max-w-[80%] ${
                   message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                 }`}
-            onC
+              >
                 <div className="flex-shrink-0">
                   {message.role === 'user' ? (
                     <User className="w-6 h-6 p-1 bg-primary text-primary-foreground rounded-full" />
-            ) : (
+                  ) : (
                     <Bot className="w-6 h-6 p-1 bg-accent text-accent-foreground rounded-full" />
-          </Button>
+                  )}
                 </div>
                 <div
                   className={`rounded-lg p-3 ${
@@ -122,17 +119,17 @@ Kullanıcı sorusu: ${inputMessage}`
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground'
                   }`}
-
+                >
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   <p className="text-xs opacity-70 mt-1">
                     {message.timestamp.toLocaleTimeString('tr-TR', {
-
+                      hour: '2-digit',
                       minute: '2-digit'
-
+                    })}
                   </p>
-
+                </div>
               </div>
-
+            </div>
           ))}
 
           {isLoading && (
@@ -150,31 +147,29 @@ Kullanıcı sorusu: ${inputMessage}`
           )}
         </div>
         <div ref={messagesEndRef} />
+      </ScrollArea>
 
-      
-
-        <div className="flex gap-2">
-
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="AI'a mesaj yazın..."
-            className="flex-1"
-            disabled={isLoading}
-          />
-          <Button 
-            onClick={sendMessage} 
-            disabled={isLoading || !inputMessage.trim()} 
-            size="icon"
-          >
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-
-        </div>
-
+      <div className="flex gap-2 mt-auto">
+        <Input
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="AI'a mesaj yazın..."
+          className="flex-1"
+          disabled={isLoading}
+        />
+        <Button 
+          onClick={sendMessage} 
+          disabled={isLoading || !inputMessage.trim()} 
+          size="icon"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
+        </Button>
+      </div>
     </Card>
-
+  )
 }
