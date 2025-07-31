@@ -213,6 +213,8 @@ export function StrategyGenerator() {
     }
     closeStrategyEditor()
   }
+
+  const generateStrategy = async () => {
     if (!strategyPrompt.trim() || !strategyName.trim()) {
       toast.error('Strateji adı ve açıklama gereklidir')
       return
