@@ -130,28 +130,13 @@ export function TradingAssistant() {
               {message.role === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
                   <User className="w-4 h-4" />
-                </div>
               )}
-            </div>
-          ))}
-          {/* Scroll referans noktası - mesajlar burada bitecek */}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-
-      {/* Mesaj input alanı - her zaman en altta sabit */}
-      <div className="border-t p-3 flex gap-2 items-center bg-background">
         <Input
           value={inputMessage}
+      </div>
+      {/* Mesaj input alanı - her zaman e
+        <Input
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="AI'a mesaj yaz..."
-          className="flex-1"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              sendMessage()
-            }
-          }}
         />
         <Button onClick={sendMessage} disabled={!inputMessage.trim() || isLoading} size="icon">
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -160,4 +145,4 @@ export function TradingAssistant() {
 
     </Card>
   )
-}
+
