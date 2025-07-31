@@ -102,66 +102,48 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Portfolio Metrics */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 ${contentPadding}`}>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Portföy Değeri</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(portfolioMetrics.totalValue)}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Günlük K/Z</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <div className={`text-2xl font-bold ${portfolioMetrics.dailyPnL >= 0 ? 'text-accent' : 'text-destructive'}`}>
+      {/* Portfolio Metrics - Küçük yatay kutular */}
+      <div className={`${contentPadding}`}>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
+            <span className="text-muted-foreground">Portföy Değeri</span>
+            <span className="font-bold text-sm text-primary">{formatCurrency(portfolioMetrics.totalValue)}</span>
+          </div>
+          
+          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
+            <span className="text-muted-foreground">Günlük K/Z</span>
+            <div className="flex items-center gap-1">
+              <span className={`font-bold text-sm ${portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(portfolioMetrics.dailyPnL)}
-              </div>
+              </span>
               {portfolioMetrics.dailyPnL >= 0 ? (
-                <ArrowTrendingUpIcon className="h-4 w-4 text-accent" />
+                <ArrowTrendingUpIcon className="h-3 w-3 text-green-600" />
               ) : (
-                <ArrowTrendingDownIcon className="h-4 w-4 text-destructive" />
+                <ArrowTrendingDownIcon className="h-3 w-3 text-red-600" />
               )}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Toplam K/Z</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${portfolioMetrics.totalPnL >= 0 ? 'text-accent' : 'text-destructive'}`}>
+          </div>
+          
+          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
+            <span className="text-muted-foreground">Toplam K/Z</span>
+            <span className={`font-bold text-sm ${portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {formatCurrency(portfolioMetrics.totalPnL)}
+            </span>
+          </div>
+          
+          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
+            <span className="text-muted-foreground">Başarı Oranı</span>
+            <span className="font-bold text-sm text-blue-600">{formatPercentage(portfolioMetrics.winRate)}</span>
+          </div>
+          
+          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
+            <span className="text-muted-foreground">Aktif Stratejiler</span>
+            <div className="flex items-center gap-1">
+              <span className="font-bold text-sm text-green-500">{portfolioMetrics.activeStrategies}</span>
+              <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Başarı Oranı</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(portfolioMetrics.winRate)}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Aktif Stratejiler</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="text-2xl font-bold">{portfolioMetrics.activeStrategies}</div>
-              <div className="h-2 w-2 bg-accent rounded-full animate-pulse"></div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Recent Trades */}
@@ -172,8 +154,8 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {/* Son 5 işlemi güvenli şekilde göster */}
-            {(recentTrades || []).slice(0, 5).map((trade) => (
+            {/* Son 2 işlemi güvenli şekilde göster */}
+            {(recentTrades || []).slice(0, 2).map((trade) => (
               <div key={trade.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div className="flex items-center gap-4">
                   <Badge variant={trade.side === 'BUY' ? 'default' : 'secondary'}>
