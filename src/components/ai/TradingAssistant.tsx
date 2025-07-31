@@ -34,18 +34,11 @@ interface ChatMessage {
 
 interface MarketSummary {
   symbol: string
-  price: number
+  change: numbe
   change: number
-  trend: 'up' | 'down' | 'sideways'
-}
+  const [messages, setMessages] = u
+ 
 
-export function TradingAssistant() {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [inputMessage, setInputMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState('chat')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  
   // KV storage'dan stratejileri al
   const [strategies] = useKV('trading-strategies', [])
   const [liveStrategies] = useKV('live-strategies', [])
@@ -117,6 +110,13 @@ Lütfen Türkçe ve ayrıntılı yanıt ver.`
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
+      console.error('AI yanıt hatası:', error)
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
+        timestamp: new Date()
       console.error('AI yanıt hatası:', error)
       
       const errorMessage: ChatMessage = {
@@ -201,13 +201,6 @@ Lütfen Türkçe ve ayrıntılı yanıt ver.`
                         <B
                           <Tre
                         
-        <div className="border-b">
-                        %{analysis.confidence}
-
-                </div
-                <p className="text-muted-fore
-               
-            </CardContent>
 
    
 
