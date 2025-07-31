@@ -119,7 +119,7 @@ export function TradingAssistant() {
               </div>
             )}
             
-            <div className={`max-w-[260px] p-3 rounded-lg text-sm ${
+            <div className={`max-w-[260px] px-2 py-1 rounded-md text-sm ${
               message.role === 'user' 
                 ? 'bg-primary text-primary-foreground' 
                 : 'bg-muted text-foreground'
@@ -147,7 +147,7 @@ export function TradingAssistant() {
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <Brain className="w-4 h-4 text-primary" />
             </div>
-            <div className="bg-muted text-foreground p-3 rounded-lg text-sm flex items-center gap-2">
+            <div className="bg-muted text-foreground px-2 py-1 rounded-md text-sm flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Düşünüyor...</span>
             </div>
