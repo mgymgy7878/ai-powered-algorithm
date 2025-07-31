@@ -1,5 +1,5 @@
 import { useEffect, useRef, memo } from 'react'
-import { createChart, ColorType, LineStyle, CrosshairMode } from 'lightweight-charts'
+import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts'
 import type { IChartApi, ISeriesApi, UTCTimestamp, LineData, CandlestickData } from 'lightweight-charts'
 
 export interface TradeSignal {
@@ -42,86 +42,94 @@ export const TradingChart = memo(function TradingChart({
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    // Grafik oluşturma
-    const chart = createChart(chartContainerRef.current, {
-      width,
-      height,
-      layout: {
-        background: { type: ColorType.Solid, color: '#ffffff' },
-        textColor: '#333',
-      },
-      grid: {
-        vertLines: { color: '#f0f0f0' },
-        horzLines: { color: '#f0f0f0' },
-      },
-      crosshair: {
-        mode: CrosshairMode.Normal,
-      },
-      rightPriceScale: {
-        borderColor: '#cccccc',
-        scaleMargins: {
-          top: 0.1,
-          bottom: 0.2,
+    try {
+      // Grafik oluşturma
+      const chart = createChart(chartContainerRef.current, {
+        width,
+        height,
+        layout: {
+          backgroundColor: '#ffffff',
+          textColor: '#333',
         },
-      },
-      timeScale: {
-        borderColor: '#cccccc',
-        timeVisible: true,
-        secondsVisible: false,
-      },
-    })
-
-    chartRef.current = chart
-
-    // Mum grafik serisi ekleme
-    const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#26a69a',
-      downColor: '#ef5350',
-      borderVisible: false,
-      wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
-    })
-    candlestickSeriesRef.current = candlestickSeries
-
-    // Hacim serisi ekleme
-    if (data.volume && data.volume.length > 0) {
-      const volumeSeries = chart.addHistogramSeries({
-        color: '#26a69a',
-        priceFormat: {
-          type: 'volume',
+        grid: {
+          vertLines: { color: '#f0f0f0' },
+          horzLines: { color: '#f0f0f0' },
         },
-        priceScaleId: 'volume',
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0,
+        crosshair: {
+          mode: CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+          borderColor: '#cccccc',
+          scaleMargins: {
+            top: 0.1,
+            bottom: 0.2,
+          },
+        },
+        timeScale: {
+          borderColor: '#cccccc',
+          timeVisible: true,
+          secondsVisible: false,
         },
       })
-      volumeSeriesRef.current = volumeSeries
-      volumeSeries.setData(data.volume)
-    }
 
-    // Alım sinyalleri için çizgi serisi
-    const buySignals = chart.addLineSeries({
-      color: 'transparent',
-      lineWidth: 0,
-      crosshairMarkerVisible: false,
-      lastValueVisible: false,
-      priceLineVisible: false,
-    })
-    buySignalsRef.current = buySignals
+      chartRef.current = chart
 
-    // Satım sinyalleri için çizgi serisi  
-    const sellSignals = chart.addLineSeries({
-      color: 'transparent',
-      lineWidth: 0,
-      crosshairMarkerVisible: false,
-      lastValueVisible: false,
-      priceLineVisible: false,
-    })
-    sellSignalsRef.current = sellSignals
+      // Mum grafik serisi ekleme
+      const candlestickSeries = chart.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+      })
+      candlestickSeriesRef.current = candlestickSeries
 
-    return () => {
-      chart.remove()
+      // Hacim serisi ekleme
+      if (data.volume && data.volume.length > 0) {
+        const volumeSeries = chart.addHistogramSeries({
+          color: '#26a69a',
+          priceFormat: {
+            type: 'volume',
+          },
+          priceScaleId: 'volume',
+          scaleMargins: {
+            top: 0.8,
+            bottom: 0,
+          },
+        })
+        volumeSeriesRef.current = volumeSeries
+        volumeSeries.setData(data.volume)
+      }
+
+      // Alım sinyalleri için çizgi serisi
+      const buySignals = chart.addLineSeries({
+        color: 'transparent',
+        lineWidth: 0,
+        crosshairMarkerVisible: false,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
+      buySignalsRef.current = buySignals
+
+      // Satım sinyalleri için çizgi serisi  
+      const sellSignals = chart.addLineSeries({
+        color: 'transparent',
+        lineWidth: 0,
+        crosshairMarkerVisible: false,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
+      sellSignalsRef.current = sellSignals
+
+      return () => {
+        try {
+          chart.remove()
+        } catch (error) {
+          console.error('Grafik temizlenirken hata:', error)
+        }
+      }
+    } catch (error) {
+      console.error('Grafik oluşturulurken hata:', error)
     }
   }, [width, height])
 
@@ -129,48 +137,56 @@ export const TradingChart = memo(function TradingChart({
   useEffect(() => {
     if (!chartRef.current || !candlestickSeriesRef.current) return
 
-    // Mum verilerini güncelle
-    if (data.candlesticks.length > 0) {
-      candlestickSeriesRef.current.setData(data.candlesticks)
-    }
-
-    // Sinyalleri güncelle
-    if (data.signals && data.signals.length > 0) {
-      const buyData: LineData[] = []
-      const sellData: LineData[] = []
-
-      data.signals.forEach(signal => {
-        if (signal.type === 'buy') {
-          buyData.push({ time: signal.time, value: signal.price })
-        } else {
-          sellData.push({ time: signal.time, value: signal.price })
-        }
-      })
-
-      if (buySignalsRef.current) {
-        buySignalsRef.current.setData(buyData)
-      }
-      if (sellSignalsRef.current) {
-        sellSignalsRef.current.setData(sellData)
+    try {
+      // Mum verilerini güncelle
+      if (data.candlesticks.length > 0) {
+        candlestickSeriesRef.current.setData(data.candlesticks)
       }
 
-      // Sinyalleri işaretleme
-      data.signals.forEach(signal => {
-        if (!chartRef.current) return
-        
-        chartRef.current.addPriceLine({
-          price: signal.price,
-          color: signal.type === 'buy' ? '#26a69a' : '#ef5350',
-          lineWidth: 1,
-          lineStyle: LineStyle.Dashed,
-          axisLabelVisible: false,
-          title: `${signal.type.toUpperCase()} - ${signal.price.toFixed(2)}`,
+      // Sinyalleri güncelle
+      if (data.signals && data.signals.length > 0) {
+        const buyData: LineData[] = []
+        const sellData: LineData[] = []
+
+        data.signals.forEach(signal => {
+          if (signal.type === 'buy') {
+            buyData.push({ time: signal.time, value: signal.price })
+          } else {
+            sellData.push({ time: signal.time, value: signal.price })
+          }
         })
-      })
-    }
 
-    // Grafik boyutunu otomatik ayarla
-    chartRef.current.timeScale().fitContent()
+        if (buySignalsRef.current) {
+          buySignalsRef.current.setData(buyData)
+        }
+        if (sellSignalsRef.current) {
+          sellSignalsRef.current.setData(sellData)
+        }
+
+        // Sinyalleri işaretleme
+        data.signals.forEach(signal => {
+          if (!chartRef.current) return
+          
+          try {
+            chartRef.current.addPriceLine({
+              price: signal.price,
+              color: signal.type === 'buy' ? '#26a69a' : '#ef5350',
+              lineWidth: 1,
+              lineStyle: LineStyle.Dashed,
+              axisLabelVisible: false,
+              title: `${signal.type.toUpperCase()} - ${signal.price.toFixed(2)}`,
+            })
+          } catch (error) {
+            console.error('Sinyal çizgisi eklenirken hata:', error)
+          }
+        })
+      }
+
+      // Grafik boyutunu otomatik ayarla
+      chartRef.current.timeScale().fitContent()
+    } catch (error) {
+      console.error('Grafik verileri güncellenirken hata:', error)
+    }
   }, [data])
 
   // Sinyal tıklama olayı
@@ -178,20 +194,32 @@ export const TradingChart = memo(function TradingChart({
     if (!chartRef.current || !onSignalClick) return
 
     const handleClick = (param: any) => {
-      if (!param.time || !data.signals) return
+      try {
+        if (!param.time || !data.signals) return
 
-      const clickedSignal = data.signals.find(signal => signal.time === param.time)
-      if (clickedSignal) {
-        onSignalClick(clickedSignal)
+        const clickedSignal = data.signals.find(signal => signal.time === param.time)
+        if (clickedSignal) {
+          onSignalClick(clickedSignal)
+        }
+      } catch (error) {
+        console.error('Sinyal tıklama işlenirken hata:', error)
       }
     }
 
-    chartRef.current.subscribeClick(handleClick)
+    try {
+      chartRef.current.subscribeClick(handleClick)
 
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.unsubscribeClick(handleClick)
+      return () => {
+        if (chartRef.current) {
+          try {
+            chartRef.current.unsubscribeClick(handleClick)
+          } catch (error) {
+            console.error('Tıklama olayı kaldırılırken hata:', error)
+          }
+        }
       }
+    } catch (error) {
+      console.error('Tıklama olayı eklenirken hata:', error)
     }
   }, [data.signals, onSignalClick])
 

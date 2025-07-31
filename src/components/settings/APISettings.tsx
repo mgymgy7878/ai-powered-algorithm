@@ -135,7 +135,7 @@ export function APISettings() {
     setTesting(prev => ({ ...prev, [provider]: true }))
     
     try {
-      const isValid = await aiService.testConnection(provider, config.apiKey)
+      const isValid = await aiService?.testConnection(provider, config.apiKey)
       setTestResults(prev => ({ ...prev, [provider]: isValid }))
       
       if (isValid) {
@@ -153,9 +153,11 @@ export function APISettings() {
 
   const generateTestStrategy = async () => {
     // Update AI service with current settings first
-    aiService.setSettings(apiSettings)
-    
-    if (!aiService.isConfigured()) {
+    if (aiService) {
+      aiService.setSettings(apiSettings)
+    }
+
+    if (!aiService?.isConfigured()) {
       toast.error('Lütfen önce en az bir AI servisini yapılandırın')
       return
     }
@@ -166,8 +168,10 @@ export function APISettings() {
       const prompt = "Basit bir RSI stratejisi oluştur. RSI 30'un altına düştüğünde al, 70'in üzerine çıktığında sat sinyali versin. Türkçe açıklamalarla C# kodu yaz."
       
       // Update AI service with current settings before using
-      aiService.setSettings(apiSettings)
-      const code = await aiService.generateStrategy(prompt)
+      if (aiService) {
+        aiService.setSettings(apiSettings)
+      }
+      const code = await aiService?.generateStrategy(prompt)
       
       console.log('Üretilen test stratejisi:', code)
       toast.success('Test stratejisi başarıyla üretildi! Konsolu kontrol edin.')
@@ -566,7 +570,7 @@ export function APISettings() {
         <CardContent>
           <Button
             onClick={generateTestStrategy}
-            disabled={!aiService.isConfigured() || isGeneratingTest}
+            disabled={!aiService?.isConfigured() || isGeneratingTest}
             className="w-full"
             size="lg"
           >
@@ -580,7 +584,7 @@ export function APISettings() {
             )}
           </Button>
           
-          {!aiService.isConfigured() && (
+          {!aiService?.isConfigured() && (
             <p className="text-sm text-muted-foreground mt-2 text-center">
               Test etmek için en az bir AI servisinin API anahtarını girin ve etkinleştirin
             </p>
