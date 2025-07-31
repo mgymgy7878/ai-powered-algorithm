@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
@@ -23,6 +23,20 @@ export function Dashboard() {
   const [showAIConfig, setShowAIConfig] = useState(false)
   const [showAITest, setShowAITest] = useState(false)
   const [showMarketData, setShowMarketData] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  
+  // Sidebar durumu değişikliklerini dinle
+  useEffect(() => {
+    const handleSidebarToggle = (event: CustomEvent) => {
+      setIsSidebarOpen(event.detail.isOpen)
+    }
+    
+    window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener)
+    
+    return () => {
+      window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener)
+    }
+  }, [])
   
   const [portfolioMetrics] = useKV<PortfolioMetrics>('portfolio-metrics', {
     totalValue: 50000,
@@ -49,6 +63,9 @@ export function Dashboard() {
     return `${(value ?? 0).toFixed(2)}%`
   }
 
+  // Sidebar durumuna göre dinamik padding hesapla
+  const contentPadding = isSidebarOpen ? 'pl-16 pr-[380px]' : 'pl-16 pr-[380px]'
+
   return (
     <div className="relative p-6 space-y-6">
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
@@ -56,7 +73,7 @@ export function Dashboard() {
         <TradingAssistant />
       </div>
 
-      <div className="flex items-center justify-between pr-[380px]">
+      <div className={`flex items-center justify-between ${contentPadding}`}>
         <div>
           <h2 className="text-3xl font-bold">Anasayfa</h2>
           <p className="text-muted-foreground">AI destekli trading yönetimi ve portföy genel görünümü</p>
@@ -86,7 +103,7 @@ export function Dashboard() {
       </div>
 
       {/* Portfolio Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pr-[380px]">
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 ${contentPadding}`}>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Portföy Değeri</CardTitle>
@@ -148,7 +165,7 @@ export function Dashboard() {
       </div>
 
       {/* Recent Trades */}
-      <div className="pr-[380px]">
+      <div className={contentPadding}>
         <Card>
         <CardHeader>
           <CardTitle>Son İşlemler</CardTitle>

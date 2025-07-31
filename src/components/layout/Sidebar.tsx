@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { AppView } from '../../App'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
@@ -10,7 +11,9 @@ import {
   House,
   Gear,
   Rocket,
-  Brain
+  Brain,
+  List,
+  X
 } from '@phosphor-icons/react'
 
 interface SidebarProps {
@@ -21,6 +24,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, onViewChange, strategyCount, runningStrategiesCount = 0 }: SidebarProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  
+  // Sidebar durumunu window'a yayınla ki Dashboard bunu kullanabilsin
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { isOpen: isSidebarOpen } }))
+  }, [isSidebarOpen])
   
   const navigation = [
     { id: 'dashboard', label: 'Anasayfa', icon: House },
@@ -34,7 +43,19 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
 
   return (
     <>
-      <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
+      {/* Toggle Button - Sol üstte sabit */}
+      <Button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        variant="ghost"
+        size="icon"
+        className="fixed top-4 left-4 z-50 bg-card border border-border shadow-md hover:bg-muted"
+        title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
+      >
+        {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
+      </Button>
+
+      {/* Sidebar - Animasyonlu genişlik */}
+      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-card border-r border-border h-screen flex flex-col`}>
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
           <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
