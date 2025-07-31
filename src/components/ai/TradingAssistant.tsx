@@ -1,35 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigg
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import {
-  Bot,
-  User,
-  Send,
-  Loader2,
-  TrendingUp,
-  TrendingDown,
-  Activity,
   Brain,
-  CheckCircle,
-  AlertTriangle,
-  DollarSign,
+  Aler
   Zap,
-  Clock
-} from 'lucide-react'
-import { useKV } from '@github/spark/hooks'
-import { aiService } from '@/services/aiService'
-import { TradingStrategy } from '@/types/trading'
+} from 
+import { a
 
-// Trading Assistant için gerekli tipler
-interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
+interface ChatM
+  role: 'us
+  timest
+
+  const [message
+  const [isLo
+  cons
+
+  useEffect(() => {
+  }, [messages])
+  // AI mesaj gönderme fonksiyonu
+    if (!inputMessage.trim() || isLoading) return
+
+      role: 'user',
+      timestamp: new Da
+
+    setInputMessage('')
+
   timestamp: Date
 }
 
@@ -62,102 +62,102 @@ export function TradingAssistant() {
     setIsLoading(true)
 
     try {
-      // AI Prompt - Trading yöneticisi rolü
-      const systemPrompt = `Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
-- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
-- Ekonomik takvimi ve haber akışını takip edip yorumlamak  
-- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
-- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
-- Türkçe yanıtlar üretmek
-
-Kullanıcı sorusu: ${inputMessage}`
-
-      // AI servisini çağır
-      const response = await aiService.generateResponse(systemPrompt)
-
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date()
-      }
-      
-      setMessages(prev => [...prev, assistantMessage])
-    } catch (error) {
-      console.error('AI yanıt hatası:', error)
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const quickCommands = [
-    {
-      label: "Piyasa Analizi",
-      icon: <TrendingUp className="w-4 h-4" />,
-      command: "Güncel piyasa durumunu analiz et ve önemli seviyeleri belirt"
-    },
-    {
-      label: "Strateji Önerisi",
-      icon: <Zap className="w-4 h-4" />,
-      command: "Mevcut piyasa koşullarına uygun strateji öner"
-    },
-    {
-      label: "Risk Analizi",
-      icon: <AlertTriangle className="w-4 h-4" />,
-      command: "Portföyümün risk analizini yap ve öneriler sun"
-    },
-    {
-      label: "Performans Raporu",
-      icon: <Activity className="w-4 h-4" />,
-      command: "Son dönem strateji performanslarını değerlendir"
-    }
-  ]
-
-  // Hızlı komut kullanma
-  const useQuickCommand = (command: string) => {
-    setInputMessage(command)
-  }
-
-  // Enter tuşu ile mesaj gönderme
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleKeyPress = (e: React.KeyboardE
       e.preventDefault()
-      sendMessage()
     }
-  }
 
-  return (
     <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
       <div className="border-b bg-card p-6">
-        <h1 className="text-2xl font-bold">AI Trading Yöneticisi</h1>
-        <p className="text-muted-foreground mt-1">
-          Yapay zeka destekli trading asistanınız
-        </p>
-      </div>
+        <p className="tex
 
-      <Tabs defaultValue="chat" className="flex-1">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="chat">Sohbet</TabsTrigger>
-          <TabsTrigger value="analysis">Analiz</TabsTrigger>
-          <TabsTrigger value="insights">Öngörüler</TabsTrigger>
+
+
+          <TabsTrigger valu
         </TabsList>
 
-        {/* Chat Tab */}
-        <TabsContent value="chat" className="flex-1 flex flex-col mt-4">
           <div className="flex-1 flex gap-6">
-            {/* Sol Panel - Sohbet */}
             <div className="flex-1">
-              <Card className="h-full flex flex-col">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeade
+                    <Brain
+                  </CardTitle
+       
+      
+                      {messages.length === 0 && (
+                     
+                          <p>Size piyasa anali
+                      )}
+                      {messages.map((mes
+                          
+                              ? 'bg-primary text-primary-foreground' 
+                          }`}
+       
+                              <div className="flex
+               
+                         
+     
+   
+
+                        <
+     
+                              
+                          </div>
+                      )}
+      
+
+                  <div className
+                      value={inputMessag
+                      onKeyPress={handleKeyPress}
+      
+     
+                      onClic
+                      size="icon"
+                      {isLoading ? (
+      
+     
+                  </div>
+              </Card>
+
+     
+   
+
+                  </CardH
+                    <div className="space-y-2">
+                        <But
+   
+
+                        >
+                          {cmd.label}
+                      ))}
+                  </Card
+
+     
+   
+
+          
+                        <Badge variant="secondary">{strate
+                    
+                        <Badge variant="defa
+                      <div className="flex items-center justify-betwe
+                        <Badge variant="outline" c
+                          Aktif
+            
+            
+
+                <Card>
+                    <CardTitle className="text-sm">AI 
+                  <CardContent>
+                      <p>• Piyasa analizi için zaman dilimi 
+                      <p>• Risk yönetimi tavsiyeleri</p>
+                   
+
+            </div>
+        </TabsContent>
+        {/* Analysis Tab */}
+          <div className="grid gap-4">
+              <CardHeader>
+                  <TrendingUp className="w-5 h-5" />
+                </CardTitle>
+              <CardContent>
                     <Brain className="w-5 h-5" />
                     AI Asistan Sohbeti
                   </CardTitle>
@@ -230,7 +230,7 @@ Kullanıcı sorusu: ${inputMessage}`
                         <Send className="w-4 h-4" />
                       )}
                     </Button>
-                  </div>
+
                 </CardContent>
               </Card>
             </div>
@@ -253,7 +253,7 @@ Kullanıcı sorusu: ${inputMessage}`
                           onClick={() => useQuickCommand(cmd.command)}
                           className="w-full justify-start gap-2"
                         >
-                          {cmd.icon}
+
                           {cmd.label}
                         </Button>
                       ))}
@@ -263,9 +263,9 @@ Kullanıcı sorusu: ${inputMessage}`
 
                 {/* Sistem Durumu */}
                 <Card>
-                  <CardHeader>
+
                     <CardTitle className="text-sm">Sistem Durumu</CardTitle>
-                  </CardHeader>
+
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -283,13 +283,13 @@ Kullanıcı sorusu: ${inputMessage}`
                           Aktif
                         </Badge>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                {/* AI İpuçları */}
+                  </CardContent>
+
+
+
                 <Card>
-                  <CardHeader>
+
                     <CardTitle className="text-sm">AI Önerileri</CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -299,11 +299,11 @@ Kullanıcı sorusu: ${inputMessage}`
                       <p>• Risk yönetimi tavsiyeleri</p>
                       <p>• Portföy dengeleme önerileri</p>
                     </div>
-                  </CardContent>
+
                 </Card>
-              </div>
+
             </div>
-          </div>
+
         </TabsContent>
 
         {/* Analysis Tab */}
@@ -313,59 +313,59 @@ Kullanıcı sorusu: ${inputMessage}`
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
-                  Piyasa Durumu
+
                 </CardTitle>
-              </CardHeader>
+
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">+2.4%</div>
                     <div className="text-sm text-muted-foreground">BTC/USDT</div>
-                  </div>
+
                   <div className="text-center">
                     <div className="text-2xl font-bold text-red-600">-1.2%</div>
                     <div className="text-sm text-muted-foreground">ETH/USDT</div>
-                  </div>
+
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">+0.8%</div>
                     <div className="text-sm text-muted-foreground">BNB/USDT</div>
-                  </div>
+
                 </div>
-              </CardContent>
+
             </Card>
 
             <Card>
-              <CardHeader>
+
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="w-5 h-5" />
                   Strateji Performansı
-                </CardTitle>
+
               </CardHeader>
-              <CardContent>
+
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Aktif Stratejiler</span>
-                    <Badge variant="default">{liveStrategies.length}</Badge>
+
                   </div>
-                  <div className="flex justify-between items-center">
+
                     <span className="text-sm">Toplam Stratejiler</span>
                     <Badge variant="outline">{strategies.length}</Badge>
                   </div>
-                </div>
+
               </CardContent>
-            </Card>
+
           </div>
-        </TabsContent>
+
 
         {/* Insights Tab */}
         <TabsContent value="insights" className="flex-1 p-4">
-          <div className="space-y-4">
+
             <Alert>
-              <Clock className="h-4 w-4" />
+
               <AlertDescription>
                 <strong>Ekonomik Takvim:</strong> Bu hafta Fed faiz kararı ve NFP verisi açıklanacak. 
                 Yüksek volatilite bekleniyor.
-              </AlertDescription>
+
             </Alert>
 
             <Alert>
@@ -373,19 +373,19 @@ Kullanıcı sorusu: ${inputMessage}`
               <AlertDescription>
                 <strong>AI Önerisi:</strong> Mevcut piyasa koşullarında grid bot stratejileri 
                 daha uygun görünüyor. Volatilite düşük seviyelerde.
-              </AlertDescription>
+
             </Alert>
 
             <Alert>
-              <AlertTriangle className="h-4 w-4" />
+
               <AlertDescription>
                 <strong>Risk Uyarısı:</strong> Portföy toplam değerinin %15'i tek bir varlıkta. 
                 Çeşitlendirme önerilir.
-              </AlertDescription>
+
             </Alert>
-          </div>
+
         </TabsContent>
-      </Tabs>
+
     </div>
-  )
+
 }
