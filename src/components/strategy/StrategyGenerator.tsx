@@ -571,7 +571,7 @@ public class ${safeName.replace(/\s+/g, '')}Strategy : Strategy
             <div className="p-2 bg-primary/10 rounded-lg">
               <Sparkle className="h-8 w-8 text-primary" />
             </div>
-            MatrixIQ Strategy Generator
+            Strateji Üreticisi
           </h2>
           <p className="text-muted-foreground">
             Cursor Agent teknolojisi ile desteklenen akıllı strateji üretici • Otomatik hata düzeltme ve optimizasyon

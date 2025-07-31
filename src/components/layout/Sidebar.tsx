@@ -8,20 +8,23 @@ import {
   ChartPieIcon,
   MagnifyingGlassIcon,
   HomeIcon,
-  CogIcon
+  CogIcon,
+  RocketLaunchIcon
 } from '@heroicons/react/24/outline'
 
 interface SidebarProps {
   currentView: AppView
   onViewChange: (view: AppView) => void
   strategyCount: number
+  runningStrategiesCount?: number
 }
 
-export function Sidebar({ currentView, onViewChange, strategyCount }: SidebarProps) {
+export function Sidebar({ currentView, onViewChange, strategyCount, runningStrategiesCount = 0 }: SidebarProps) {
   
   const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
-    { id: 'strategies', label: 'Strategy Generator', icon: CpuChipIcon, badge: strategyCount },
+    { id: 'strategies', label: 'Stratejiler', icon: CpuChipIcon, badge: strategyCount },
+    { id: 'running-strategies', label: 'Çalışan Stratejiler', icon: RocketLaunchIcon, badge: runningStrategiesCount },
     { id: 'backtest', label: 'Backtesting', icon: ChartBarIcon },
     { id: 'live', label: 'Live Trading', icon: PlayIcon },
     { id: 'portfolio', label: 'Portfolio', icon: ChartPieIcon },
