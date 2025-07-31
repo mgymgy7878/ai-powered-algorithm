@@ -187,6 +187,75 @@ class BinanceService {
       return []
     }
   }
+
+  // Kline verilerini getir (candlestick data)
+  async getKlineData(
+    symbol: string, 
+    interval: string, 
+    limit: number = 500,
+    startTime?: number,
+    endTime?: number
+  ): Promise<KlineData[]> {
+    try {
+      const params = new URLSearchParams({
+        symbol: symbol.toUpperCase(),
+        interval,
+        limit: limit.toString()
+      })
+
+      if (startTime) {
+        params.append('startTime', startTime.toString())
+      }
+      if (endTime) {  
+        params.append('endTime', endTime.toString())
+      }
+
+      const response = await fetch(`${this.baseUrl}/fapi/v1/klines?${params}`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const rawData = await response.json()
+      
+      // Raw kline data'yı KlineData formatına çevir
+      return rawData.map((kline: any[]) => ({
+        openTime: kline[0],
+        open: kline[1],
+        high: kline[2],
+        low: kline[3],
+        close: kline[4],
+        volume: kline[5],
+        closeTime: kline[6],
+        quoteAssetVolume: kline[7],
+        numberOfTrades: kline[8],
+        takerBuyBaseAssetVolume: kline[9],
+        takerBuyQuoteAssetVolume: kline[10],
+        ignore: kline[11]
+      }))
+    } catch (error) {
+      console.error('Kline verisi alınırken hata:', error)
+      return []
+    }
+  }
+
+  // Test bağlantısı
+  async testConnection(): Promise<boolean> {
+    try {
+      if (!this.hasCredentials()) {
+        // Kimlik bilgileri yoksa sadece public endpoint test et
+        const response = await fetch(`${this.baseUrl}/fapi/v1/ping`)
+        return response.ok
+      }
+
+      // Kimlik bilgileri varsa hesap bilgilerini test et
+      const accountInfo = await this.getAccountInfo()
+      return accountInfo !== null
+    } catch (error) {
+      console.error('Bağlantı testi hatası:', error)
+      return false
+    }
+  }
 }
 
 // Singleton instance oluşturma
