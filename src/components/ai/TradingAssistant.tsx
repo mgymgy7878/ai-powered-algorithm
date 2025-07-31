@@ -1,19 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { Card, CardContent, CardHeader, Car
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Alert, AlertDescription } from '@/co
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import {
-  Send,
-  Bot,
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
+  Clock,
+  CheckCircle,
+  Dollar
+  Calen
+} from
+import { bina
+// Trading Assi
+  id: string
   Clock,
   AlertTriangle,
   CheckCircle,
@@ -30,37 +30,37 @@ import { binanceService } from '../../services/binanceService'
 interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-  type?: 'analysis' | 'suggestion' | 'warning' | 'info'
-}
+  // Veriler
+  const [liveStra
 
-interface MarketAnalysis {
-  timeframe: string
-  trend: 'up' | 'down' | 'sideways'
-  confidence: number
-  suggestion: string
-}
+ 
 
-interface PortfolioSummary {
-  totalValue: number
-  pnl: number
-  pnlPercentage: number
-  activePositions: number
-  dailyVolume: number
-}
+  // AI Trading Manager Sy
+    return `Sen yap
+1. PIYASA ANALİZİ:
+- Teknik indikatörle
 
-export const TradingAssistant: React.FC = () => {
-  // Chat durumu
-  const [messages, setMessages] = useKV<ChatMessage[]>('ai-chat-messages', [])
-  const [inputMessage, setInputMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+-
 
-  // Analiz durumu
-  const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis[]>([])
-  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
+3. PORTFÖY YÖNETİMİ:
+- Risk analizi ve po
+
+- Hangi stratejilerin ç
+- Risk yönetimi tavsiyele
+5. İLETİŞİM:
+-
+
+- Toplam strateji sayısı: ${strategies.length}
+- API durumu: ${
+Her zaman objektif, veri tabanlı ve risk odaklı öneriler sun.`
+
+  const sendMessage = async () => {
+
+
+      content: inp
+    }
+    setMessages(prev => [...prev, userMessage])
+    setIsLoading(true)
 
   // Veriler
   const [strategies] = useKV('trading-strategies', [])
@@ -126,135 +126,135 @@ Her zaman objektif, veri tabanlı ve risk odaklı öneriler sun.`
 
     try {
       const response = await aiService.generateResponse(
-        getSystemPrompt(),
-        inputMessage
-      )
-
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
-        type: determineMessageType(response)
-      }
-
-      setMessages(prev => [...prev, assistantMessage])
-    } catch (error) {
-      console.error('AI response error:', error)
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Üzgünüm, şu anda bir hata oluştu. API ayarlarınızı kontrol edin veya tekrar deneyin.',
-        timestamp: new Date(),
-        type: 'warning'
-      }
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Mesaj türünü belirleme
-  const determineMessageType = (content: string): 'analysis' | 'suggestion' | 'warning' | 'info' => {
-    const lowerContent = content.toLowerCase()
-    if (lowerContent.includes('risk') || lowerContent.includes('dikkat') || lowerContent.includes('uyarı')) {
-      return 'warning'
-    }
-    if (lowerContent.includes('öneri') || lowerContent.includes('öner') || lowerContent.includes('tavsiye')) {
-      return 'suggestion'
-    }
-    if (lowerContent.includes('analiz') || lowerContent.includes('trend') || lowerContent.includes('teknik')) {
-      return 'analysis'
-    }
-    return 'info'
-  }
-
-  // Hızlı piyasa analizi
-  const performQuickAnalysis = async () => {
-    setIsAnalyzing(true)
-    try {
-      const analysisPrompt = `Şu anda piyasa durumunu analiz et ve aşağıdaki zaman dilimlerinde trend analizi yap:
-      - 1D (günlük)
-      - 4H (4 saatlik)
-      - 1H (saatlik)
-      - 15M (15 dakika)
-      - 1M (1 dakika)
-      
-      Her zaman dilimi için trend yönü, güven düzeyi ve kısa öneri ver.`
-
-      const response = await aiService.generateResponse(getSystemPrompt(), analysisPrompt)
-      
-      // Analiz sonuçlarını parse et (basit yaklaşım)
-      const timeframes = ['1D', '4H', '1H', '15M', '1M']
-      const analyses: MarketAnalysis[] = timeframes.map(tf => ({
-        timeframe: tf,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        confidence: Math.floor(Math.random() * 40) + 60,
-        suggestion: `${tf} diliminde analiz yapıldı`
-      }))
-
-      setMarketAnalysis(analyses)
-
-      // Chat'e analiz mesajı ekle
-      const analysisMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
-        type: 'analysis'
-      }
-      setMessages(prev => [...prev, analysisMessage])
-
-    } catch (error) {
-      console.error('Analysis error:', error)
-    } finally {
-      setIsAnalyzing(false)
-    }
-  }
-
-  // Portföy özetini al
-  const getPortfolioSummary = async () => {
-    try {
-      // Binance hesap bilgilerini al (eğer bağlı ise)
-      if (apiSettings?.binance?.enabled) {
-        const accountInfo = await binanceService.getAccountInfo()
-        if (accountInfo) {
-          const summary: PortfolioSummary = {
-            totalValue: parseFloat(accountInfo.totalWalletBalance || '0'),
-            pnl: parseFloat(accountInfo.totalUnrealizedProfit || '0'),
-            pnlPercentage: 0, // Hesaplanacak
-            activePositions: accountInfo.positions?.filter(p => parseFloat(p.positionAmt) !== 0).length || 0,
-            dailyVolume: 0 // Hesaplanacak
-          }
-          setPortfolioSummary(summary)
-        }
-      }
-    } catch (error) {
-      console.error('Portfolio summary error:', error)
-    }
-  }
-
-  // Hızlı komutlar
-  const quickCommands = [
-    { text: 'Piyasa durumu nasıl?', icon: BarChart3 },
-    { text: 'Hangi stratejileri çalıştırmalıyım?', icon: Zap },
-    { text: 'Risk analizi yap', icon: AlertTriangle },
-    { text: 'Portföyümü değerlendir', icon: DollarSign },
-    { text: 'Bugünün ekonomik takvimine bak', icon: Calendar },
-    { text: 'Volatilite analizi', icon: Activity }
-  ]
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Başlık */}
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <Brain className="h-6 w-6 text-primary" />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Yapay Zeka Trading Yöneticisi</h1>
-          <p className="text-muted-foreground">AI destekli piyasa analizi ve strateji önerileri</p>
+
+       
+
+              <div className="flex items-cent
+                  <Bot className="h-5 w-
+                </CardTitl
+                  <Button
+                    variant="o
+                    disabled={isAnalyzing}
+       
+
+                    size="sm"
+                    o
+                    <DollarSign className="h-4 w
+                  </Button>
+              </div>
+
+              {/* Mesajlar */}
+                <div className
+                    <di
+       
+                    </div>
+               
+                    <div
+     
+   
+
+                           
+                      >
+                          <div className="flex
+                            {message.type === 'suggestion' && <CheckCircle className="h-4 w-4" />}
+                      
+     
+                              {message.type === 'warning' && 'Uyarı'}
+                         
+     
+                        <div className="text-xs opacity-70 mt-2">
+                       
+     
+                 
+   
+
+                         
+                      </div>
+                  )}
+         
+
+              <div 
+                  {qui
+                    
+                      v
+                     
+      
+                    </Button>
+
+
+      
+                  value={inputMessage}
+                  placeholder="AI'a mesaj yazın... (örn:
+                  disabled={isLoading}
+                <Butto
+                </Button>
+            </CardContent>
         </div>
+        {
+
+            <CardHeader>
+
+              </CardTitle>
+            <CardContent>
+                <div className="sp
+                    <div k
+                        <B
+                          <Tre
+                        
+       
+                        %{analysis.confidence}
+
+                </div
+                <p className="text-muted-fore
+               
+            </CardContent>
+
+   
+
+                Portföy
+            </CardHeader>
+         
+                  <div className="flex justify-between
+                    <span className="font-
+                  <div className="flex justify-between">
+                    <span 
+                    </span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">{portfolioSummary.ac
+                </div>
+                <p className="text-muted-foreground text-sm text-center py-4">
+                </p>
+           
+
+         
+       
+                Strat
+            </CardHeader>
+     
+   
+
+                  <
+                </div>
+                  <span className="text-sm text-muted-
+                </div>
+
+                <Alert className="mt-4">
+                  <AlertDescription>
+                  </AlertDescription>
+   
+
+      </di
+  )
+
+
+
+
+        </div>
+
+
+
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
