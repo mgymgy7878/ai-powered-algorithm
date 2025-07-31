@@ -14,11 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Separator } from '../ui/separator'
 import { Switch } from '../ui/switch'
 import { Slider } from '../ui/slider'
+import { StrategyEditor } from './StrategyEditor'
 import { toast } from 'sonner'
 import { 
   Play, Bot, Code, TrendingUp, Settings, Zap, AlertTriangle, CheckCircle, Target, BarChart3,
   Sparkle, Brain, Lightning, Cpu, Activity, Timer, Upload, Download, Copy, Trash, Eye,
-  ArrowRight, ArrowUp, ArrowDown, CircleNotch, ChartLine, Gauge, Trophy, Shield
+  ArrowRight, ArrowUp, ArrowDown, CircleNotch, ChartLine, Gauge, Trophy, Shield, Plus
 } from '@phosphor-icons/react'
 
 interface Indicator {
@@ -185,8 +186,33 @@ export function StrategyGenerator() {
   const [tradingPair, setTradingPair] = useState<string>('BTC/USDT')
   const [autoOptimize, setAutoOptimize] = useState(true)
   const [advancedMode, setAdvancedMode] = useState(false)
+  const [showStrategyEditor, setShowStrategyEditor] = useState(false)
+  const [editingStrategy, setEditingStrategy] = useState<TradingStrategy | null>(null)
 
-  const generateStrategy = async () => {
+  const openStrategyEditor = (strategy?: TradingStrategy) => {
+    setEditingStrategy(strategy || null)
+    setShowStrategyEditor(true)
+  }
+
+  const closeStrategyEditor = () => {
+    setShowStrategyEditor(false)
+    setEditingStrategy(null)
+  }
+
+  const saveStrategyFromEditor = (strategy: TradingStrategy) => {
+    if (editingStrategy) {
+      // Update existing strategy
+      setStrategies(current => 
+        current.map(s => s.id === strategy.id ? strategy : s)
+      )
+      toast.success('Strateji güncellendi')
+    } else {
+      // Add new strategy
+      setStrategies(current => [...current, strategy])
+      toast.success('Yeni strateji kaydedildi')
+    }
+    closeStrategyEditor()
+  }
     if (!strategyPrompt.trim() || !strategyName.trim()) {
       toast.error('Strateji adı ve açıklama gereklidir')
       return
@@ -996,6 +1022,10 @@ export function StrategyGenerator() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button onClick={() => openStrategyEditor()} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Yeni Strateji
+          </Button>
           <Badge variant="outline" className="flex items-center gap-2 px-3 py-1">
             <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
             AI Engine: {aiModels.find(m => m.id === selectedModel)?.name}
@@ -1684,6 +1714,15 @@ export function StrategyGenerator() {
                       
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-2 pt-4 border-t">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => openStrategyEditor(strategy)}
+                        >
+                          <Code className="h-4 w-4 mr-2" />
+                          Editörde Aç
+                        </Button>
+                        
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -1776,6 +1815,17 @@ export function StrategyGenerator() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Strategy Editor Modal */}
+      {showStrategyEditor && (
+        <div className="fixed inset-0 z-50">
+          <StrategyEditor
+            strategy={editingStrategy}
+            onSave={saveStrategyFromEditor}
+            onClose={closeStrategyEditor}
+          />
+        </div>
+      )}
     </div>
   )
 }
