@@ -58,29 +58,48 @@ export function APISettings() {
   const updateOpenAISettings = (updates: Partial<APISettingsType['openai']>) => {
     setApiSettings(prev => ({
       ...prev,
-      openai: { ...prev.openai, ...updates }
+      openai: { 
+        apiKey: '', 
+        model: 'gpt-4', 
+        enabled: true, 
+        ...prev?.openai, 
+        ...updates 
+      }
     }))
   }
 
   const updateAnthropicSettings = (updates: Partial<APISettingsType['anthropic']>) => {
     setApiSettings(prev => ({
       ...prev,
-      anthropic: { ...prev.anthropic, ...updates }
+      anthropic: { 
+        apiKey: '', 
+        model: 'claude-3-sonnet', 
+        enabled: false, 
+        ...prev?.anthropic, 
+        ...updates 
+      }
     }))
   }
 
   const updateBinanceSettings = (updates: Partial<APISettingsType['binance']>) => {
     setApiSettings(prev => ({
       ...prev,
-      binance: { ...prev.binance, ...updates }
+      binance: { 
+        apiKey: '', 
+        secretKey: '', 
+        testnet: true, 
+        enabled: false, 
+        ...prev?.binance, 
+        ...updates 
+      }
     }))
   }
 
   const testAPIConnection = async (provider: 'openai' | 'anthropic' | 'binance') => {
     if (provider === 'binance') {
-      const config = apiSettings.binance
+      const config = apiSettings?.binance
       
-      if (!config.apiKey.trim() || !config.secretKey.trim()) {
+      if (!config?.apiKey?.trim() || !config?.secretKey?.trim()) {
         toast.error('Binance API anahtarı ve secret key gerekli')
         return
       }
@@ -88,7 +107,7 @@ export function APISettings() {
       setTesting(prev => ({ ...prev, binance: true }))
       
       try {
-        binanceService.setCredentials(config.apiKey, config.secretKey, config.testnet)
+        binanceService.setCredentials(config.apiKey, config.secretKey, config.testnet ?? true)
         const isValid = await binanceService.testConnection()
         setTestResults(prev => ({ ...prev, binance: isValid }))
         
@@ -106,9 +125,9 @@ export function APISettings() {
       return
     }
     
-    const config = provider === 'openai' ? apiSettings.openai : apiSettings.anthropic
+    const config = provider === 'openai' ? apiSettings?.openai : apiSettings?.anthropic
     
-    if (!config.apiKey.trim()) {
+    if (!config?.apiKey?.trim()) {
       toast.error(`${provider === 'openai' ? 'OpenAI' : 'Anthropic'} API anahtarı gerekli`)
       return
     }
@@ -216,7 +235,7 @@ export function APISettings() {
                 </CardDescription>
               </div>
               <Switch
-                checked={apiSettings.openai.enabled}
+                checked={apiSettings?.openai?.enabled ?? false}
                 onCheckedChange={(enabled) => updateOpenAISettings({ enabled })}
               />
             </div>
@@ -230,9 +249,9 @@ export function APISettings() {
                     id="openai-key"
                     type={showKeys.openai ? "text" : "password"}
                     placeholder="sk-..."
-                    value={apiSettings.openai.apiKey}
+                    value={apiSettings?.openai?.apiKey ?? ''}
                     onChange={(e) => updateOpenAISettings({ apiKey: e.target.value })}
-                    disabled={!apiSettings.openai.enabled}
+                    disabled={!(apiSettings?.openai?.enabled ?? false)}
                   />
                   <Button
                     type="button"
@@ -250,9 +269,9 @@ export function APISettings() {
             <div className="space-y-2">
               <Label htmlFor="openai-model">Model</Label>
               <Select
-                value={apiSettings.openai.model}
+                value={apiSettings?.openai?.model ?? 'gpt-4'}
                 onValueChange={(value) => updateOpenAISettings({ model: value as APISettingsType['openai']['model'] })}
-                disabled={!apiSettings.openai.enabled}
+                disabled={!(apiSettings?.openai?.enabled ?? false)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -267,7 +286,7 @@ export function APISettings() {
             
             <Button
               onClick={() => testAPIConnection('openai')}
-              disabled={!apiSettings.openai.enabled || !apiSettings.openai.apiKey.trim() || testing.openai}
+              disabled={!(apiSettings?.openai?.enabled ?? false) || !(apiSettings?.openai?.apiKey?.trim()) || testing.openai}
               className="w-full"
               variant="outline"
             >
@@ -297,7 +316,7 @@ export function APISettings() {
                 </CardDescription>
               </div>
               <Switch
-                checked={apiSettings.anthropic.enabled}
+                checked={apiSettings?.anthropic?.enabled ?? false}
                 onCheckedChange={(enabled) => updateAnthropicSettings({ enabled })}
               />
             </div>
@@ -311,9 +330,9 @@ export function APISettings() {
                     id="anthropic-key"
                     type={showKeys.anthropic ? "text" : "password"}
                     placeholder="sk-ant-..."
-                    value={apiSettings.anthropic.apiKey}
+                    value={apiSettings?.anthropic?.apiKey ?? ''}
                     onChange={(e) => updateAnthropicSettings({ apiKey: e.target.value })}
-                    disabled={!apiSettings.anthropic.enabled}
+                    disabled={!(apiSettings?.anthropic?.enabled ?? false)}
                   />
                   <Button
                     type="button"
@@ -331,9 +350,9 @@ export function APISettings() {
             <div className="space-y-2">
               <Label htmlFor="anthropic-model">Model</Label>
               <Select
-                value={apiSettings.anthropic.model}
+                value={apiSettings?.anthropic?.model ?? 'claude-3-sonnet'}
                 onValueChange={(value) => updateAnthropicSettings({ model: value as APISettingsType['anthropic']['model'] })}
-                disabled={!apiSettings.anthropic.enabled}
+                disabled={!(apiSettings?.anthropic?.enabled ?? false)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -348,7 +367,7 @@ export function APISettings() {
             
             <Button
               onClick={() => testAPIConnection('anthropic')}
-              disabled={!apiSettings.anthropic.enabled || !apiSettings.anthropic.apiKey.trim() || testing.anthropic}
+              disabled={!(apiSettings?.anthropic?.enabled ?? false) || !(apiSettings?.anthropic?.apiKey?.trim()) || testing.anthropic}
               className="w-full"
               variant="outline"
             >
@@ -378,7 +397,7 @@ export function APISettings() {
                 </CardDescription>
               </div>
               <Switch
-                checked={apiSettings.binance.enabled}
+                checked={apiSettings?.binance?.enabled ?? false}
                 onCheckedChange={(enabled) => updateBinanceSettings({ enabled })}
               />
             </div>
@@ -392,9 +411,9 @@ export function APISettings() {
                     id="binance-key"
                     type={showKeys.binance ? "text" : "password"}
                     placeholder="API Key..."
-                    value={apiSettings.binance.apiKey}
+                    value={apiSettings?.binance?.apiKey ?? ''}
                     onChange={(e) => updateBinanceSettings({ apiKey: e.target.value })}
-                    disabled={!apiSettings.binance.enabled}
+                    disabled={!(apiSettings?.binance?.enabled ?? false)}
                   />
                   <Button
                     type="button"
@@ -417,9 +436,9 @@ export function APISettings() {
                     id="binance-secret"
                     type={showKeys.binanceSecret ? "text" : "password"}
                     placeholder="Secret Key..."
-                    value={apiSettings.binance.secretKey}
+                    value={apiSettings?.binance?.secretKey ?? ''}
                     onChange={(e) => updateBinanceSettings({ secretKey: e.target.value })}
-                    disabled={!apiSettings.binance.enabled}
+                    disabled={!(apiSettings?.binance?.enabled ?? false)}
                   />
                   <Button
                     type="button"
@@ -437,9 +456,9 @@ export function APISettings() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="testnet-mode"
-                checked={apiSettings.binance.testnet}
+                checked={apiSettings?.binance?.testnet ?? true}
                 onCheckedChange={(testnet) => updateBinanceSettings({ testnet })}
-                disabled={!apiSettings.binance.enabled}
+                disabled={!(apiSettings?.binance?.enabled ?? false)}
               />
               <Label htmlFor="testnet-mode" className="text-sm">
                 Testnet Modu (Güvenli Test)
@@ -448,7 +467,7 @@ export function APISettings() {
             
             <Button
               onClick={() => testAPIConnection('binance')}
-              disabled={!apiSettings.binance.enabled || !apiSettings.binance.apiKey.trim() || !apiSettings.binance.secretKey.trim() || testing.binance}
+              disabled={!(apiSettings?.binance?.enabled ?? false) || !(apiSettings?.binance?.apiKey?.trim()) || !(apiSettings?.binance?.secretKey?.trim()) || testing.binance}
               className="w-full"
               variant="outline"
             >
@@ -479,16 +498,16 @@ export function APISettings() {
           <div className="grid gap-4 md:grid-cols-2">
             <Button
               onClick={async () => {
-                if (!apiSettings.binance.enabled) {
+                if (!(apiSettings?.binance?.enabled ?? false)) {
                   toast.error('Önce Binance API ayarlarını yapılandırın')
                   return
                 }
                 
                 try {
                   binanceService.setCredentials(
-                    apiSettings.binance.apiKey, 
-                    apiSettings.binance.secretKey, 
-                    apiSettings.binance.testnet
+                    apiSettings?.binance?.apiKey ?? '', 
+                    apiSettings?.binance?.secretKey ?? '', 
+                    apiSettings?.binance?.testnet ?? true
                   )
                   
                   const prices = await binanceService.getSymbolPrices()
@@ -499,23 +518,23 @@ export function APISettings() {
                 }
               }}
               variant="outline"
-              disabled={!apiSettings.binance.enabled}
+              disabled={!(apiSettings?.binance?.enabled ?? false)}
             >
               Fiyat Verilerini Test Et
             </Button>
             
             <Button
               onClick={async () => {
-                if (!apiSettings.binance.enabled) {
+                if (!(apiSettings?.binance?.enabled ?? false)) {
                   toast.error('Önce Binance API ayarlarını yapılandırın')
                   return
                 }
                 
                 try {
                   binanceService.setCredentials(
-                    apiSettings.binance.apiKey, 
-                    apiSettings.binance.secretKey, 
-                    apiSettings.binance.testnet
+                    apiSettings?.binance?.apiKey ?? '', 
+                    apiSettings?.binance?.secretKey ?? '', 
+                    apiSettings?.binance?.testnet ?? true
                   )
                   
                   const klines = await binanceService.getKlineData('BTCUSDT', '1h', 100)
@@ -526,7 +545,7 @@ export function APISettings() {
                 }
               }}
               variant="outline"
-              disabled={!apiSettings.binance.enabled}
+              disabled={!(apiSettings?.binance?.enabled ?? false)}
             >
               Grafik Verilerini Test Et
             </Button>

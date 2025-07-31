@@ -29,8 +29,9 @@ export class AIService {
     if (!this.settings) return false
     
     try {
-      const openaiReady = this.settings.openai?.enabled && this.settings.openai?.apiKey?.trim()
-      const anthropicReady = this.settings.anthropic?.enabled && this.settings.anthropic?.apiKey?.trim()
+      // Güvenli erişim için varsayılan değerler ve açık boolean kontrolü
+      const openaiReady = this.settings.openai?.enabled === true && this.settings.openai?.apiKey?.trim()
+      const anthropicReady = this.settings.anthropic?.enabled === true && this.settings.anthropic?.apiKey?.trim()
       
       return !!(openaiReady || anthropicReady)
     } catch (error) {
@@ -44,20 +45,21 @@ export class AIService {
       throw new Error('AI servisleri yapılandırılmamış. Lütfen API anahtarlarını ayarlayın.')
     }
 
-    // Auto-select provider if not specified
+    // Auto-select provider if not specified - Güvenli erişim için açık boolean kontrolü
     if (!provider) {
-      if (this.settings.openai?.enabled && this.settings.openai?.apiKey) {
+      if (this.settings.openai?.enabled === true && this.settings.openai?.apiKey) {
         provider = 'openai'
-      } else if (this.settings.anthropic?.enabled && this.settings.anthropic?.apiKey) {
+      } else if (this.settings.anthropic?.enabled === true && this.settings.anthropic?.apiKey) {
         provider = 'anthropic'
       } else {
-        throw new Error('Hiçbir AI servisi etkin değil. Lütfen en az birini etkinleştirin.')
+        throw new Error('Hiçbir AI servisi etkin değil. Lütfen enaz birini etkinleştirin.')
       }
     }
 
     const config = provider === 'openai' ? this.settings.openai : this.settings.anthropic
 
-    if (!config?.enabled || !config?.apiKey) {
+    // Güvenli erişim için açık boolean ve var kontrolü
+    if (!config?.enabled || config.enabled !== true || !config?.apiKey) {
       throw new Error(`${provider} servisi etkin değil veya API anahtarı eksik.`)
     }
 

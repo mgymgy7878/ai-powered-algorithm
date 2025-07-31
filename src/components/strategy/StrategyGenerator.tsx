@@ -180,9 +180,9 @@ export function StrategyGenerator() {
       return
     }
 
-    // Check AI configuration with more robust checking
-    const openaiConfigured = apiSettings?.openai?.enabled && apiSettings?.openai?.apiKey?.trim()
-    const anthropicConfigured = apiSettings?.anthropic?.enabled && apiSettings?.anthropic?.apiKey?.trim()
+    // Check AI configuration with more robust checking - Güvenli erişim için optional chaining ve varsayılan değerler
+    const openaiConfigured = apiSettings?.openai?.enabled === true && apiSettings?.openai?.apiKey?.trim()
+    const anthropicConfigured = apiSettings?.anthropic?.enabled === true && apiSettings?.anthropic?.apiKey?.trim()
     
     if (!openaiConfigured && !anthropicConfigured) {
       console.log('API Settings:', apiSettings)
