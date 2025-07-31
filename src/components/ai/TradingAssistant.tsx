@@ -1,19 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  DollarSign,
   Zap,
-  Calendar,
   Clock,
-  AlertTriangle,
   CheckCircle,
-  Brain,
+  Bot,
+  Send,
+  Tren
+} from 'luc
+import {
+// Trading Assis
+  id: string
+  conten
   Bot,
   User,
   Send,
@@ -30,104 +30,104 @@ interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
-}
 
-interface MarketSummary {
-  symbol: string
-  price: string
-  change: string
-  changePercent: string
-}
 
-export function TradingAssistant() {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [inputMessage, setInputMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [strategies] = useKV('trading-strategies', [])
-  const [liveStrategies] = useKV('live-strategies', [])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Otomatik scroll - yeni mesaj geldiğinde
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  // Mesaj gönderme fonksiyonu
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return
-
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputMessage,
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    setInputMessage('')
-    setIsLoading(true)
-
-    try {
-      // AI Prompt Hazırlama
-      const prompt = `Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
-- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
-- Ekonomik takvimi ve haber akışını takip edip yorumlamak
-- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
-- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
-- Türkçe yanıtlar üretmek
-
-Kullanıcı sorusu: ${inputMessage}
-
-Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
+      // AI Prom
+- Farklı zaman 
+- Kullanıcının p
+- Türkçe yanıtlar üretm
+K
 
       // AI servisini çağır
-      const response = await aiService.generateResponse(prompt)
 
-      const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
         content: response,
-        timestamp: new Date()
       }
-
       setMessages(prev => [...prev, assistantMessage])
-    } catch (error) {
       console.error('AI yanıt hatası:', error)
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
-        timestamp: new Date()
+
+        content: 'Üzgünüm, şu anda bir tekni
       }
-      setMessages(prev => [...prev, errorMessage])
     } finally {
-      setIsLoading(false)
     }
+
+  const quickCommands = [
+      label: "Piyasa Analizi",
+      command: "Güncel piyasa durumunu analiz et 
+
+      icon: <DollarSign className="w-4
+    },
+      label: "Risk 
+      command: "Portföyümün 
+    {
+     
+
+
+  const useQuickCommand
   }
 
-  // Hızlı komutlar
-  const quickCommands = [
-    {
-      label: "Piyasa Analizi",
-      icon: <TrendingUp className="w-4 h-4" />,
-      command: "Güncel piyasa durumunu analiz et ve önemli seviyeleri belirt"
-    },
-    {
-      label: "Strateji Önerisi",
-      icon: <DollarSign className="w-4 h-4" />,
-      command: "Mevcut piyasa koşullarına göre en uygun trading stratejilerini öner"
-    },
-    {
-      label: "Risk Analizi",
-      icon: <AlertTriangle className="w-4 h-4" />,
-      command: "Portföyümün risk seviyesini değerlendir ve öneriler sun"
-    },
-    {
-      label: "Ekonomik Takvim",
-      icon: <Calendar className="w-4 h-4" />,
-      command: "Bu hafta önemli ekonomik olayları listele ve etkilerini açıkla"
-    }
-  ]
+    if (e
+      sendMessage()
+  }
+  return (
+      {/* Header */}
+        <h1 className="text-2xl font-bold">AI Trading Yönetic
+          Yapay zeka destekli trading asistanınız
+      </div>
+
+          <TabsTrigger value="cha
+
+
+
+            {/* Sol Panel -
+              <Card className="h-full flex flex-col">
+
+                    AI Asistan Sohbeti
+                </CardHeader>
+                  {/* Mesa
+                    <div c
+                        <div 
+       
+
+                      
+                     
+                            message.role === '
+                              : 'bg-muted
+                            <div classNa
+                          
+                                <p className="whitespace-pre-wrap">{message.content}</p>
+                             
+       
+                          </div>
+               
+                      {is
+     
+   
+
+                   
+                    </div
+     
+                  {/* Mesaj In
+                    <Input
+                      onChange={(e) => setInputMessage(e.target.value)}
+      
+     
+                    <Button 
+                      disabled={isLoading || !i
+                    >
+      
+     
+                    </Button
+                </CardContent>
+            </div>
+      
+     
+                <Card>
+                    <CardTitle className="tex
+                  <CardContent>
+     
+   
 
   // Hızlı komut kullanma
   const useQuickCommand = (command: string) => {
@@ -262,7 +262,7 @@ Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
                           onClick={() => useQuickCommand(cmd.command)}
                           className="w-full justify-start gap-2"
                         >
-                          {cmd.icon}
+      </Tabs>
                           {cmd.label}
                         </Button>
                       ))}
@@ -272,9 +272,9 @@ Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
 
                 {/* Sistem Durumu */}
                 <Card>
-                  <CardHeader>
+
                     <CardTitle className="text-sm">Sistem Durumu</CardTitle>
-                  </CardHeader>
+
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -292,13 +292,13 @@ Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
                           Aktif
                         </Badge>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                {/* Öneriler */}
+                  </CardContent>
+
+
+
                 <Card>
-                  <CardHeader>
+
                     <CardTitle className="text-sm">AI Önerileri</CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -308,11 +308,11 @@ Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
                       <p>• Risk yönetimi tavsiyeleri</p>
                       <p>• Portföy dengeleme önerileri</p>
                     </div>
-                  </CardContent>
+
                 </Card>
-              </div>
+
             </div>
-          </div>
+
         </TabsContent>
 
         {/* Analysis Tab */}
@@ -322,59 +322,59 @@ Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
-                  Piyasa Durumu
+
                 </CardTitle>
-              </CardHeader>
+
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">+2.4%</div>
                     <div className="text-sm text-muted-foreground">BTC/USDT</div>
-                  </div>
+
                   <div className="text-center">
                     <div className="text-2xl font-bold text-red-600">-1.2%</div>
                     <div className="text-sm text-muted-foreground">ETH/USDT</div>
-                  </div>
+
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">+0.8%</div>
                     <div className="text-sm text-muted-foreground">BNB/USDT</div>
-                  </div>
+
                 </div>
-              </CardContent>
+
             </Card>
 
             <Card>
-              <CardHeader>
+
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="w-5 h-5" />
                   Strateji Performansı
-                </CardTitle>
+
               </CardHeader>
-              <CardContent>
+
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Aktif Stratejiler</span>
-                    <Badge variant="secondary">{liveStrategies.length}</Badge>
+
                   </div>
-                  <div className="flex justify-between items-center">
+
                     <span className="text-sm">Toplam Stratejiler</span>
                     <Badge variant="outline">{strategies.length}</Badge>
                   </div>
-                </div>
+
               </CardContent>
-            </Card>
+
           </div>
-        </TabsContent>
+
 
         {/* Insights Tab */}
         <TabsContent value="insights" className="flex-1 p-4">
-          <div className="space-y-4">
+
             <Alert>
-              <Calendar className="h-4 w-4" />
+
               <AlertDescription>
                 <strong>Ekonomik Takvim:</strong> Bu hafta Fed faiz kararı ve NFP verisi açıklanacak. 
                 Yüksek volatilite bekleniyor.
-              </AlertDescription>
+
             </Alert>
 
             <Alert>
@@ -382,19 +382,19 @@ Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
               <AlertDescription>
                 <strong>AI Önerisi:</strong> Mevcut piyasa koşullarında grid bot stratejileri 
                 daha uygun görünüyor. Volatilite düşük seviyelerde.
-              </AlertDescription>
+
             </Alert>
 
             <Alert>
-              <AlertTriangle className="h-4 w-4" />
+
               <AlertDescription>
                 <strong>Risk Uyarısı:</strong> Portföy toplam değerinin %15'i tek bir varlıkta. 
                 Çeşitlendirme önerilir.
-              </AlertDescription>
+
             </Alert>
-          </div>
+
         </TabsContent>
-      </Tabs>
+
     </div>
-  )
+
 }
