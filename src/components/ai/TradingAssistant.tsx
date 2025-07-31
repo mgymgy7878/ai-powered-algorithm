@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/s
-import { Loader2, Send, User, Brain } from 
-interface ChatMessage {
-  role: 'user' | 'assistant'
-  timestamp: Date
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Loader2, Send, User, Brain } from 'lucide-react'
 
 interface ChatMessage {
   id: string
@@ -20,7 +19,7 @@ export function TradingAssistant() {
       role: 'assistant',
       content: 'Merhaba! Ben AI Trading Yöneticinizim. Size piyasa analizi, strateji önerileri ve portföy yönetimi konularında yardımcı olabilirim. Nasıl yardımcı olabilirim?',
       timestamp: new Date()
-  }
+    }
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -38,7 +37,7 @@ export function TradingAssistant() {
   }, [messages])
 
   // AI ile mesaj gönderme
-      - Hangi stratejiler çalıştırı
+  const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
 
     const userMessage: ChatMessage = {
@@ -46,13 +45,13 @@ export function TradingAssistant() {
       role: 'user',
       content: inputMessage.trim(),
       timestamp: new Date()
-     
+    }
 
-
+    setMessages(prev => [...prev, userMessage])
     setInputMessage('')
     setIsLoading(true)
 
-        r
+    try {
       // AI prompt oluştur
       const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
       - Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
@@ -60,9 +59,9 @@ export function TradingAssistant() {
       - Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
       - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
       - Türkçe yanıtlar üretmek
-    if
+
       Kullanıcı mesajı: ${userMessage.content}
-    }
+      
       Lütfen kısa, öz ve işe yarar bir yanıt ver. Gerekirse somut öneriler sun.`
 
       const aiResponse = await spark.llm(prompt)
@@ -72,7 +71,7 @@ export function TradingAssistant() {
         role: 'assistant',
         content: aiResponse,
         timestamp: new Date()
-
+      }
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
@@ -84,17 +83,17 @@ export function TradingAssistant() {
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
-               
+    } finally {
       setIsLoading(false)
-     
+    }
   }
 
   // Enter tuşu ile mesaj gönderme
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-              )}
+      e.preventDefault()
       sendMessage()
-     
+    }
   }
 
   return (
@@ -108,69 +107,66 @@ export function TradingAssistant() {
             Aktif
           </Badge>
         </div>
-        <Inp
+      </div>
 
-          onKeyDown={handleKeyDown}
+      {/* Mesaj listesi - scrollable alan */}
       <div className="flex-1 overflow-y-auto px-4 py-2 scroll-smooth">
-          disabled={isLoading}
-          {messages.map((message) => (
-            <div key={message.id} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {message.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Brain className="w-4 h-4 text-primary" />
-          ) : (
-              )}
-        </Butt
-              <div className={`max-w-[260px] p-3 rounded-lg text-sm ${
-                message.role === 'user' 
-                  ? 'bg-primary text-primary-foreground' 
-
-              }`}>
-                <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                <p className="text-xs opacity-60 mt-1">
-
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-
-              </div>
-              
-              {message.role === 'user' && (
-                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4" />
-
-              )}
-
-          ))}
-
-          {/* Loading mesajı */}
-
-            <div className="flex gap-3 justify-start">
+        {messages.map((message) => (
+          <div key={message.id} className={`flex gap-3 mb-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {message.role === 'assistant' && (
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Brain className="w-4 h-4 text-primary" />
-
-              <div className="bg-muted text-foreground p-3 rounded-lg text-sm flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Düşünüyor...</span>
               </div>
+            )}
+            
+            <div className={`max-w-[260px] p-3 rounded-lg text-sm ${
+              message.role === 'user' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-muted text-foreground'
+            }`}>
+              <p className="whitespace-pre-wrap break-words">{message.content}</p>
+              <p className="text-xs opacity-60 mt-1">
+                {message.timestamp.toLocaleTimeString('tr-TR', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </p>
             </div>
+            
+            {message.role === 'user' && (
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4" />
+              </div>
+            )}
+          </div>
+        ))}
 
-          
-
-          <div ref={messagesEndRef} />
-
+        {/* Loading mesajı */}
+        {isLoading && (
+          <div className="flex gap-3 justify-start mb-4">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Brain className="w-4 h-4 text-primary" />
+            </div>
+            <div className="bg-muted text-foreground p-3 rounded-lg text-sm flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Düşünüyor...</span>
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Mesaj input alanı - her zaman altta sabit */}
-
+      <div className="border-t p-3 flex gap-2 items-center bg-background">
         <Input
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="AI'a mesaj yaz..."
-
+          className="flex-1"
           disabled={isLoading}
-
+        />
         <Button 
           onClick={sendMessage} 
           disabled={!inputMessage.trim() || isLoading} 
@@ -180,9 +176,9 @@ export function TradingAssistant() {
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <Send className="w-4 h-4" />
-
+          )}
         </Button>
-
+      </div>
     </Card>
-
+  )
 }
