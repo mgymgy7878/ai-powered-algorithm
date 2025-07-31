@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -24,6 +24,18 @@ export function TradingAssistant() {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // Mesaj scroll container referansı
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Yeni mesaj eklendiğinde scroll'u en alta kaydır
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   // AI ile mesaj gönderme
   const sendMessage = async () => {
@@ -90,8 +102,8 @@ export function TradingAssistant() {
         </div>
       </div>
 
-      {/* Mesaj listesi - scrollable */}
-      <ScrollArea className="flex-1 overflow-y-auto px-4 py-2 space-y-2 scroll-smooth">
+      {/* Mesaj listesi - scrollable, sabit yükseklik */}
+      <div className="flex-1 overflow-y-auto px-4 py-2 scroll-smooth">
         <div className="space-y-3">
           {messages.map((message) => (
             <div key={message.id} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -101,12 +113,12 @@ export function TradingAssistant() {
                 </div>
               )}
               
-              <div className={`max-w-[280px] p-3 rounded-lg text-sm ${
+              <div className={`max-w-[260px] p-3 rounded-lg text-sm ${
                 message.role === 'user' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted text-foreground'
               }`}>
-                <p className="whitespace-pre-wrap">{message.content}</p>
+                <p className="whitespace-pre-wrap break-words">{message.content}</p>
                 <p className="text-xs opacity-60 mt-1">
                   {message.timestamp.toLocaleTimeString('tr-TR', { 
                     hour: '2-digit', 
@@ -122,8 +134,10 @@ export function TradingAssistant() {
               )}
             </div>
           ))}
+          {/* Scroll referans noktası - mesajlar burada bitecek */}
+          <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Mesaj input alanı - her zaman en altta sabit */}
       <div className="border-t p-3 flex gap-2 items-center bg-background">
@@ -132,7 +146,12 @@ export function TradingAssistant() {
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="AI'a mesaj yaz..."
           className="flex-1"
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              sendMessage()
+            }
+          }}
         />
         <Button onClick={sendMessage} disabled={!inputMessage.trim() || isLoading} size="icon">
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
