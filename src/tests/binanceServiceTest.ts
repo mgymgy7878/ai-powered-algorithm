@@ -1,5 +1,5 @@
 // TypeScript Binance Service Test
-import { binanceService, KlineData, PositionInfo, BinanceOrder, AccountInfo, Ticker24hr } from '../services/binanceService';
+import { binanceService, KlineData, PositionInfo, BinanceOrder, AccountInfo, TickerInfo } from '../services/binanceService';
 
 // Test that the service exports are working correctly
 export const testBinanceService = async () => {
@@ -8,17 +8,9 @@ export const testBinanceService = async () => {
     const isConnected = await binanceService.testConnection();
     console.log('Binance bağlantı testi:', isConnected ? 'Başarılı' : 'Başarısız');
 
-    // Test server time (doesn't require API keys)
-    const serverTime = await binanceService.getServerTime();
-    console.log('Binance server zamanı:', new Date(serverTime));
-
     // Test 24hr ticker data (doesn't require API keys)
-    const tickerData = await binanceService.get24hrTicker('BTCUSDT');
+    const tickerData = await binanceService.getTicker24hr('BTCUSDT');
     console.log('BTCUSDT 24hr ticker:', tickerData);
-
-    // Test symbol prices (doesn't require API keys)
-    const symbolData = await binanceService.getSymbols();
-    console.log('Sembol sayısı:', symbolData.length);
 
     // Test kline data (doesn't require API keys)
     const klineData = await binanceService.getKlineData('BTCUSDT', '1h', 10);
@@ -26,9 +18,7 @@ export const testBinanceService = async () => {
 
     return {
       connectivity: isConnected,
-      serverTime,
       tickerData,
-      symbolCount: symbolData.length,
       klineDataCount: klineData.length
     };
   } catch (error) {
@@ -41,12 +31,12 @@ export const testBinanceService = async () => {
 export const testAuthenticatedMethods = async () => {
   try {
     // Test API keys
-    const authTest = await binanceService.testApiKeys();
+    const authTest = await binanceService.testApiConnection();
     console.log('API anahtarları geçerli:', authTest);
 
     if (authTest) {
       // Test account info
-      const accountInfo = await binanceService.getAccountInformation();
+      const accountInfo = await binanceService.getAccountInfo();
       console.log('Hesap bilgileri:', accountInfo);
 
       // Test position info

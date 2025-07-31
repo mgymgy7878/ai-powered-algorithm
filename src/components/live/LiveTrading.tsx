@@ -72,7 +72,9 @@ export function LiveTrading() {
 
     const updateMarketData = async () => {
       try {
-        const prices = await binanceService.get24hrTicker()
+        const pricesResponse = await binanceService.getTicker24hr()
+        // getTicker24hr returns either single TickerInfo or array, ensure it's always an array
+        const prices = Array.isArray(pricesResponse) ? pricesResponse : [pricesResponse]
         const filteredPrices = prices
           .filter(p => p && p.symbol && symbols.includes(p.symbol)) // Güvenli erişim kontrolü ekle
           .map(p => ({
