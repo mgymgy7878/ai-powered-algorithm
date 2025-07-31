@@ -36,9 +36,8 @@ interface MarketSummary {
   symbol: string
   price: number
   change: number
-  volume: number
   trend: 'up' | 'down' | 'sideways'
-}
+- Teknik indikatörle
 
 export function TradingAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -77,7 +76,6 @@ export function TradingAssistant() {
 - Piyasa koşullarına göre uygun strateji öner
 
 5. İLETİŞİM:
-- Türkçe yanıtlar ver
 - Açık ve anlaşılır finansal tavsiyelerde bulun
 - Risk uyarılarını belirt
 - Somut örneklerle açıkla
@@ -153,83 +151,83 @@ Lütfen Türkçe ve ayrıntılı yanıt ver.`
     },
     {
       label: "Risk Uyarısı",
-      icon: <AlertTriangle className="w-4 h-4" />,
-      command: "Portföyümde hangi riskler var ve nasıl minimize edebilirim?"
-    }
-  ]
+   
 
-  // Mesajları scroll et
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+                           
+                      >
+                          <div className="flex
+                            {message.type === 'suggestion' && <CheckCircle className="h-4 w-4" />}
+                      
+     
+                              {message.type === 'warning' && 'Uyarı'}
+                         
+     
+                        <div className="text-xs opacity-70 mt-2">
+                       
+     
+                 
+   
 
-  // Başlangıç mesajı
-  useEffect(() => {
-    if (messages.length === 0) {
-      const welcomeMessage: ChatMessage = {
-        id: 'welcome',
-        role: 'assistant',
-        content: `Merhaba! Ben AI Trading Yöneticinizim. 🤖
-
-Size şu konularda yardımcı olabilirim:
-• Piyasa analizi ve teknik değerlendirme
-• Strateji önerileri ve optimizasyon
-• Portföy risk analizi
-• Ekonomik haberlerin değerlendirilmesi
-• Algoritmik strateji yönetimi
-
-Nasıl yardımcı olabilirim?`,
-        timestamp: new Date()
-      }
-      setMessages([welcomeMessage])
-    }
-  }, [])
-
-  return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="flex items-center gap-3 p-4">
-          <div className="flex items-center gap-2">
-            <Brain className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold">AI Trading Yöneticisi</h1>
-          </div>
-          <Badge variant="secondary" className="ml-auto">
-            <Activity className="w-3 h-3 mr-1" />
-            Aktif
-          </Badge>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <div className="border-b">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="chat">Sohbet</TabsTrigger>
-            <TabsTrigger value="analysis">Analiz</TabsTrigger>
-            <TabsTrigger value="insights">İçgörüler</TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* Chat Tab */}
-        <TabsContent value="chat" className="flex-1 flex flex-col m-0">
-          {/* Messages Area */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  {message.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Bot className="w-4 h-4 text-primary" />
-                    </div>
+                         
+                      </div>
                   )}
-                  
-                  <div className={`max-w-[70%] ${message.role === 'user' ? 'order-1' : ''}`}>
-                    <div className={`p-3 rounded-lg ${
-                      message.role === 'user' 
-                        ? 'bg-primary text-primary-foreground ml-12' 
-                        : 'bg-muted'
-                    }`}>
+• Strateji önerileri ve optimizasyon
+
+              <div 
+                  {qui
+                    
+                      v
+                     
+      
+                    </Button>
+
+
+      
+                  value={inputMessage}
+                  placeholder="AI'a mesaj yazın... (örn:
+                  disabled={isLoading}
+                <Butto
+                </Button>
+            </CardContent>
+        </div>
+        {
+
+            <CardHeader>
+
+              </CardTitle>
+            <CardContent>
+                <div className="sp
+                    <div k
+                        <B
+                          <Tre
+                        
+        <div className="border-b">
+                        %{analysis.confidence}
+
+                </div
+                <p className="text-muted-fore
+               
+            </CardContent>
+
+   
+
+                Portföy
+            </CardHeader>
+         
+                  <div className="flex justify-between
+                    <span className="font-
+                  <div className="flex justify-between">
+                    <span 
+                    </span>
+                  <div className="flex justify-between">
+                    <span className="font-medium">{portfolioSummary.ac
+                </div>
+                <p className="text-muted-foreground text-sm text-center py-4">
+                </p>
+           
+
+         
+       
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1 px-1">
