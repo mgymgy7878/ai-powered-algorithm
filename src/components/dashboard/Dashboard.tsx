@@ -155,7 +155,8 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {recentTrades.map((trade) => (
+            {/* Son 5 işlemi güvenli şekilde göster */}
+            {(recentTrades || []).slice(0, 5).map((trade) => (
               <div key={trade.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div className="flex items-center gap-4">
                   <Badge variant={trade.side === 'BUY' ? 'default' : 'secondary'}>
@@ -176,6 +177,13 @@ export function Dashboard() {
                 </div>
               </div>
             ))}
+            {/* Eğer hiç işlem yoksa boş durum mesajı göster */}
+            {(!recentTrades || recentTrades.length === 0) && (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Henüz işlem bulunmuyor</p>
+                <p className="text-sm">İlk işleminizi gerçekleştirdiğinizde burada görünecektir</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

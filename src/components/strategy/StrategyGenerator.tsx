@@ -1098,7 +1098,8 @@ public class ${safeName.replace(/\s+/g, '')}Strategy : Strategy
                             <div>
                               <span className="text-muted-foreground block mb-1">Piyasa Koşulları</span>
                               <div className="flex flex-wrap gap-1">
-                                {strategy.aiAnalysis.marketConditions.slice(0, 2).map((condition, idx) => (
+                                {/* Piyasa koşullarını güvenli şekilde göster */}
+                                {(strategy.aiAnalysis?.marketConditions || []).slice(0, 2).map((condition, idx) => (
                                   <Badge key={idx} variant="outline" className="text-xs">
                                     {condition}
                                   </Badge>
@@ -1108,7 +1109,8 @@ public class ${safeName.replace(/\s+/g, '')}Strategy : Strategy
                             <div>
                               <span className="text-muted-foreground block mb-1">Zaman Dilimleri</span>
                               <div className="flex flex-wrap gap-1">
-                                {strategy.aiAnalysis.timeframe?.slice(0, 2).map((tf, idx) => (
+                                {/* Zaman dilimlerini güvenli şekilde göster */}
+                                {(strategy.aiAnalysis?.timeframe || []).slice(0, 2).map((tf, idx) => (
                                   <Badge key={idx} variant="outline" className="text-xs">
                                     {tf}
                                   </Badge>
@@ -1118,7 +1120,8 @@ public class ${safeName.replace(/\s+/g, '')}Strategy : Strategy
                             <div>
                               <span className="text-muted-foreground block mb-1">Uygun Varlıklar</span>
                               <div className="flex flex-wrap gap-1">
-                                {strategy.aiAnalysis.assets?.slice(0, 2).map((asset, idx) => (
+                                {/* Varlıkları güvenli şekilde göster */}
+                                {(strategy.aiAnalysis?.assets || []).slice(0, 2).map((asset, idx) => (
                                   <Badge key={idx} variant="outline" className="text-xs">
                                     {asset}
                                   </Badge>

@@ -273,7 +273,8 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
               <div className="space-y-2">
                 <h4 className="font-medium">Son 5 Mum Verisi</h4>
                 <div className="grid gap-2">
-                  {klineData.slice(-5).reverse().map((kline, index) => (
+                  {/* Kline verilerini güvenli şekilde göster */}
+                  {(klineData || []).slice(-5).reverse().map((kline, index) => (
                     <div key={index} className="flex items-center justify-between p-2 rounded border">
                       <div className="text-sm">
                         {new Date(kline.openTime).toLocaleString('tr-TR')}

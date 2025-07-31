@@ -439,7 +439,8 @@ export function LiveTrading() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {marketData.slice(0, 6).map((market) => market && market.symbol ? (
+              {/* Piyasa verilerini güvenli şekilde göster */}
+              {(marketData || []).slice(0, 6).map((market) => market && market.symbol ? (
                 <div key={market.symbol} className="text-center p-3 bg-muted rounded-lg">
                   <div className="font-medium">{market.symbol}</div>
                   <div className="text-lg font-semibold">${(market.price || 0).toFixed(2)}</div>
@@ -448,6 +449,12 @@ export function LiveTrading() {
                   </div>
                 </div>
               ) : null)}
+              {/* Piyasa verisi yoksa yükleme durumu göster */}
+              {(!marketData || marketData.length === 0) && (
+                <div className="col-span-full text-center py-8 text-muted-foreground">
+                  <p>Piyasa verileri yükleniyor...</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

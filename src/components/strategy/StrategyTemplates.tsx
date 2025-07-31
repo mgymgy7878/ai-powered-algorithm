@@ -442,16 +442,16 @@ export function StrategyTemplates({ onSelectTemplate }: StrategyTemplatesProps) 
               </CardHeader>
 
               <CardContent className="space-y-3">
-                {/* Indicators */}
+                {/* Indicators - güvenli şekilde göster */}
                 <div className="flex flex-wrap gap-1">
-                  {template.indicators.slice(0, 3).map((indicator, idx) => (
+                  {(template.indicators || []).slice(0, 3).map((indicator, idx) => (
                     <Badge key={idx} variant="outline" className="text-xs">
                       {indicator}
                     </Badge>
                   ))}
-                  {template.indicators.length > 3 && (
+                  {(template.indicators || []).length > 3 && (
                     <Badge variant="outline" className="text-xs">
-                      +{template.indicators.length - 3}
+                      +{(template.indicators || []).length - 3}
                     </Badge>
                   )}
                 </div>
