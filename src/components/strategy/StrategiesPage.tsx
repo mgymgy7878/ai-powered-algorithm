@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Input } from '@/components/ui/inpu
+import { Button } from '@/components/ui/butto
+import { Dialog, DialogContent, DialogHeader, DialogTitl
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
-import { TradingStrategy } from '../../types/trading'
-import { StrategyEditor } from './StrategyEditor'
 import { 
-  Plus, 
-  Play, 
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
   Pause, 
-  Bot,
-  Copy, 
+import { StrategyEditor } from './StrategyEditor'
   Trash,
+  Plus, 
+  Trendi
+  Pause, 
+  Sett
+  Copy, 
+
   MoreHorizontal,
-  TrendingUp,
+  const [sele
   TrendingDown, 
-  Activity,
+  const [fi
   Zap,
   Settings
 } from '@phosphor-icons/react'
@@ -47,81 +47,81 @@ export function StrategiesPage() {
 
   // Yeni strateji oluştur
   const handleCreateNew = () => {
-    const newStrategy: TradingStrategy = {
-      id: Date.now().toString(),
-      name: 'Yeni Strateji',
-      description: 'AI ile oluşturulan trading stratejisi',
-      code: '',
-      language: 'csharp',
-      category: 'custom',
-      status: 'draft',
-      parameters: {},
-      lastModified: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    }
     
-    setSelectedStrategy(newStrategy)
-    setShowEditor(true)
-  }
+    toast.success('Strateji kopy
 
-  // Strateji düzenle
-  const handleEditStrategy = (strategy: TradingStrategy) => {
-    setSelectedStrategy(strategy)
-    setShowEditor(true)
-  }
-
-  // Strateji kaydet
-  const handleSaveStrategy = (strategy: TradingStrategy) => {
-    const existingIndex = strategies.findIndex(s => s.id === strategy.id)
-    if (existingIndex >= 0) {
-      const updatedStrategies = [...strategies]
-      updatedStrategies[existingIndex] = { ...strategy, lastModified: new Date().toISOString() }
-      setStrategies(updatedStrategies)
-    } else {
-      setStrategies([...strategies, { ...strategy, createdAt: new Date().toISOString() }])
-    }
-    
-    setShowEditor(false)
-    setSelectedStrategy(null)
-    toast.success('Strateji kaydedildi')
-  }
-
-  // Strateji kopyala
-  const handleDuplicateStrategy = (strategy: TradingStrategy) => {
-    const duplicatedStrategy: TradingStrategy = {
-      ...strategy,
-      id: Date.now().toString(),
-      name: `${strategy.name} (Kopya)`,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString()
-    }
-    
-    setStrategies([...strategies, duplicatedStrategy])
-    toast.success('Strateji kopyalandı')
-  }
-
-  // Strateji sil
   const handleDeleteStrategy = (strategyId: string) => {
-    setStrategies(strategies.filter(s => s.id !== strategyId))
-    toast.success('Strateji silindi')
-  }
+    toast.succe
 
-  // Strateji durum rozeti
-  const getStrategyStatusBadge = (strategy: TradingStrategy) => {
-    switch (strategy.status) {
+  const getStrategyStatus
       case 'live':
-        return <Badge className="bg-green-100 text-green-800">Canlı</Badge>
       case 'testing':
-        return <Badge className="bg-blue-100 text-blue-800">Test</Badge>
       case 'ready':
-        return <Badge className="bg-orange-100 text-orange-800">Hazır</Badge>
       case 'draft':
-        return <Badge variant="outline">Taslak</Badge>
-      default:
-        return <Badge variant="secondary">Bilinmeyen</Badge>
-    }
-  }
+     
+    
+
+  const getPerformanceI
+   
+
+  // İstatistikler
+  const readyStrategiesCount = strategies.filter(s => s.statu
+    .filter(s => s.performance?.t
+
+   
+
+          <h2 classN
+            Algoritmik trading stratejilerinizi yönetin ve op
+        </div>
+          <Plus className="h-
+        </Button>
+
+      <div className="flex flex-col sm
+          pl
+          onChange={(e) => setSearchTerm(e.target.value)}
+     
+    
+            <TabsTrigger
+          </TabsList>
+      </div>
+   
+
+            <CardTitl
+          <CardContent>
+          </CardContent>
+        
+          <CardHeader className=
+          </CardHeader>
+            <div class
+        </Card>
+        <Card>
+     
+    
+          </CardContent>
+        
+   
+
+            <div 
+            </div>
+        </Card>
+
+   
+
+        <CardContent>
+            {filteredStrategies.length === 0 ? (
+                <Bot className
+                <p
+                </p>
+                  <Pl
+                </Button>
+            ) : (
+                {filteredStrategies.map((strategy) => (
+                   
+                        <div className="flex items-cen
+              
+                              <h4 className="font-semibold">
+     
+   
 
   // Performans ikonu al
   const getPerformanceIcon = (performance?: { totalReturn: number }) => {
@@ -250,16 +250,16 @@ export function StrategiesPage() {
                         <div className="flex items-center space-x-3">
                           {getStrategyStatusBadge(strategy)}
                           {strategy.performance && (
-                            <Badge variant="outline" className="text-xs">
+
                               {strategy.performance.totalReturn > 0 ? '+' : ''}
-                              {strategy.performance.totalReturn}% Getiri
-                            </Badge>
+
+
                           )}
-                          <Badge variant="secondary" className="text-xs">
+
                             {strategy.category}
-                          </Badge>
+
                           
-                          <DropdownMenu>
+
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm">
                                 <MoreHorizontal className="h-4 w-4" />
@@ -267,15 +267,15 @@ export function StrategiesPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() => handleEditStrategy(strategy)}>
-                                <Settings className="h-4 w-4 mr-2" />
+
                                 Düzenle
-                              </DropdownMenuItem>
+
                               <DropdownMenuItem onClick={() => handleDuplicateStrategy(strategy)}>
                                 <Copy className="h-4 w-4 mr-2" />
                                 Kopyala
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem
+
                                 onClick={() => handleDeleteStrategy(strategy.id)}
                                 className="text-red-600"
                               >
@@ -285,23 +285,23 @@ export function StrategiesPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                      </div>
+
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+
             )}
-          </ScrollArea>
+
         </CardContent>
-      </Card>
+
 
       {/* Strategy Editor Dialog */}
       <Dialog open={showEditor} onOpenChange={setShowEditor}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
           <DialogHeader className="sr-only">
-            <DialogTitle>Strateji Editörü</DialogTitle>
+
           </DialogHeader>
-          {selectedStrategy && (
+
             <StrategyEditor 
               strategy={selectedStrategy}
               onSave={handleSaveStrategy}
@@ -311,8 +311,7 @@ export function StrategiesPage() {
               }}
             />
           )}
-        </DialogContent>
+
       </Dialog>
-    </div>
+
   )
-}
