@@ -126,33 +126,33 @@ Lütfen detaylı ve yararlı bir yanıt ver.`
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col bg-background">
       {/* Header */}
-      <div className="border-b bg-card p-6">
+      <div className="border-b bg-card p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
             <Brain className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">AI Trading Yöneticisi</h1>
+            <h1 className="text-lg font-semibold">AI Trading Yöneticisi</h1>
             <p className="text-sm text-muted-foreground">Yapay zeka destekli trading asistanınız</p>
           </div>
         </div>
       </div>
 
       <Tabs defaultValue="chat" className="flex-1 flex flex-col">
-        <TabsList className="mx-6 mt-4">
+        <TabsList className="mx-4 mt-4">
           <TabsTrigger value="chat">Sohbet</TabsTrigger>
           <TabsTrigger value="analysis">Analiz</TabsTrigger>
           <TabsTrigger value="insights">Öngörüler</TabsTrigger>
         </TabsList>
 
         {/* Chat Tab */}
-        <TabsContent value="chat" className="flex-1 p-6">
-          <div className="flex-1 flex gap-6">
+        <TabsContent value="chat" className="flex-1 p-4">
+          <div className="flex-1 flex gap-4">
             {/* Ana Sohbet Alanı */}
             <div className="flex-1">
-              <Card className="h-[calc(100vh-200px)] flex flex-col">
+              <Card className="h-[600px] flex flex-col">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="w-5 h-5" />
@@ -304,7 +304,7 @@ Lütfen detaylı ve yararlı bir yanıt ver.`
         </TabsContent>
 
         {/* Analysis Tab */}
-        <TabsContent value="analysis" className="flex-1 p-6">
+        <TabsContent value="analysis" className="flex-1 p-4">
           <div className="grid gap-4">
             <Card>
               <CardHeader>
@@ -355,7 +355,7 @@ Lütfen detaylı ve yararlı bir yanıt ver.`
         </TabsContent>
 
         {/* Insights Tab */}
-        <TabsContent value="insights" className="flex-1 p-6">
+        <TabsContent value="insights" className="flex-1 p-4">
           <div className="space-y-4">
             <Alert>
               <AlertTriangle className="h-4 w-4" />

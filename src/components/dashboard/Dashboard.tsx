@@ -9,6 +9,7 @@ import { Gear, TestTube, Database } from '@phosphor-icons/react'
 import { AIConfiguration } from '../ai/AIConfiguration'
 import { AITestPanel } from '../ai/AITestPanel'
 import { MarketData } from '../data/MarketData'
+import { TradingAssistant } from '../ai/TradingAssistant'
 
 interface PortfolioMetrics {
   totalValue: number
@@ -52,8 +53,8 @@ export function Dashboard() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold">Trading Dashboard</h2>
-          <p className="text-muted-foreground">Real-time portfolio overview and trading activity</p>
+          <h2 className="text-3xl font-bold">Anasayfa</h2>
+          <p className="text-muted-foreground">AI destekli trading yönetimi ve portföy genel görünümü</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" size="sm" onClick={() => setShowMarketData(true)}>
@@ -173,42 +174,19 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* AI Market Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      {/* Yapay Zeka Trading Yöneticisi */}
+      <section>
+        <div className="mb-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
             <CpuChipIcon className="h-5 w-5" />
-            AI Market Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-accent rounded-full mt-2"></div>
-                <div>
-                  <div className="font-medium text-accent">Bullish Signal Detected</div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    BTC showing strong momentum with RSI oversold recovery. Consider increasing position size for momentum strategies.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 bg-muted rounded-lg">
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-muted-foreground rounded-full mt-2"></div>
-                <div>
-                  <div className="font-medium">Market Volatility Alert</div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    ETH volatility increased by 15% in the last 4 hours. Risk management protocols activated for scalping strategies.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            Yapay Zeka Trading Yöneticisi
+          </h2>
+          <p className="text-muted-foreground">
+            Piyasa analizi, strateji önerisi ve portföy özetleri için AI asistanınızı kullanın.
+          </p>
+        </div>
+        <TradingAssistant />
+      </section>
 
       {/* Market Data Dialog */}
       <Dialog open={showMarketData} onOpenChange={setShowMarketData}>

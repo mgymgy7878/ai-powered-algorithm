@@ -14,7 +14,7 @@ import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 
-export type AppView = 'dashboard' | 'ai-assistant' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -74,8 +74,6 @@ function App() {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />
-      case 'ai-assistant':
-        return <TradingAssistant />
       case 'strategies':
         return <StrategiesPage />
       case 'backtest':
