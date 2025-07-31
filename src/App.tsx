@@ -10,6 +10,7 @@ import { MarketAnalysis } from './components/analysis/MarketAnalysis'
 import { APISettings } from './components/settings/APISettings'
 import { Toaster } from './components/ui/sonner'
 import { aiService } from './services/aiService'
+import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 
 export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
@@ -27,12 +28,27 @@ function App() {
       apiKey: '',
       model: 'claude-3-sonnet',
       enabled: false
+    },
+    binance: {
+      apiKey: '',
+      secretKey: '',
+      testnet: true,
+      enabled: false
     }
   })
 
   // Initialize AI service with stored settings
   useEffect(() => {
     aiService.setSettings(apiSettings)
+    
+    // Initialize Binance service if configured
+    if (apiSettings.binance.enabled && apiSettings.binance.apiKey && apiSettings.binance.secretKey) {
+      binanceService.setCredentials(
+        apiSettings.binance.apiKey,
+        apiSettings.binance.secretKey,
+        apiSettings.binance.testnet
+      )
+    }
   }, [apiSettings])
 
   const renderView = () => {

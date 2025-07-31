@@ -162,24 +162,22 @@ export function StrategyGenerator() {
       return
     }
 
-    // Ensure AI service has latest settings
+    // Ensure AI service has latest settings BEFORE checking configuration
     aiService.setSettings(apiSettings)
 
-    // Check AI configuration with detailed error messages
-    if (!aiService.isConfigured()) {
+    // Check AI configuration with more robust checking
+    const openaiConfigured = apiSettings.openai?.enabled && apiSettings.openai?.apiKey?.trim()
+    const anthropicConfigured = apiSettings.anthropic?.enabled && apiSettings.anthropic?.apiKey?.trim()
+    
+    if (!openaiConfigured && !anthropicConfigured) {
       console.log('API Settings:', apiSettings)
-      console.log('OpenAI enabled:', apiSettings.openai?.enabled)
-      console.log('OpenAI key exists:', !!apiSettings.openai?.apiKey)
-      console.log('Anthropic enabled:', apiSettings.anthropic?.enabled)
-      console.log('Anthropic key exists:', !!apiSettings.anthropic?.apiKey)
+      console.log('OpenAI configured:', openaiConfigured)
+      console.log('Anthropic configured:', anthropicConfigured)
       
-      if (!apiSettings.openai?.apiKey && !apiSettings.anthropic?.apiKey) {
+      if (!apiSettings.openai?.apiKey?.trim() && !apiSettings.anthropic?.apiKey?.trim()) {
         toast.error('AI API anahtarı bulunamadı. Lütfen ayarlardan API anahtarınızı girin.')
-      } else if (apiSettings.openai?.apiKey && !apiSettings.openai?.enabled && 
-                 apiSettings.anthropic?.apiKey && !apiSettings.anthropic?.enabled) {
-        toast.error('API anahtarları mevcut ancak hiçbiri etkin değil. Lütfen en az birini etkinleştirin.')
       } else {
-        toast.error('AI servisi yapılandırılmamış. Ayarları kontrol edin.')
+        toast.error('API anahtarları mevcut ancak hiçbiri etkin değil. Lütfen en az birini etkinleştirin.')
       }
       
       setShowAIConfig(true)

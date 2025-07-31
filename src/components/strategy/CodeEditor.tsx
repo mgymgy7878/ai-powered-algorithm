@@ -11,6 +11,8 @@ import { Progress } from '../ui/progress'
 import { useKV } from '@github/spark/hooks'
 import { toast } from 'sonner'
 import { highlightCode, formatCode } from './syntaxHighlighter'
+import { aiService } from '../../services/aiService'
+import { APISettings } from '../../types/api'
 import {
   Play, Bot, Code, Settings, Sparkle, Brain, Lightning, Cpu, 
   Activity, Save, RotateCcw, FileText, Terminal, Zap, 
@@ -53,6 +55,12 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ strategy, onSave, onClose, onChange }: CodeEditorProps) {
+  const [apiSettings] = useKV<APISettings>('api-settings', {
+    openai: { apiKey: '', model: 'gpt-4', enabled: true },
+    anthropic: { apiKey: '', model: 'claude-3-sonnet', enabled: false },
+    binance: { apiKey: '', secretKey: '', testnet: true, enabled: false }
+  })
+
   const [code, setCode] = useState(strategy?.code || `using System;
 using System.Collections.Generic;
 using MatriksIQ.API;
@@ -139,13 +147,18 @@ public class NewTradingStrategy : Strategy
   const [currentLine, setCurrentLine] = useState(1)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [rightPanelWidth, setRightPanelWidth] = useState(400)
-  const [selectedModel, setSelectedModel] = useState('gpt-4o')
+  const [selectedModel, setSelectedModel] = useState('gpt-4')
   const [searchQuery, setSearchQuery] = useState('')
   const [replaceQuery, setReplaceQuery] = useState('')
   const [showSearchReplace, setShowSearchReplace] = useState(false)
   
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const editorContainerRef = useRef<HTMLDivElement>(null)
+
+  // Initialize AI service with current settings
+  useEffect(() => {
+    aiService.setSettings(apiSettings)
+  }, [apiSettings])
 
   const addChatMessage = (type: ChatMessage['type'], content: string, metadata?: ChatMessage['metadata']) => {
     const newMessage: ChatMessage = {
@@ -195,6 +208,16 @@ public class NewTradingStrategy : Strategy
   const sendChatMessage = async () => {
     if (!chatInput.trim()) return
 
+    // Check if AI is configured
+    const openaiConfigured = apiSettings.openai?.enabled && apiSettings.openai?.apiKey?.trim()
+    const anthropicConfigured = apiSettings.anthropic?.enabled && apiSettings.anthropic?.apiKey?.trim()
+    
+    if (!openaiConfigured && !anthropicConfigured) {
+      toast.error('AI servisi yapılandırılmamış. Lütfen ayarlardan API anahtarınızı girin.')
+      addChatMessage('system', '❌ AI servisi bağlı değil. API ayarlarını kontrol edin.')
+      return
+    }
+
     const userMessage = chatInput.trim()
     setChatInput('')
     setIsProcessing(true)
@@ -203,8 +226,8 @@ public class NewTradingStrategy : Strategy
     addChatMessage('user', userMessage)
 
     try {
-      // Create AI prompt with current code context
-      const aiPrompt = spark.llmPrompt`Sen bir MatrixIQ seviyesinde trading strateji asistanısın. Kullanıcının C# trading stratejisi kod editöründe yardım istiyor.
+      // Create a comprehensive prompt for the AI
+      const fullPrompt = `Sen bir MatrixIQ seviyesinde trading strateji asistanısın. Kullanıcının C# trading stratejisi kod editöründe yardım istiyor.
 
 Mevcut kod:
 \`\`\`csharp
@@ -226,21 +249,24 @@ Lütfen:
 
 Türkçe yanıt ver ve kısa, net açıklamalar yap.`
 
-      const response = await spark.llm(aiPrompt, selectedModel)
+      // Use the AI service to generate response
+      const aiResponse = await aiService.generateCode(fullPrompt)
       
       // Add AI response
-      addChatMessage('assistant', response)
+      addChatMessage('assistant', aiResponse)
       
       // If response contains code improvements, offer to apply them
-      if (response.includes('```') || response.toLowerCase().includes('kod') || response.toLowerCase().includes('düzelt')) {
+      if (aiResponse.includes('```') || aiResponse.toLowerCase().includes('kod') || aiResponse.toLowerCase().includes('düzelt')) {
         addChatMessage('system', '💡 AI kod iyileştirmesi tespit edildi. Değişiklikleri uygulamak ister misiniz?', {
           action: 'apply_suggestion'
         })
       }
 
     } catch (error) {
-      addChatMessage('system', '❌ AI yanıt verirken hata oluştu. Lütfen tekrar deneyin.')
-      console.error(error)
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata'
+      addChatMessage('system', `❌ AI yanıt verirken hata oluştu: ${errorMessage}`)
+      console.error('AI chat error:', error)
+      toast.error(`AI chat hatası: ${errorMessage}`)
     } finally {
       setIsProcessing(false)
     }
