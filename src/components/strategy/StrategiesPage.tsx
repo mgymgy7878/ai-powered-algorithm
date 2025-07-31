@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ScrollArea } from '@/components/ui/scr
+import { Dialog, DialogContent, DialogHeader,
+import { TradingStrategy } from '../../types/
+import { 
+  Play, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TradingStrategy } from '../../types/trading'
@@ -14,15 +14,15 @@ import {
   Plus, 
   Play, 
   Pause, 
-  Settings, 
-  Copy, 
-  Trash, 
-  MoreHorizontal,
-  TrendingUp, 
-  TrendingDown, 
-  Activity, 
-  Zap, 
   Bot 
+  Copy, 
+
+  MoreHorizontal,
+  const [selec
+  TrendingDown, 
+  const [fil
+  Zap, 
+  cons
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -54,77 +54,77 @@ export function StrategiesPage() {
       code: '',
       language: 'csharp',
       category: 'custom',
-      indicators: [],
+      name: `${strate
       parameters: {},
-      status: 'draft',
+      lastModified: ne
       createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString()
-    }
-    
-    setSelectedStrategy(newStrategy)
-    setShowEditor(true)
-  }
-
-  // Strateji düzenle
-  const handleEditStrategy = (strategy: TradingStrategy) => {
-    setSelectedStrategy(strategy)
-    setShowEditor(true)
-  }
-
-  // Strateji sil
-  const handleDeleteStrategy = (strategyId: string) => {
-    setStrategies(current => current.filter(s => s.id !== strategyId))
-    toast.success('Strateji silindi')
-  }
-
-  // Strateji kopyala
-  const handleDuplicateStrategy = (strategy: TradingStrategy) => {
-    const newStrategy: TradingStrategy = {
-      ...strategy,
-      id: Date.now().toString(),
-      name: `${strategy.name} - Kopya`,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString()
-    }
-    setStrategies(current => [...current, newStrategy])
     toast.success('Strateji kopyalandı')
-  }
-
-  // Strateji kaydet
-  const handleSaveStrategy = (strategy: TradingStrategy) => {
-    const existingIndex = strategies.findIndex(s => s.id === strategy.id)
-    if (existingIndex >= 0) {
-      setStrategies(current => 
-        current.map(s => s.id === strategy.id ? strategy : s)
-      )
-    } else {
-      setStrategies(current => [...current, strategy])
     }
-    setShowEditor(false)
-    setSelectedStrategy(null)
-    toast.success('Strateji kaydedildi')
-  }
+  //
+    setSelectedStrategy(newStrategy)
+  // Performans ikonu a
+   
 
-  // Durum badge'i al
-  const getStrategyStatusBadge = (strategy: TradingStrategy) => {
-    switch (strategy.status) {
-      case 'live':
-        return <Badge className="bg-green-500 text-white">Canlı</Badge>
-      case 'testing':
-        return <Badge className="bg-blue-500 text-white">Test Ediliyor</Badge>
-      case 'paused':
-        return <Badge variant="secondary">Duraklatıldı</Badge>
-      case 'error':
-        return <Badge variant="destructive">Hata</Badge>
-      case 'ready':
-        return <Badge className="bg-emerald-500 text-white">Hazır</Badge>
-      case 'optimizing':
-        return <Badge className="bg-purple-500 text-white">Optimize Ediliyor</Badge>
-      default:
-        return <Badge variant="outline">Taslak</Badge>
-    }
-  }
+
+  const activeStrategiesCount = strategies.filter(s => s.stat
+  const totalPerformance = strate
+    .reduce((sum, s) =>
+  r
+
+        <div>
+          <p className="text-muted-foreground">
+          </p>
+        <Button onClick={handleCreate
+   
+
+      {/* Search and 
+        <Input
+          value={searchTerm}
+          classNam
+        <Tabs value={filterStatu
+            <TabsTrigger value="all">Tü
+            <TabsTrigg
+        </Tabs>
+
+     
+          <CardHeader className="pb-2">
+          </CardHeader>
+   
+
+        <Card>
+            <CardTitle className="text-sm font-medium text-mu
+          <CardContent>
+          </CardContent>
+        
+          <CardHeader className="pb-2">
+       
+            
+        </Card>
+     
+            <CardTitle c
+          <CardContent>
+              {totalPerformance > 0 ? '+
+   
+
+      {/* Strategies 
+        <CardHeader>
+        </CardHeader>
+          <ScrollA
+              <div className="text-center py-12">
+                <h3 c
+                  İlk trading stratejinizi oluşturmak için AI asistanından yar
+                <But
+                  İlk Stratejiyi Oluştur
+              </div
+              <div className="space-y-4">
+                  <
+                      <div className="flex items-center justify-between">
+                        
+                            <div>
+              
+                              </p>
+     
+   
 
   // Performans ikonu al
   const getPerformanceIcon = (performance?: { totalReturn: number }) => {
@@ -256,13 +256,13 @@ export function StrategiesPage() {
                             <Badge variant="outline" className="text-xs">
                               {strategy.performance.totalReturn > 0 ? '+' : ''}
                               {strategy.performance.totalReturn}% Getiri
-                            </Badge>
+
                           )}
-                          <Badge variant="secondary" className="text-xs">
+
                             {strategy.category}
-                          </Badge>
+
                           
-                          <DropdownMenu>
+
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm">
                                 <MoreHorizontal className="h-4 w-4" />
@@ -270,15 +270,15 @@ export function StrategiesPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() => handleEditStrategy(strategy)}>
-                                <Settings className="h-4 w-4 mr-2" />
+
                                 Düzenle
-                              </DropdownMenuItem>
+
                               <DropdownMenuItem onClick={() => handleDuplicateStrategy(strategy)}>
                                 <Copy className="h-4 w-4 mr-2" />
                                 Kopyala
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem 
+
                                 onClick={() => handleDeleteStrategy(strategy.id)}
                                 className="text-red-600"
                               >
@@ -288,23 +288,23 @@ export function StrategiesPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                      </div>
+
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+
             )}
-          </ScrollArea>
+
         </CardContent>
-      </Card>
+
 
       {/* Strategy Editor Dialog */}
       <Dialog open={showEditor} onOpenChange={setShowEditor}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
           <DialogHeader className="sr-only">
-            <DialogTitle>Strateji Editörü</DialogTitle>
+
           </DialogHeader>
-          {selectedStrategy && (
+
             <StrategyEditor 
               strategy={selectedStrategy}
               onSave={handleSaveStrategy}
@@ -314,8 +314,7 @@ export function StrategiesPage() {
               }}
             />
           )}
-        </DialogContent>
+
       </Dialog>
-    </div>
+
   )
-}
