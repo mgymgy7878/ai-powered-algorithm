@@ -17,6 +17,7 @@ export interface TradingStrategy {
   status: 'draft' | 'generating' | 'testing' | 'optimizing' | 'ready' | 'live' | 'paused' | 'error'
   createdAt: string
   lastModified: string
+  updatedAt: string
   errors?: string[]
   performance?: {
     winRate: number
