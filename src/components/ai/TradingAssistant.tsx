@@ -1,28 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scr
-import { Alert, AlertDescription } from '@/co
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-  DollarS
-  Calend
-  AlertTria
-  Brain
 import {
-// Trading Ass
-  id: string
-  content: 
   DollarSign,
   Zap,
   Calendar,
   Clock,
   AlertTriangle,
   CheckCircle,
-  Brain
+  Brain,
+  Bot,
+  User,
+  Send,
+  Loader2,
+  TrendingUp,
+  Activity
 } from 'lucide-react'
 import { useKV } from '@github/spark/hooks'
+import { aiService } from '@/services/aiService'
 
 // Trading Assistant için gerekli tipler
 interface ChatMessage {
@@ -30,163 +30,126 @@ interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
-1
+}
 
+interface MarketSummary {
+  symbol: string
+  price: string
+  change: string
+  changePercent: string
+}
 
-- Önemli makroekonomik ge
-- Haber akışında
-3. PORTFÖY YÖNE
-- Kâr/zarar hesa
+export function TradingAssistant() {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [strategies] = useKV('trading-strategies', [])
+  const [liveStrategies] = useKV('live-strategies', [])
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-- Hangi strateji
--
+  // Otomatik scroll - yeni mesaj geldiğinde
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
-- Risk uyarılarını belirt
-
-  }
-  // Mesaj gönderme
+  // Mesaj gönderme fonksiyonu
+  const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
+
     const userMessage: ChatMessage = {
-
+      id: Date.now().toString(),
+      role: 'user',
+      content: inputMessage,
       timestamp: new Date()
+    }
 
+    setMessages(prev => [...prev, userMessage])
     setInputMessage('')
+    setIsLoading(true)
 
+    try {
+      // AI Prompt Hazırlama
+      const prompt = `Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
+- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
+- Ekonomik takvimi ve haber akışını takip edip yorumlamak
+- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+- Türkçe yanıtlar üretmek
 
+Kullanıcı sorusu: ${inputMessage}
 
+Lütfen kısa, öz ve kullanışlı bir yanıt ver.`
 
+      // AI servisini çağır
+      const response = await aiService.generateResponse(prompt)
 
-
-
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
         content: response,
+        timestamp: new Date()
       }
+
       setMessages(prev => [...prev, assistantMessage])
-
-      const errorM
+    } catch (error) {
+      console.error('AI yanıt hatası:', error)
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
         role: 'assistant',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
         timestamp: new Date()
-
-
-    }
-
-  const quickCommands = [
-      label: "Piyasa Analizi",
-
-    {
-      icon: <DollarSign className="w-4 h-4" />,
-    },
-      label: "Strateji Önerisi",
-
-    {
-      icon: <AlertTriangle className="w-4 h-4" />,
-    }
-
-
-  }
-  // Enter tuşu ile mesaj gönderme
-    if (e.key === 'Enter'
-      sendMessage()
-
-  return (
-   
-
-          <h1 class
-        <p className="text-muted-fo
-        </p>
-
-        <TabsList className="grid w-fu
-          <TabsTrigger value="an
-        </TabsList>
-        {/* Chat Tab */}
-          <div className="f
-     
-
-                    <Brain className="w-5 h-5" 
-                  </Car
-                <CardC
-
-         
-                        
-                          <p>Size piyasa analizi, stratej
-
-                      {messages.map((mes
-
-                              ? 'bg-pr
-
-                              {message.role ==
-
-                                <div classNam
-                                </div>
-                          
-                        </
-                      
       }
-
-                              <span>AI düşünüyor...</s
-                     
-                      )}
-      
-
-                  <div className="flex g
-        role: 'assistant',
-                      onKeyPress={handleKeyPress}
-        timestamp: new Date()
-       
-
-                      size="icon"
-               
-                      ) :
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
     }
-   
+  }
 
-
+  // Hızlı komutlar
   const quickCommands = [
-     
+    {
       label: "Piyasa Analizi",
-                  </CardHeader>
-                    <div className="space-y-2">
-      
-    {
-                          onCl
-      icon: <DollarSign className="w-4 h-4" />,
-                          {cmd.label}
+      icon: <TrendingUp className="w-4 h-4" />,
+      command: "Güncel piyasa durumunu analiz et ve önemli seviyeleri belirt"
     },
-     
-      label: "Strateji Önerisi",
-                <Card>
-                    <CardTitle className="text-sm">Sistem Durumu</CardTitle>
-      
     {
-                        <Bad
+      label: "Strateji Önerisi",
+      icon: <DollarSign className="w-4 h-4" />,
+      command: "Mevcut piyasa koşullarına göre en uygun trading stratejilerini öner"
+    },
+    {
+      label: "Risk Analizi",
       icon: <AlertTriangle className="w-4 h-4" />,
-                        <Badge variant="default">{liveStrategies.length}</Badge>
+      command: "Portföyümün risk seviyesini değerlendir ve öneriler sun"
+    },
+    {
+      label: "Ekonomik Takvim",
+      icon: <Calendar className="w-4 h-4" />,
+      command: "Bu hafta önemli ekonomik olayları listele ve etkilerini açıkla"
     }
-   
+  ]
 
-                      </di
-                  </CardContent>
-
+  // Hızlı komut kullanma
+  const useQuickCommand = (command: string) => {
+    setInputMessage(command)
   }
 
   // Enter tuşu ile mesaj gönderme
-                      <p>• Piyasa analizi için zaman d
-                      <p>• Risk yönetimi ta
-                    </di
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
       sendMessage()
-     
-   
+    }
+  }
 
   return (
-              <CardHeader>
-                  <T
-                </CardTitle>
-              <CardContent>
-                  <div className="text-center">
-                    <div className="text-sm text-muted-foreground">BTC/
-        </div>
-                    <div className="text-sm t
-                  <div className="text-center">
-            
+    <div className="flex flex-col h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card p-6">
+        <h1 className="text-2xl font-bold">AI Trading Yöneticisi</h1>
+        <p className="text-muted-foreground mt-1">
+          Yapay zeka destekli trading asistanınız
+        </p>
       </div>
 
       <Tabs defaultValue="chat" className="flex-1">
@@ -236,9 +199,9 @@ interface ChatMessage {
                                   {message.timestamp.toLocaleTimeString('tr-TR')}
                                 </div>
                               </div>
-
-
-
+                            </div>
+                          </div>
+                        </div>
                       ))}
                       
                       {isLoading && (
@@ -249,7 +212,7 @@ interface ChatMessage {
                               <span>AI düşünüyor...</span>
                             </div>
                           </div>
-
+                        </div>
                       )}
                     </div>
                     <div ref={messagesEndRef} />
@@ -317,7 +280,7 @@ interface ChatMessage {
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Toplam Strateji</span>
                         <Badge variant="secondary">{strategies.length}</Badge>
-
+                      </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Çalışan Strateji</span>
                         <Badge variant="default">{liveStrategies.length}</Badge>
@@ -329,7 +292,7 @@ interface ChatMessage {
                           Aktif
                         </Badge>
                       </div>
-
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -347,7 +310,7 @@ interface ChatMessage {
                     </div>
                   </CardContent>
                 </Card>
-
+              </div>
             </div>
           </div>
         </TabsContent>
@@ -355,39 +318,39 @@ interface ChatMessage {
         {/* Analysis Tab */}
         <TabsContent value="analysis" className="flex-1 p-4">
           <div className="grid gap-4">
-
-
+            <Card>
+              <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
                   Piyasa Durumu
                 </CardTitle>
-
-
+              </CardHeader>
+              <CardContent>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">+2.4%</div>
                     <div className="text-sm text-muted-foreground">BTC/USDT</div>
-
+                  </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-red-600">-1.2%</div>
                     <div className="text-sm text-muted-foreground">ETH/USDT</div>
-
+                  </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">+0.8%</div>
                     <div className="text-sm text-muted-foreground">BNB/USDT</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-
-
-
-
-
-
+            <Card>
+              <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="w-5 h-5" />
                   Strateji Performansı
                 </CardTitle>
-
-
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Aktif Stratejiler</span>
@@ -397,10 +360,10 @@ interface ChatMessage {
                     <span className="text-sm">Toplam Stratejiler</span>
                     <Badge variant="outline">{strategies.length}</Badge>
                   </div>
-
-
-
-
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Insights Tab */}
@@ -432,5 +395,6 @@ interface ChatMessage {
           </div>
         </TabsContent>
       </Tabs>
-
-
+    </div>
+  )
+}
