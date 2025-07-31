@@ -76,7 +76,7 @@ export interface PositionInfo {
   totalCrossWalletBalance: string       // Toplam çapraz cüzdan bakiyesi
   totalCrossUnPnl: string       // Toplam çapraz gerçekleşmemiş kar/zarar
   availableBalance: string      // Kullanılabilir bakiye
-  maxWithdrawAmount: string     // Maksimum çekim miktarı
+  maxWithdrawAmount: string,    // Maksimum çekim miktarı
   assets: Array<{
     asset: string               // Varlık
     walletBalance: string       // Cüzdan bakiyesi
