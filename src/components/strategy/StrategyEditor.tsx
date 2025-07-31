@@ -10,29 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable'
 import { StrategyTemplates } from './StrategyTemplates'
 import { AIAssistant } from './AIAssistant'
+import { TradingStrategy, Indicator } from '../../types/trading'
 import { Play, Square, Settings, TrendingUp, Activity, BookOpen, Bot, Save, X, Code2, FileText, Lightbulb } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-
-interface TradingStrategy {
-  id: string
-  name: string
-  description: string
-  code: string
-  language: 'csharp' | 'python'
-  category: 'scalping' | 'grid' | 'trend' | 'breakout' | 'mean_reversion' | 'custom'
-  indicators: string[]
-  parameters: Record<string, number>
-  status: 'draft' | 'generating' | 'testing' | 'optimizing' | 'ready' | 'live' | 'paused' | 'error'
-  createdAt: string
-  lastModified: string
-  performance?: {
-    totalReturn: number
-    sharpeRatio: number
-    winRate: number
-    maxDrawdown: number
-    totalTrades: number
-  }
-}
 
 interface StrategyEditorProps {
   strategy?: TradingStrategy | null
@@ -79,7 +59,10 @@ public class NewStrategy : Strategy
 }`,
   language: 'csharp',
   category: 'custom',
-  indicators: ['RSI', 'SMA'],
+  indicators: [
+    { name: 'RSI', type: 'momentum', parameters: { period: 14, overbought: 70, oversold: 30 }, enabled: true },
+    { name: 'SMA', type: 'technical', parameters: { period: 20 }, enabled: true }
+  ],
   parameters: { period: 14, threshold: 0.7 },
   status: 'draft'
 }
@@ -261,12 +244,20 @@ export function StrategyEditor({ strategy, onSave, onClose }: StrategyEditorProp
                 <TabsContent value="templates" className="h-full p-0">
                   <StrategyTemplates 
                     onSelectTemplate={(template) => {
+                      // Convert string[] indicators to Indicator[] format
+                      const indicators = template.indicators.map(name => ({
+                        name,
+                        type: 'technical' as const,
+                        parameters: { period: 14 },
+                        enabled: true
+                      }))
+                      
                       setCurrentStrategy(prev => ({
                         ...prev,
                         code: template.code,
                         category: template.category,
-                        indicators: template.indicators,
-                        parameters: template.parameters
+                        indicators,
+                        // parameters: template.parameters || {}
                       }))
                       toast.success('Şablon yüklendi')
                     }}
@@ -323,7 +314,7 @@ export function StrategyEditor({ strategy, onSave, onClose }: StrategyEditorProp
                 <div className="flex items-center gap-2 mb-2">
                   <Label className="text-sm font-medium">Strateji Kodu ({currentStrategy.language})</Label>
                   <Badge variant="outline" className="text-xs">
-                    {currentStrategy.indicators.join(', ')}
+                    {currentStrategy.indicators.map(ind => ind.name).join(', ')}
                   </Badge>
                 </div>
                 <Textarea
@@ -382,7 +373,8 @@ export function StrategyEditor({ strategy, onSave, onClose }: StrategyEditorProp
               <ResizablePanel defaultSize={30} minSize={25}>
                 <AIAssistant
                   strategy={currentStrategy}
-                  onStrategyUpdate={setCurrentStrategy}
+                  onUpdateStrategy={setCurrentStrategy}
+                  onClose={() => setShowAssistant(false)}
                 />
               </ResizablePanel>
             </>

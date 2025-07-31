@@ -16,82 +16,12 @@ import { Switch } from '../ui/switch'
 import { Slider } from '../ui/slider'
 import { StrategyEditor } from './StrategyEditor'
 import { toast } from 'sonner'
+import { TradingStrategy, Indicator } from '../../types/trading'
 import { 
   Play, Bot, Code, TrendingUp, Settings, Zap, AlertTriangle, CheckCircle, Target, BarChart3,
   Sparkle, Brain, Lightning, Cpu, Activity, Timer, Upload, Download, Copy, Trash, Eye,
   ArrowRight, ArrowUp, ArrowDown, CircleNotch, ChartLine, Gauge, Trophy, Shield, Plus
 } from '@phosphor-icons/react'
-
-interface Indicator {
-  name: string
-  type: 'technical' | 'volume' | 'momentum' | 'volatility'
-  parameters: Record<string, number>
-  enabled: boolean
-}
-
-interface TradingStrategy {
-  id: string
-  name: string
-  description: string
-  code: string
-  indicators: Indicator[]
-  parameters: Record<string, number>
-  status: 'draft' | 'generating' | 'testing' | 'optimizing' | 'ready' | 'live' | 'paused' | 'error'
-  createdAt: string
-  lastModified: string
-  errors?: string[]
-  performance?: {
-    winRate: number
-    totalReturn: number
-    sharpeRatio: number
-    maxDrawdown: number
-    totalTrades: number
-    avgTradeDuration: number
-    profitFactor: number
-    calmarRatio: number
-    monthlyReturns?: number[]
-    riskMetrics?: {
-      volatility: number
-      beta: number
-      alpha: number
-      var95: number
-    }
-  }
-  optimization?: {
-    bestParameters: Record<string, number>
-    iterations: number
-    score: number
-    history: Array<{
-      parameters: Record<string, number>
-      score: number
-      metrics: any
-    }>
-  }
-  aiAnalysis?: {
-    marketConditions: string[]
-    riskLevel: 'low' | 'medium' | 'high'
-    suitability: string
-    suggestions: string[]
-    confidence: number
-    complexity: 'simple' | 'moderate' | 'complex'
-    timeframe: string[]
-    assets: string[]
-  }
-  matrixScore?: {
-    overall: number
-    profitability: number
-    stability: number
-    robustness: number
-    efficiency: number
-  }
-  liveStats?: {
-    isRunning: boolean
-    startDate: string
-    currentPnL: number
-    activePositions: number
-    todayTrades: number
-  }
-}
 
 export function StrategyGenerator() {
   const [strategies, setStrategies] = useKV<TradingStrategy[]>('trading-strategies', [])
