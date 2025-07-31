@@ -1,5 +1,5 @@
 // TypeScript Binance Service Test
-import { binanceService, KlineData, PositionInfo, BinanceOrder, AccountInfo, TickerInfo } from '../services/binanceService';
+import { binanceService, KlineData, PositionInfo, OrderData, AccountInfo } from '../services/binanceService';
 
 // Test that the service exports are working correctly
 export const testBinanceService = async () => {
@@ -8,17 +8,12 @@ export const testBinanceService = async () => {
     const isConnected = await binanceService.testConnection();
     console.log('Binance bağlantı testi:', isConnected ? 'Başarılı' : 'Başarısız');
 
-    // Test 24hr ticker data (doesn't require API keys)
-    const tickerData = await binanceService.getTicker24hr('BTCUSDT');
-    console.log('BTCUSDT 24hr ticker:', tickerData);
-
     // Test kline data (doesn't require API keys)
     const klineData = await binanceService.getKlineData('BTCUSDT', '1h', 10);
     console.log('BTCUSDT kline verisi (10 adet):', klineData.length);
 
     return {
       connectivity: isConnected,
-      tickerData,
       klineDataCount: klineData.length
     };
   } catch (error) {
@@ -31,7 +26,7 @@ export const testBinanceService = async () => {
 export const testAuthenticatedMethods = async () => {
   try {
     // Test API keys
-    const authTest = await binanceService.testApiConnection();
+    const authTest = await binanceService.testApiKey();
     console.log('API anahtarları geçerli:', authTest);
 
     if (authTest) {
@@ -40,7 +35,7 @@ export const testAuthenticatedMethods = async () => {
       console.log('Hesap bilgileri:', accountInfo);
 
       // Test position info
-      const positions = await binanceService.getPositionInformation();
+      const positions = await binanceService.getPositions();
       console.log('Pozisyon sayısı:', positions.length);
     }
 

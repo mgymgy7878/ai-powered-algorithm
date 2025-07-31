@@ -6,15 +6,15 @@ export interface KlineData {
   open: string                  // Açılış fiyatı
   high: string                  // En yüksek fiyat
   low: string                   // En düşük fiyat
+  close: string                 // Kapanış fiyatı
+  volume: string                // Hacim
+  closeTime: number             // Kapanış zamanı
+  quoteAssetVolume: string      // Quote varlık hacmi
+  numberOfTrades: number        // İşlem sayısı
+  takerBuyBaseAssetVolume: string    // Taker alım base varlık hacmi
+  takerBuyQuoteAssetVolume: string   // Taker alım quote varlık hacmi
+  ignore: string                // Yoksay
 }
-// Emir verisi interface'i
-  orderId: number               // Emir ID
-  status: string                // Durum
-  price: string                 // Fiyat
-  origQty: string               // Orijinal miktar
-  cumQuote: string              // Kümülatif quote
-  type: string                  // Tip
- 
 
 // Emir verisi interface'i
 export interface OrderData {
@@ -40,27 +40,49 @@ export interface OrderData {
   updateTime: number            // Güncelleme zamanı
 }
 
-  feeTier: number              
+// Pozisyon bilgisi interface'i
 export interface PositionInfo {
   symbol: string                // Sembol
   positionAmt: string           // Pozisyon miktarı
-  totalMaintMargin: string      // Toplam bakım
+  entryPrice: string            // Giriş fiyatı
   markPrice: string             // İşaret fiyatı
   unRealizedProfit: string      // Gerçekleşmemiş kar/zarar
   liquidationPrice: string      // Tasfiye fiyatı
-  totalCrossWalletBalance: string       // 
+  leverage: string              // Kaldıraç
   maxNotionalValue: string      // Maksimum nominal değer
-  maxWithdrawAmount: string     // Maksimum 
+  marginType: string            // Marj tipi
   isolatedMargin: string        // İzole marj
-    walletBalance: string       // Cüzdan bakiyesi
+  isAutoAddMargin: string       // Otomatik marj ekleme
   positionSide: string          // Pozisyon tarafı
-    maintMargin: string         // Bakım m
+  notional: string              // Nominal
   isolatedWallet: string        // İzole cüzdan
-    openOrderInitialMargin: string      // Açık emir
+  updateTime: number            // Güncelleme zamanı
 }
 
-// Hesap bilgisi interface'i
-    updateTime: number        
+// Sembol fiyatlarını getir (24hr ticker statistics)
+export interface SymbolPrice {
+  symbol: string
+  price: string
+  priceChange: string
+  priceChangePercent: string
+  weightedAvgPrice: string
+  prevClosePrice: string
+  lastPrice: string
+  lastQty: string
+  bidPrice: string
+  askPrice: string
+  openPrice: string
+  highPrice: string
+  lowPrice: string
+  volume: string
+  quoteVolume: string
+  openTime: number
+  closeTime: number
+  firstId: number
+  lastId: number
+  count: number
+}
+export interface AccountInfo {
   feeTier: number               // Ücret katmanı
   canTrade: boolean             // İşlem yapabilir mi
   canDeposit: boolean           // Para yatırabilir mi
@@ -76,7 +98,7 @@ export interface PositionInfo {
   totalCrossWalletBalance: string       // Toplam çapraz cüzdan bakiyesi
   totalCrossUnPnl: string       // Toplam çapraz gerçekleşmemiş kar/zarar
   availableBalance: string      // Kullanılabilir bakiye
-  maxWithdrawAmount: string,    // Maksimum çekim miktarı
+  maxWithdrawAmount: string     // Maksimum çekim miktarı
   assets: Array<{
     asset: string               // Varlık
     walletBalance: string       // Cüzdan bakiyesi
@@ -92,13 +114,13 @@ export interface PositionInfo {
     maxWithdrawAmount: string   // Maksimum çekim miktarı
     marginAvailable: boolean    // Marj kullanılabilir mi
     updateTime: number          // Güncelleme zamanı
-     
+  }>
   positions: PositionInfo[]     // Pozisyonlar
- 
+}
 
-        },
+class BinanceService {
   private apiKey: string = ''
-      if (!response.ok) {
+  private secretKey: string = ''
   private baseUrl: string = ''
 
   constructor() {
@@ -108,23 +130,23 @@ export interface PositionInfo {
   // API kimlik bilgilerini ayarlama
   setCredentials(apiKey: string, secretKey: string, isTestnet: boolean = true) {
     this.apiKey = apiKey
-    type: string,
+    this.secretKey = secretKey
     this.baseUrl = isTestnet 
       ? 'https://testnet.binancefuture.com'
       : 'https://fapi.binance.com'
-  )
+  }
 
-    }
+  // Kimlik bilgilerini doğrula
   private validateCredentials(): boolean {
     return !!(this.apiKey && this.secretKey)
-   
+  }
 
   // Timestamp üret
   private getTimestamp(): number {
     return Date.now()
   }
 
-        method: '
+  // İmza oluştur
   private createSignature(queryString: string): string {
     return CryptoJS.HmacSHA256(queryString, this.secretKey).toString()
   }
@@ -136,49 +158,49 @@ export interface PositionInfo {
     }
 
     try {
-  }
+      const timestamp = this.getTimestamp()
       const queryString = `timestamp=${timestamp}`
-  async testConnection(): Promise<boolean> {
+      const signature = this.createSignature(queryString)
       const finalQuery = `${queryString}&signature=${signature}`
 
       const response = await fetch(`${this.baseUrl}/fapi/v2/account?${finalQuery}`, {
-      return false
+        method: 'GET',
         headers: {
-
+          'X-MBX-APIKEY': this.apiKey,
         },
-    if (
+      })
 
-
+      if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
-      c
+      }
 
-      const response = await fetch
+      return await response.json()
     } catch (error) {
       console.error('Hesap bilgileri alınırken hata:', error)
       return null
-
+    }
   }
 
   // Emir ver
-  }
+  async placeOrder(
     symbol: string,
-  async getKlineData(
+    side: string,
     type: string,
-    limit: number = 5
+    quantity: string,
     price?: string,
-  ): Promise<KlineData[]>
+    timeInForce?: string,
     stopPrice?: string,
-      
+    callbackRate?: string
   ): Promise<OrderData | null> {
-
+    if (!this.validateCredentials()) {
       throw new Error('API kimlik bilgileri ayarlanmamış')
-     
+    }
 
-
+    try {
       const timestamp = this.getTimestamp()
       let queryString = `symbol=${symbol}&side=${side}&type=${type}&quantity=${quantity}&timestamp=${timestamp}`
 
-        open: item[1],
+      if (price) queryString += `&price=${price}`
       if (timeInForce) queryString += `&timeInForce=${timeInForce}`
       if (stopPrice) queryString += `&stopPrice=${stopPrice}`
       if (callbackRate) queryString += `&callbackRate=${callbackRate}`
@@ -188,7 +210,7 @@ export interface PositionInfo {
 
       const response = await fetch(`${this.baseUrl}/fapi/v1/order`, {
         method: 'POST',
-    }
+        headers: {
           'X-MBX-APIKEY': this.apiKey,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -198,13 +220,13 @@ export interface PositionInfo {
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(`Emir hatası: ${errorData.msg || response.statusText}`)
-      c
+      }
 
       return await response.json()
     } catch (error) {
       console.error('Emir verirken hata:', error)
       return null
-
+    }
   }
 
   // Bağlantı testi
@@ -212,39 +234,39 @@ export interface PositionInfo {
     try {
       const response = await fetch(`${this.baseUrl}/fapi/v1/ping`)
       return response.ok
-  }
+    } catch (error) {
       console.error('Bağlantı testi hatası:', error)
-// Singleton insta
+      return false
     }
+  }
 
-
-
+  // API anahtarı testi
   async testApiKey(): Promise<boolean> {
     if (!this.validateCredentials()) {
       return false
+    }
 
-
-
+    try {
       const timestamp = this.getTimestamp()
       const queryString = `timestamp=${timestamp}`
       const signature = this.createSignature(queryString)
 
       const response = await fetch(`${this.baseUrl}/fapi/v2/account?${queryString}&signature=${signature}`, {
-
+        method: 'GET',
         headers: {
-
+          'X-MBX-APIKEY': this.apiKey,
         },
-
+      })
 
       return response.ok
     } catch (error) {
       console.error('API anahtarı testi hatası:', error)
       return false
-
+    }
   }
 
   // Kline verilerini getir
-
+  async getKlineData(
     symbol: string,
     interval: string,
     limit: number = 500,
@@ -254,7 +276,7 @@ export interface PositionInfo {
     try {
       let queryString = `symbol=${symbol}&interval=${interval}&limit=${limit}`
       
-
+      if (startTime) queryString += `&startTime=${startTime}`
       if (endTime) queryString += `&endTime=${endTime}`
 
       const response = await fetch(`${this.baseUrl}/fapi/v1/klines?${queryString}`)
@@ -266,7 +288,7 @@ export interface PositionInfo {
       const rawData = await response.json()
       
       // Raw array verisini KlineData nesnesine dönüştür
-
+      return rawData.map((item: any[]) => ({
         openTime: item[0],
         open: item[1],
         high: item[2],
@@ -274,25 +296,25 @@ export interface PositionInfo {
         close: item[4],
         volume: item[5],
         closeTime: item[6],
-
+        quoteAssetVolume: item[7],
         numberOfTrades: item[8],
-
+        takerBuyBaseAssetVolume: item[9],
         takerBuyQuoteAssetVolume: item[10],
-
+        ignore: item[11]
       }))
-
+    } catch (error) {
       console.error('Kline verileri alınırken hata:', error)
       return []
     }
-
+  }
 
   // Pozisyonları getir
   async getPositions(symbol?: string): Promise<PositionInfo[]> {
     if (!this.validateCredentials()) {
       throw new Error('API kimlik bilgileri ayarlanmamış')
+    }
 
-
-
+    try {
       const timestamp = this.getTimestamp()
       let queryString = `timestamp=${timestamp}`
       
@@ -306,11 +328,11 @@ export interface PositionInfo {
         headers: {
           'X-MBX-APIKEY': this.apiKey,
         },
-
+      })
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
-
+      }
 
       const positions = await response.json()
       // Sadece açık pozisyonları filtrele
@@ -321,6 +343,22 @@ export interface PositionInfo {
     }
   }
 
+  // Sembol fiyatlarını getir (24hr ticker statistics)
+  async getSymbolPrices(): Promise<SymbolPrice[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/fapi/v1/ticker/24hr`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Sembol fiyatları alınırken hata:', error)
+      return []
+    }
+  }
+}
 
 // Singleton instance oluşturma
 export const binanceService = new BinanceService()
