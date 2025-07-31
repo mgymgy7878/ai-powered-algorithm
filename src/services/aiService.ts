@@ -368,6 +368,104 @@ Sadece çalışır C# kodu döndür, başka açıklama ekleme.`
       throw new Error(`Strateji kodu üretilemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`)
     }
   }
+
+  // Trading Assistant için genel yanıt üretme metodu
+  async generateResponse(systemPrompt: string, userPrompt: string, provider?: 'openai' | 'anthropic'): Promise<string> {
+    if (!this.settings) {
+      throw new Error('AI servisleri yapılandırılmamış. Lütfen API anahtarlarını ayarlayın.')
+    }
+
+    // Auto-select provider if not specified
+    if (!provider) {
+      if (this.settings.openai?.enabled === true && this.settings.openai?.apiKey) {
+        provider = 'openai'
+      } else if (this.settings.anthropic?.enabled === true && this.settings.anthropic?.apiKey) {
+        provider = 'anthropic'
+      } else {
+        throw new Error('Hiçbir AI servisi etkin değil. Lütfen en az birini etkinleştirin.')
+      }
+    }
+
+    const config = provider === 'openai' ? this.settings.openai : this.settings.anthropic
+
+    if (!config?.enabled || !config?.apiKey) {
+      throw new Error(`${provider} servisi etkin değil veya API anahtarı eksik.`)
+    }
+
+    try {
+      if (provider === 'openai') {
+        return await this.callOpenAIWithSystem(systemPrompt, userPrompt, config.model, config.apiKey)
+      } else {
+        return await this.callAnthropicWithSystem(systemPrompt, userPrompt, config.model, config.apiKey)
+      }
+    } catch (error) {
+      console.error(`AI yanıt üretimi hatası (${provider}):`, error)
+      throw new Error(`AI yanıtı üretilemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`)
+    }
+  }
+
+  private async callOpenAIWithSystem(systemPrompt: string, userPrompt: string, model: string, apiKey: string): Promise<string> {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: userPrompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: { message: 'API çağrısı başarısız' } }))
+      throw new Error(error.error?.message || `HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.choices[0]?.message?.content || 'Yanıt alınamadı'
+  }
+
+  private async callAnthropicWithSystem(systemPrompt: string, userPrompt: string, model: string, apiKey: string): Promise<string> {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: userPrompt
+          }
+        ]
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: { message: 'API çağrısı başarısız' } }))
+      throw new Error(error.error?.message || `HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.content[0]?.text || 'Yanıt alınamadı'
+  }
 }
 
 export const aiService = AIService.getInstance()

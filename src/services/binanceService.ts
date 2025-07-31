@@ -110,6 +110,7 @@ export interface AccountInfo {
     marginAvailable: boolean
     updateTime: number
   }>
+  positions?: PositionInfo[]
 }
 
 // Binance servis sınıfı

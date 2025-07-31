@@ -9,7 +9,8 @@ import {
   MagnifyingGlass,
   House,
   Gear,
-  Rocket
+  Rocket,
+  Brain
 } from '@phosphor-icons/react'
 
 interface SidebarProps {
@@ -23,6 +24,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
   
   const navigation = [
     { id: 'dashboard', label: 'Anasayfa', icon: House },
+    { id: 'ai-assistant', label: 'AI Trading Yöneticisi', icon: Brain },
     { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
     { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
     { id: 'backtest', label: 'Backtesting', icon: ChartBar },
