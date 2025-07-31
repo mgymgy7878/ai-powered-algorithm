@@ -195,6 +195,179 @@ export class AIService {
       return false
     }
   }
+
+  // AITestPanel için ek metodlar
+  getConfig() {
+    if (!this.settings) {
+      return {
+        openaiApiKey: '',
+        anthropicApiKey: '',
+        preferredModel: 'gpt-4',
+        temperature: 0.7,
+        maxTokens: 2000
+      }
+    }
+
+    return {
+      openaiApiKey: this.settings.openai?.apiKey || '',
+      anthropicApiKey: this.settings.anthropic?.apiKey || '',
+      preferredModel: this.settings.openai?.enabled ? this.settings.openai.model : this.settings.anthropic?.model || 'gpt-4',
+      temperature: 0.7,
+      maxTokens: 2000
+    }
+  }
+
+  async generalQuestion(prompt: string, provider?: 'openai' | 'anthropic'): Promise<{ content: string; model: string }> {
+    if (!this.settings) {
+      throw new Error('AI servisleri yapılandırılmamış. Lütfen API anahtarlarını ayarlayın.')
+    }
+
+    // Auto-select provider if not specified
+    if (!provider) {
+      if (this.settings.openai?.enabled === true && this.settings.openai?.apiKey) {
+        provider = 'openai'
+      } else if (this.settings.anthropic?.enabled === true && this.settings.anthropic?.apiKey) {
+        provider = 'anthropic'
+      } else {
+        throw new Error('Hiçbir AI servisi etkin değil. Lütfen en az birini etkinleştirin.')
+      }
+    }
+
+    const config = provider === 'openai' ? this.settings.openai : this.settings.anthropic
+
+    if (!config?.enabled || !config?.apiKey) {
+      throw new Error(`${provider} servisi etkin değil veya API anahtarı eksik.`)
+    }
+
+    try {
+      let content: string
+      if (provider === 'openai') {
+        content = await this.callOpenAISimple(prompt, config.model, config.apiKey)
+      } else {
+        content = await this.callAnthropicSimple(prompt, config.model, config.apiKey)
+      }
+
+      return {
+        content,
+        model: config.model
+      }
+    } catch (error) {
+      console.error(`AI genel soru hatası (${provider}):`, error)
+      throw new Error(`AI yanıtı alınamadı: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`)
+    }
+  }
+
+  private async callOpenAISimple(prompt: string, model: string, apiKey: string): Promise<string> {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1000
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: { message: 'API çağrısı başarısız' } }))
+      throw new Error(error.error?.message || `HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.choices[0]?.message?.content || 'Yanıt alınamadı'
+  }
+
+  private async callAnthropicSimple(prompt: string, model: string, apiKey: string): Promise<string> {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1000,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: { message: 'API çağrısı başarısız' } }))
+      throw new Error(error.error?.message || `HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.content[0]?.text || 'Yanıt alınamadı'
+  }
+
+  async generateStrategyCode(description: string, provider?: 'openai' | 'anthropic'): Promise<{ content: string; model: string }> {
+    if (!this.settings) {
+      throw new Error('AI servisleri yapılandırılmamış. Lütfen API anahtarlarını ayarlayın.')
+    }
+
+    // Auto-select provider if not specified
+    if (!provider) {
+      if (this.settings.openai?.enabled === true && this.settings.openai?.apiKey) {
+        provider = 'openai'
+      } else if (this.settings.anthropic?.enabled === true && this.settings.anthropic?.apiKey) {
+        provider = 'anthropic'
+      } else {
+        throw new Error('Hiçbir AI servisi etkin değil. Lütfen en az birini etkinleştirin.')
+      }
+    }
+
+    const config = provider === 'openai' ? this.settings.openai : this.settings.anthropic
+
+    if (!config?.enabled || !config?.apiKey) {
+      throw new Error(`${provider} servisi etkin değil veya API anahtarı eksik.`)
+    }
+
+    const strategyPrompt = `Aşağıdaki talebe göre tam bir C# trading stratejisi kodu yaz. Kod, OnBarUpdate() metodunu içermeli ve trading mantığını gerçekleştirmeli. Türkçe açıklama satırları ekle.
+
+Talep: "${description}"
+
+Kod şu formatta olmalı:
+- using direktifleri
+- namespace ve class tanımı
+- Gerekli değişkenler
+- OnBarUpdate() metodu
+- Al/sat sinyalleri
+- Risk yönetimi
+
+Sadece çalışır C# kodu döndür, başka açıklama ekleme.`
+
+    try {
+      let content: string
+      if (provider === 'openai') {
+        content = await this.callOpenAI(strategyPrompt, config.model, config.apiKey)
+      } else {
+        content = await this.callAnthropic(strategyPrompt, config.model, config.apiKey)
+      }
+
+      return {
+        content,
+        model: config.model
+      }
+    } catch (error) {
+      console.error(`AI strateji kod üretimi hatası (${provider}):`, error)
+      throw new Error(`Strateji kodu üretilemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`)
+    }
+  }
 }
 
 export const aiService = AIService.getInstance()

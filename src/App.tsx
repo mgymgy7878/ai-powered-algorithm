@@ -3,7 +3,7 @@ import { useKV } from '@github/spark/hooks'
 import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
 import { RunningStrategies } from './components/strategy/RunningStrategies'
-import { StrategyGenerator } from './components/strategy/StrategyGenerator'
+import { StrategiesPage } from './components/strategy/StrategiesPage'
 import { BacktestEngine } from './components/backtest/BacktestEngine'
 import { LiveTrading } from './components/live/LiveTrading'
 import { PortfolioView } from './components/portfolio/PortfolioView'
@@ -75,7 +75,7 @@ function App() {
       case 'dashboard':
         return <Dashboard />
       case 'strategies':
-        return <StrategyGenerator />
+        return <StrategiesPage />
       case 'running-strategies':
         return <RunningStrategies />
       case 'backtest':
