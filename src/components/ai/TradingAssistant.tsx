@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -23,6 +23,14 @@ export function TradingAssistant() {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Yeni mesaj geldiğinde otomatik scroll
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages])
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
@@ -87,10 +95,14 @@ Kısa ve öz bir yanıt ver.`
   }
 
   return (
-    <Card className="w-full h-full p-4 flex flex-col">
-      <h3 className="text-lg font-bold mb-2">AI Trading Yöneticisi</h3>
+    <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
+      {/* Sabit başlık */}
+      <div className="flex-shrink-0 px-4 py-3 border-b bg-card">
+        <h3 className="text-lg font-bold">AI Trading Yöneticisi</h3>
+      </div>
       
-      <ScrollArea className="flex-1 pr-2 mb-3">
+      {/* Sabit yükseklikte mesaj alanı - otomatik scroll */}
+      <ScrollArea className="flex-1 px-4 py-3 overflow-auto">
         <div className="space-y-3">
           {messages.map((message) => (
             <div 
@@ -126,29 +138,49 @@ Kısa ve öz bir yanıt ver.`
               )}
             </div>
           ))}
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="flex gap-3 justify-start">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-4 h-4 text-primary" />
+              </div>
+              <div className="bg-muted px-3 py-2 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm text-muted-foreground">Yazıyor...</span>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Otomatik scroll referans noktası */}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
       
-      <div className="flex gap-2 mt-auto">
-        <Input
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="AI'a mesaj yazın..."
-          className="flex-1"
-          disabled={isLoading}
-        />
-        <Button 
-          onClick={sendMessage} 
-          disabled={isLoading || !inputMessage.trim()} 
-          size="icon"
-        >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Send className="w-4 h-4" />
-          )}
-        </Button>
+      {/* Sabit alt mesaj yazma alanı */}
+      <div className="flex-shrink-0 p-4 border-t bg-card">
+        <div className="flex gap-2">
+          <Input
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="AI'a mesaj yazın..."
+            className="flex-1"
+            disabled={isLoading}
+          />
+          <Button 
+            onClick={sendMessage} 
+            disabled={isLoading || !inputMessage.trim()} 
+            size="icon"
+            className="flex-shrink-0"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
       </div>
     </Card>
   )
