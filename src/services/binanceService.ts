@@ -2,10 +2,10 @@ import CryptoJS from 'crypto-js'
 
 export interface KlineData {
   openTime: number
-  open: string
-  high: string
-  low: string
-  close: string
+  volume: stri
+  quoteAssetVo
+  takerBuyBas
+  ignore: strin
   volume: string
   closeTime: number
   quoteAssetVolume: string
@@ -15,23 +15,23 @@ export interface KlineData {
   ignore: string
 }
 
-export interface AccountInfo {
-  accountType: string
-  totalInitialMargin: string
-  totalMaintMargin: string
-  totalWalletBalance: string
-  totalUnrealizedProfit: string
-  totalMarginBalance: string
-  totalPositionInitialMargin: string
-  totalOpenOrderInitialMargin: string
-  maxWithdrawAmount: string
-  assets: Array<{
-    asset: string
-    walletBalance: string
-    unrealizedProfit: string
-    marginBalance: string
+    positionInitialMargin: str
+  }>
+    symbol: string
     maintMargin: string
-    initialMargin: string
+    positionInitialMargin: s
+    leverage: string
+    entryPrice: string
+    positionSide: string
+    notional: string
+    updateTime: number
+}
+export interface 
+  price: string
+
+  orderId: number
+  status: string
+  price: string
     positionInitialMargin: string
     openOrderInitialMargin: string
   }>
@@ -66,383 +66,382 @@ export interface Order {
   clientOrderId: string
   price: string
   avgPrice: string
-  origQty: string
-  executedQty: string
-  cumQty: string
-  cumQuote: string
-  timeInForce: string
-  type: string
-  reduceOnly: boolean
-  closePosition: boolean
-  side: string
-  positionSide: string
-  stopPrice: string
-  workingType: string
-  priceProtect: boolean
-  origType: string
-  time: number
-  updateTime: number
-}
 
-class BinanceService {
-  private apiKey: string = ''
-  private secretKey: string = ''
-  private baseUrl: string = ''
-  private isTestnet: boolean = true
+      headers['X-MBX-
 
-  // API anahtarlarını ayarla
-  setCredentials(apiKey: string, secretKey: string, testnet: boolean = true) {
-    this.apiKey = apiKey
-    this.secretKey = secretKey
-    this.isTestnet = testnet
-    this.baseUrl = this.getBaseUrl()
-  }
-
-  // Base URL'i belirle
-  private getBaseUrl(): string {
-    return this.isTestnet 
-      ? 'https://testnet.binancefuture.com'
-      : 'https://fapi.binance.com'
-  }
-
-  // İmza oluştur
-  private createSignature(queryString: string): string {
-    return CryptoJS.HmacSHA256(queryString, this.secretKey).toString()
-  }
-
-  // API isteği yap
-  private async makeRequest(
-    endpoint: string,
-    method: 'GET' | 'POST' | 'DELETE' = 'GET',
-    params: Record<string, any> = {},
-    requiresAuth: boolean = true
-  ): Promise<any> {
-    if (requiresAuth && (!this.apiKey || !this.secretKey)) {
-      throw new Error('Binance API anahtarları gerekli')
-    }
-
-    const timestamp = Date.now()
-    if (requiresAuth) {
-      params.timestamp = timestamp
-    }
-
-    const queryString = new URLSearchParams(params).toString()
-    const signature = requiresAuth ? this.createSignature(queryString) : ''
-
-    const url = `${this.baseUrl}${endpoint}${queryString ? `?${queryString}` : ''}${signature ? `&signature=${signature}` : ''}`
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-
-    if (requiresAuth) {
-      headers['X-MBX-APIKEY'] = this.apiKey
-    }
-
-    try {
-      const response = await fetch(url, {
-        method,
+      const respon
         headers,
-      })
 
-      if (!response.ok) {
-        const error = await response.text()
-        throw new Error(`Binance API hatası: ${error}`)
+        const error =
       }
-
-      return response.json()
-    } catch (error) {
-      console.error('Binance API isteği başarısız:', error)
-      throw error
+      return r
+      console.error('B
     }
-  }
 
-  // Test bağlantısı
-  async testConnection(): Promise<boolean> {
-    try {
-      await this.makeRequest('/fapi/v1/ping', 'GET', {}, false)
-      return true
-    } catch (error) {
-      console.error('Binance bağlantı testi başarısız:', error)
+  async testConnection(
+      await this.m
+    } catch (e
       return false
-    }
-  }
+ 
 
-  // Hesap bilgilerini al
-  async getAccountInfo(): Promise<AccountInfo> {
     try {
-      const data = await this.makeRequest('/fapi/v2/account')
       return {
-        ...data,
-        assets: data.assets.map((asset: any) => ({
-          asset: asset.asset,
-          walletBalance: asset.walletBalance,
-          unrealizedProfit: asset.unrealizedProfit,
-          marginBalance: asset.marginBalance,
-          maintMargin: asset.maintMargin,
-          initialMargin: asset.initialMargin,
-          positionInitialMargin: asset.positionInitialMargin,
-          openOrderInitialMargin: asset.openOrderInitialMargin,
-        }))
+        assets: data.assets.map(
+          walletBalance: asset
+          marginBalance: asset.marg
+
+          openOrderInitialMar
       }
-    } catch (error) {
-      console.error('Hesap bilgileri alınamadı:', error)
-      throw new Error(`Hesap bilgileri alınamadı: ${error}`)
+      console.error('Hes
     }
-  }
 
-  // 24 saatlik sembol fiyat istatistikleri
-  async getSymbolPrices(): Promise<SymbolPrice[]> {
-    try {
-      const [tickerData, priceData] = await Promise.all([
-        this.makeRequest('/fapi/v1/ticker/24hr', 'GET', {}, false),
-        this.makeRequest('/fapi/v1/ticker/price', 'GET', {}, false)
-      ])
+  async getSymbolPrices(): Promise<S
+   
 
-      return priceData.map((item: any) => ({
+
         symbol: item.symbol,
-        price: item.price
       }))
-    } catch (error) {
-      console.error('Sembol fiyatları alınamadı:', error)
-      throw new Error(`Sembol fiyatları alınamadı: ${error}`)
+      console.error('Sembol fiyatları alına
     }
-  }
 
-  // Kline (mum) verilerini al
-  async getKlineData(
-    symbol: string,
-    interval: string = '1m',
-    limit: number = 500,
+
+    interval: str
     startTime?: number,
-    endTime?: number
   ): Promise<KlineData[]> {
-    try {
-      const params: Record<string, any> = {
-        symbol: symbol.toUpperCase(),
-        interval,
-        limit
+   
+
       }
+      if (startTime) params.
 
-      if (startTime) params.startTime = startTime
-      if (endTime) params.endTime = endTime
 
-      const data = await this.makeRequest('/fapi/v1/klines', 'GET', params, false)
-
-      return data.map((kline: any[]) => ({
         openTime: kline[0],
-        open: kline[1],
         high: kline[2],
-        low: kline[3],
-        close: kline[4],
-        volume: kline[5],
+        close: klin
         closeTime: kline[6],
-        quoteAssetVolume: kline[7],
         numberOfTrades: kline[8],
-        takerBuyBaseAssetVolume: kline[9],
-        takerBuyQuoteAssetVolume: kline[10],
-        ignore: kline[11]
-      }))
-    } catch (error) {
-      console.error('Kline verileri alınamadı:', error)
-      throw new Error(`Kline verileri alınamadı: ${error}`)
-    }
-  }
+     
 
-  // WebSocket URL'ini al
-  getWebSocketUrl(): string {
-    const wsBaseUrl = this.isTestnet
-      ? 'wss://stream.binancefuture.com'
-      : 'wss://fstream.binance.com'
+      console.error('Kline veril
+    }
+
+  get
+
     return `${wsBaseUrl}/ws`
-  }
 
-  // Exchange bilgilerini al
-  async getExchangeInfo(): Promise<any> {
-    try {
+
       return await this.makeRequest('/fapi/v1/exchangeInfo', 'GET', {}, false)
-    } catch (error) {
-      console.error('Exchange bilgileri alınamadı:', error)
-      throw new Error(`Exchange bilgileri alınamadı: ${error}`)
+
     }
+
+  asy
+
+    } catch (error) {
+      throw new Error(`Pozisyonlar alınamad
   }
 
-  // Aktif pozisyonları al
-  async getPositions(): Promise<any[]> {
     try {
-      const accountInfo = await this.getAccountInfo()
-      return accountInfo.positions.filter(pos => parseFloat(pos.positionAmt) !== 0)
-    } catch (error) {
-      console.error('Pozisyonlar alınamadı:', error)
-      throw new Error(`Pozisyonlar alınamadı: ${error}`)
+      if (symbol) params.symbol = symbol.
+      return aw
+      console.er
     }
-  }
 
-  // Açık emirleri al
-  async getOpenOrders(symbol?: string): Promise<Order[]> {
-    try {
-      const params: Record<string, any> = {}
-      if (symbol) params.symbol = symbol.toUpperCase()
-
-      return await this.makeRequest('/fapi/v1/openOrders', 'GET', params)
-    } catch (error) {
-      console.error('Açık emirler alınamadı:', error)
-      throw new Error(`Açık emirler alınamadı: ${error}`)
-    }
-  }
-
-  // Market emir ver
   async placeMarketOrder(
-    symbol: string,
     side: 'BUY' | 'SELL',
-    quantity: number,
     positionSide: 'BOTH' | 'LONG' | 'SHORT' = 'BOTH'
-  ): Promise<Order> {
-    try {
-      const params = {
-        symbol: symbol.toUpperCase(),
-        side,
+    try
+
         type: 'MARKET',
-        quantity: quantity.toString(),
         positionSide,
-        timestamp: Date.now()
       }
+      return awai
+     
+   
 
-      return await this.makeRequest('/fapi/v1/order', 'POST', params)
-    } catch (error) {
-      console.error('Market emir verilemedi:', error)
-      throw new Error(`Market emir verilemedi: ${error}`)
-    }
-  }
-
-  // Limit emir ver
-  async placeLimitOrder(
-    symbol: string,
+  async placeLimitOr
     side: 'BUY' | 'SELL',
-    quantity: number,
-    price: number,
-    positionSide: 'BOTH' | 'LONG' | 'SHORT' = 'BOTH',
+    price
     timeInForce: 'GTC' | 'IOC' | 'FOK' = 'GTC'
-  ): Promise<Order> {
     try {
-      const params = {
-        symbol: symbol.toUpperCase(),
-        side,
+        symbol: symbo
         type: 'LIMIT',
-        quantity: quantity.toString(),
-        price: price.toString(),
-        positionSide,
-        timeInForce,
-        timestamp: Date.now()
-      }
+        price: pri
+     
+   
 
-      return await this.makeRequest('/fapi/v1/order', 'POST', params)
-    } catch (error) {
-      console.error('Limit emir verilemedi:', error)
-      throw new Error(`Limit emir verilemedi: ${error}`)
+      console.error('Limi
     }
-  }
 
-  // Tüm açık emirleri iptal et
   async cancelAllOrders(symbol?: string): Promise<any> {
-    try {
-      const params: Record<string, any> = {
-        timestamp: Date.now()
+      const pa
       }
-      if (symbol) params.symbol = symbol.toUpperCase()
 
-      return await this.makeRequest('/fapi/v1/allOpenOrders', 'DELETE', params)
     } catch (error) {
-      console.error('Emirler iptal edilemedi:', error)
-      throw new Error(`Emirler iptal edilemedi: ${error}`)
-    }
+      throw new Error(`Emirler iptal edilemed
   }
-
   // Pozisyonu kapat
-  async closePosition(symbol: string): Promise<Order | null> {
     try {
-      const positions = await this.getPositions()
-      const position = positions.find(pos => pos.symbol === symbol.toUpperCase())
-
-      if (!position || parseFloat(position.positionAmt) === 0) {
-        throw new Error('Kapatılacak pozisyon bulunamadı')
+      const position = positions.find(pos => 
+      if (!position || parseFloat(position.positionAmt) === 0
       }
+      const
 
-      const side = parseFloat(position.positionAmt) > 0 ? 'SELL' : 'BUY'
-      const quantity = Math.abs(parseFloat(position.positionAmt))
-
-      return await this.placeMarketOrder(symbol, side, quantity)
     } catch (error) {
-      console.error('Pozisyon kapatılamadı:', error)
       throw new Error(`Pozisyon kapatılamadı: ${error}`)
-    }
   }
+  // 
+   
 
-  // Kaldıraç ayarla
-  async setLeverage(symbol: string, leverage: number): Promise<any> {
-    try {
-      const params = {
-        symbol: symbol.toUpperCase(),
-        leverage: leverage.toString(),
         timestamp: Date.now()
-      }
 
-      return await this.makeRequest('/fapi/v1/leverage', 'POST', params)
-    } catch (error) {
-      console.error('Kaldıraç ayarlanamadı:', error)
+    } cat
       throw new Error(`Kaldıraç ayarlanamadı: ${error}`)
-    }
   }
-
   // Margin tipini ayarla
-  async setMarginType(symbol: string, marginType: 'ISOLATED' | 'CROSSED'): Promise<any> {
-    try {
-      const params = {
-        symbol: symbol.toUpperCase(),
-        marginType,
+    try 
+
         timestamp: Date.now()
-      }
 
-      return await this.makeRequest('/fapi/v1/marginType', 'POST', params)
     } catch (error) {
-      console.error('Margin tipi ayarlanamadı:', error)
-      throw new Error(`Margin tipi ayarlanamadı: ${error}`)
-    }
+      thr
   }
-
   // İşlem geçmişini al
-  async getTradeHistory(symbol?: string, limit: number = 500): Promise<any[]> {
     try {
-      const params: Record<string, any> = {
-        limit,
-        timestamp: Date.now()
-      }
-      if (symbol) params.symbol = symbol.toUpperCase()
+     
+   
 
-      return await this.makeRequest('/fapi/v1/userTrades', 'GET', params)
     } catch (error) {
-      console.error('İşlem geçmişi alınamadı:', error)
-      throw new Error(`İşlem geçmişi alınamadı: ${error}`)
-    }
+      throw new Error
   }
-
   // Gelir geçmişini al
-  async getIncomeHistory(symbol?: string, incomeType?: string, limit: number = 100): Promise<any[]> {
     try {
-      const params: Record<string, any> = {
         limit,
-        timestamp: Date.now()
       }
-      if (symbol) params.symbol = symbol.toUpperCase()
-      if (incomeType) params.incomeType = incomeType
-
-      return await this.makeRequest('/fapi/v1/income', 'GET', params)
-    } catch (error) {
-      console.error('Gelir geçmişi alınamadı:', error)
-      throw new Error(`Gelir geçmişi alınamadı: ${error}`)
+      if (incomeType) param
+      ret
+      console.error('Gelir geçmişi alınamad
     }
-  }
 }
+// Singleton 
 
-// Singleton instance oluştur
-export const binanceService = new BinanceService()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
