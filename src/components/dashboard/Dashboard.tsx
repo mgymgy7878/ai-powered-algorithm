@@ -50,8 +50,13 @@ export function Dashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="relative p-6 space-y-6">
+      {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
+      <div className="absolute top-4 right-4 w-[360px] max-h-[500px] bg-background border rounded-lg shadow-md p-4 overflow-auto z-50">
+        <TradingAssistant />
+      </div>
+
+      <div className="flex items-center justify-between pr-[380px]">
         <div>
           <h2 className="text-3xl font-bold">Anasayfa</h2>
           <p className="text-muted-foreground">AI destekli trading yönetimi ve portföy genel görünümü</p>
@@ -81,7 +86,7 @@ export function Dashboard() {
       </div>
 
       {/* Portfolio Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pr-[380px]">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Portfolio Value</CardTitle>
@@ -143,7 +148,8 @@ export function Dashboard() {
       </div>
 
       {/* Recent Trades */}
-      <Card>
+      <div className="pr-[380px]">
+        <Card>
         <CardHeader>
           <CardTitle>Recent Trades</CardTitle>
         </CardHeader>
@@ -173,20 +179,7 @@ export function Dashboard() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Yapay Zeka Trading Yöneticisi */}
-      <section>
-        <div className="mb-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <CpuChipIcon className="h-5 w-5" />
-            Yapay Zeka Trading Yöneticisi
-          </h2>
-          <p className="text-muted-foreground">
-            Piyasa analizi, strateji önerisi ve portföy özetleri için AI asistanınızı kullanın.
-          </p>
-        </div>
-        <TradingAssistant />
-      </section>
+      </div>
 
       {/* Market Data Dialog */}
       <Dialog open={showMarketData} onOpenChange={setShowMarketData}>
