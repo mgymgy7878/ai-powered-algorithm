@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
@@ -8,12 +8,31 @@ import { LiveTrading } from './components/live/LiveTrading'
 import { PortfolioView } from './components/portfolio/PortfolioView'
 import { MarketAnalysis } from './components/analysis/MarketAnalysis'
 import { Toaster } from './components/ui/sonner'
+import { aiService } from './services/aiService'
+import { APISettings } from './types/api'
 
 export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
   const [strategies] = useKV('trading-strategies', [])
+  const [apiSettings] = useKV<APISettings>('api-settings', {
+    openai: {
+      apiKey: '',
+      model: 'gpt-4',
+      enabled: true
+    },
+    anthropic: {
+      apiKey: '',
+      model: 'claude-3-sonnet',
+      enabled: false
+    }
+  })
+
+  // Initialize AI service with stored settings
+  useEffect(() => {
+    aiService.setSettings(apiSettings)
+  }, [apiSettings])
 
   const renderView = () => {
     switch (currentView) {

@@ -1,113 +1,115 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Eye, EyeSlash, Gear, CheckCircle, Warning } from '@phosphor-icons/react'
+import { Switch } from '@/components/ui/switch'
+import { Eye, EyeSlash, CheckCircle, AlertTriangle, Key, TestTube, Settings } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { aiService, AIConfig } from '@/lib/ai-service'
+import { aiService } from '../../services/aiService'
+import { useKV } from '@github/spark/hooks'
+import { APISettings } from '../../types/api'
 
 interface AIConfigurationProps {
   onClose?: () => void
 }
 
 export function AIConfiguration({ onClose }: AIConfigurationProps) {
-  const [config, setConfig] = useState<AIConfig>({
-    preferredModel: 'gpt-4',
-    temperature: 0.7,
-    maxTokens: 2000
+  const [settings, setSettings] = useKV<APISettings>('api-settings', {
+    openai: {
+      apiKey: '',
+      model: 'gpt-4',
+      enabled: true
+    },
+    anthropic: {
+      apiKey: '',
+      model: 'claude-3-sonnet',
+      enabled: false
+    }
   })
+
   const [showOpenAIKey, setShowOpenAIKey] = useState(false)
   const [showAnthropicKey, setShowAnthropicKey] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [testResults, setTestResults] = useState<{[key: string]: 'success' | 'error' | 'testing'}>({})
+  const [testingOpenAI, setTestingOpenAI] = useState(false)
+  const [testingAnthropic, setTestingAnthropic] = useState(false)
+  const [openAIStatus, setOpenAIStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [anthropicStatus, setAnthropicStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
-  useEffect(() => {
-    loadConfig()
-  }, [])
+  const updateSettings = (newSettings: APISettings) => {
+    setSettings(newSettings)
+    aiService.setSettings(newSettings)
+  }
 
-  const loadConfig = async () => {
-    try {
-      const currentConfig = aiService.getConfig()
-      setConfig(currentConfig)
-    } catch (error) {
-      console.error('Konfigürasyon yüklenirken hata:', error)
+  const testOpenAI = async () => {
+    if (!settings.openai.apiKey) {
+      toast.error('OpenAI API anahtarı girilmelidir')
+      return
     }
-  }
 
-  const handleConfigChange = (key: keyof AIConfig, value: any) => {
-    setConfig(prev => ({ ...prev, [key]: value }))
-  }
+    setTestingOpenAI(true)
+    setOpenAIStatus('idle')
 
-  const saveConfig = async () => {
-    setIsLoading(true)
     try {
-      await aiService.updateConfig(config)
-      toast.success('AI konfigürasyonu kaydedildi')
-      onClose?.()
-    } catch (error) {
-      toast.error('Konfigürasyon kaydedilirken hata oluştu')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const testAPIKey = async (provider: 'openai' | 'anthropic') => {
-    setTestResults(prev => ({ ...prev, [provider]: 'testing' }))
-    
-    try {
-      // Create a temporary service with current config
-      await aiService.updateConfig(config)
-      
-      const testMessage = 'Merhaba, bu bir test mesajıdır.'
-      const result = await aiService.generalQuestion(testMessage)
-      
-      if (result.content) {
-        setTestResults(prev => ({ ...prev, [provider]: 'success' }))
-        toast.success(`${provider === 'openai' ? 'OpenAI' : 'Anthropic'} API anahtarı başarıyla test edildi`)
+      const isValid = await aiService.testConnection('openai', settings.openai.apiKey)
+      if (isValid) {
+        setOpenAIStatus('success')
+        toast.success('OpenAI API anahtarı başarıyla doğrulandı')
       } else {
-        throw new Error('Boş yanıt alındı')
+        setOpenAIStatus('error')
+        toast.error('OpenAI API anahtarı geçersiz')
       }
-    } catch (error: any) {
-      setTestResults(prev => ({ ...prev, [provider]: 'error' }))
-      toast.error(`${provider === 'openai' ? 'OpenAI' : 'Anthropic'} API test hatası: ${error.message}`)
+    } catch (error) {
+      setOpenAIStatus('error')
+      toast.error('OpenAI bağlantı testi başarısız')
+    } finally {
+      setTestingOpenAI(false)
     }
   }
 
-  const getModelOptions = () => {
-    const options = []
-    
-    if (config.openaiApiKey) {
-      options.push(
-        { value: 'gpt-4', label: 'GPT-4 (En Güçlü)' },
-        { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (Hızlı)' }
-      )
+  const testAnthropic = async () => {
+    if (!settings.anthropic.apiKey) {
+      toast.error('Anthropic API anahtarı girilmelidir')
+      return
     }
-    
-    if (config.anthropicApiKey) {
-      options.push(
-        { value: 'claude-3-sonnet', label: 'Claude 3 Sonnet (Dengeli)' },
-        { value: 'claude-3-haiku', label: 'Claude 3 Haiku (Hızlı)' }
-      )
+
+    setTestingAnthropic(true)
+    setAnthropicStatus('idle')
+
+    try {
+      const isValid = await aiService.testConnection('anthropic', settings.anthropic.apiKey)
+      if (isValid) {
+        setAnthropicStatus('success')
+        toast.success('Anthropic API anahtarı başarıyla doğrulandı')
+      } else {
+        setAnthropicStatus('error')
+        toast.error('Anthropic API anahtarı geçersiz')
+      }
+    } catch (error) {
+      setAnthropicStatus('error')
+      toast.error('Anthropic bağlantı testi başarısız')
+    } finally {
+      setTestingAnthropic(false)
     }
-    
-    return options
   }
 
-  const getStatusBadge = (provider: 'openai' | 'anthropic') => {
-    const status = testResults[provider]
-    
+  const getStatusBadge = (status: 'idle' | 'success' | 'error') => {
     switch (status) {
-      case 'testing':
-        return <Badge variant="secondary" className="animate-pulse">Test ediliyor...</Badge>
       case 'success':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Çalışıyor</Badge>
+        return (
+          <Badge variant="secondary" className="bg-green-100 text-green-800">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Doğrulandı
+          </Badge>
+        )
       case 'error':
-        return <Badge variant="destructive"><Warning className="w-3 h-3 mr-1" />Hata</Badge>
+        return (
+          <Badge variant="destructive">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Hata
+          </Badge>
+        )
       default:
         return null
     }
@@ -116,59 +118,106 @@ export function AIConfiguration({ onClose }: AIConfigurationProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Gear className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold">AI Konfigürasyonu</h2>
+        <Settings className="w-6 h-6 text-primary" />
+        <div>
+          <h2 className="text-xl font-semibold">AI Konfigürasyonu</h2>
+          <p className="text-sm text-muted-foreground">
+            Trading stratejileri için AI modellerini yapılandırın
+          </p>
+        </div>
       </div>
 
       {/* OpenAI Configuration */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                OpenAI API
-                {getStatusBadge('openai')}
-              </CardTitle>
-              <CardDescription>
-                GPT-4 ve GPT-3.5 Turbo modellerine erişim için OpenAI API anahtarı
-              </CardDescription>
+            <div className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              <div>
+                <CardTitle>OpenAI API</CardTitle>
+                <CardDescription>
+                  GPT-4 ve GPT-3.5 Turbo modellerine erişim
+                </CardDescription>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {getStatusBadge(openAIStatus)}
+              <Switch
+                checked={settings.openai.enabled}
+                onCheckedChange={(enabled) => 
+                  updateSettings({
+                    ...settings,
+                    openai: { ...settings.openai, enabled }
+                  })
+                }
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="openai-key">API Anahtarı</Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  id="openai-key"
-                  type={showOpenAIKey ? 'text' : 'password'}
-                  placeholder="sk-..."
-                  value={config.openaiApiKey || ''}
-                  onChange={(e) => handleConfigChange('openaiApiKey', e.target.value)}
-                />
+          <div className="grid gap-4">
+            <div>
+              <Label htmlFor="openai-key">API Anahtarı</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    id="openai-key"
+                    type={showOpenAIKey ? 'text' : 'password'}
+                    placeholder="sk-..."
+                    value={settings.openai.apiKey}
+                    onChange={(e) => 
+                      updateSettings({
+                        ...settings,
+                        openai: { ...settings.openai, apiKey: e.target.value }
+                      })
+                    }
+                    disabled={!settings.openai.enabled}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowOpenAIKey(!showOpenAIKey)}
+                    disabled={!settings.openai.enabled}
+                  >
+                    {showOpenAIKey ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
                 <Button
-                  type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowOpenAIKey(!showOpenAIKey)}
+                  onClick={testOpenAI}
+                  disabled={!settings.openai.enabled || !settings.openai.apiKey || testingOpenAI}
                 >
-                  {showOpenAIKey ? <EyeSlash className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <TestTube className="w-4 h-4 mr-1" />
+                  {testingOpenAI ? 'Test ediliyor...' : 'Test Et'}
                 </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => testAPIKey('openai')}
-                disabled={!config.openaiApiKey || testResults.openai === 'testing'}
-              >
-                Test Et
-              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              API anahtarınızı <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">OpenAI hesabınızdan</a> alabilirsiniz
-            </p>
+
+            <div>
+              <Label htmlFor="openai-model">Model</Label>
+              <Select
+                value={settings.openai.model}
+                onValueChange={(model: 'gpt-4' | 'gpt-4-turbo' | 'gpt-3.5-turbo') =>
+                  updateSettings({
+                    ...settings,
+                    openai: { ...settings.openai, model }
+                  })
+                }
+                disabled={!settings.openai.enabled}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gpt-4">GPT-4 (En İyi Kalite)</SelectItem>
+                  <SelectItem value="gpt-4-turbo">GPT-4 Turbo (Hızlı)</SelectItem>
+                  <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Ekonomik)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -177,171 +226,163 @@ export function AIConfiguration({ onClose }: AIConfigurationProps) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                Anthropic API
-                {getStatusBadge('anthropic')}
-              </CardTitle>
-              <CardDescription>
-                Claude 3 modellerine erişim için Anthropic API anahtarı
-              </CardDescription>
+            <div className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              <div>
+                <CardTitle>Anthropic (Claude)</CardTitle>
+                <CardDescription>
+                  Claude 3 model ailesi erişimi
+                </CardDescription>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {getStatusBadge(anthropicStatus)}
+              <Switch
+                checked={settings.anthropic.enabled}
+                onCheckedChange={(enabled) => 
+                  updateSettings({
+                    ...settings,
+                    anthropic: { ...settings.anthropic, enabled }
+                  })
+                }
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="anthropic-key">API Anahtarı</Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  id="anthropic-key"
-                  type={showAnthropicKey ? 'text' : 'password'}
-                  placeholder="sk-ant-..."
-                  value={config.anthropicApiKey || ''}
-                  onChange={(e) => handleConfigChange('anthropicApiKey', e.target.value)}
-                />
+          <div className="grid gap-4">
+            <div>
+              <Label htmlFor="anthropic-key">API Anahtarı</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    id="anthropic-key"
+                    type={showAnthropicKey ? 'text' : 'password'}
+                    placeholder="sk-ant-..."
+                    value={settings.anthropic.apiKey}
+                    onChange={(e) => 
+                      updateSettings({
+                        ...settings,
+                        anthropic: { ...settings.anthropic, apiKey: e.target.value }
+                      })
+                    }
+                    disabled={!settings.anthropic.enabled}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowAnthropicKey(!showAnthropicKey)}
+                    disabled={!settings.anthropic.enabled}
+                  >
+                    {showAnthropicKey ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
                 <Button
-                  type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowAnthropicKey(!showAnthropicKey)}
+                  onClick={testAnthropic}
+                  disabled={!settings.anthropic.enabled || !settings.anthropic.apiKey || testingAnthropic}
                 >
-                  {showAnthropicKey ? <EyeSlash className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <TestTube className="w-4 h-4 mr-1" />
+                  {testingAnthropic ? 'Test ediliyor...' : 'Test Et'}
                 </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => testAPIKey('anthropic')}
-                disabled={!config.anthropicApiKey || testResults.anthropic === 'testing'}
+            </div>
+
+            <div>
+              <Label htmlFor="anthropic-model">Model</Label>
+              <Select
+                value={settings.anthropic.model}
+                onValueChange={(model: 'claude-3-opus' | 'claude-3-sonnet' | 'claude-3-haiku') =>
+                  updateSettings({
+                    ...settings,
+                    anthropic: { ...settings.anthropic, model }
+                  })
+                }
+                disabled={!settings.anthropic.enabled}
               >
-                Test Et
-              </Button>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="claude-3-opus">Claude 3 Opus (En İyi Kalite)</SelectItem>
+                  <SelectItem value="claude-3-sonnet">Claude 3 Sonnet (Dengeli)</SelectItem>
+                  <SelectItem value="claude-3-haiku">Claude 3 Haiku (Hızlı)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <p className="text-xs text-muted-foreground">
-              API anahtarınızı <a href="https://console.anthropic.com/account/keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Anthropic hesabınızdan</a> alabilirsiniz
-            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Model Settings */}
+      {/* Configuration Status */}
       <Card>
         <CardHeader>
-          <CardTitle>Model Ayarları</CardTitle>
-          <CardDescription>
-            AI modeli ve yanıt parametrelerini yapılandırın
-          </CardDescription>
+          <CardTitle className="text-lg">Yapılandırma Durumu</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="model-select">Tercih Edilen Model</Label>
-            <Select
-              value={config.preferredModel}
-              onValueChange={(value) => handleConfigChange('preferredModel', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Model seçin" />
-              </SelectTrigger>
-              <SelectContent>
-                {getModelOptions().map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-                {getModelOptions().length === 0 && (
-                  <SelectItem value="" disabled>
-                    Önce API anahtarı ekleyin
-                  </SelectItem>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span>OpenAI API</span>
+              <div className="flex items-center gap-2">
+                {settings.openai.enabled && settings.openai.apiKey ? (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Yapılandırıldı
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">
+                    Yapılandırılmadı
+                  </Badge>
                 )}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
+              </div>
+            </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="temperature">Yaratıcılık (Temperature)</Label>
-              <Badge variant="outline">{config.temperature}</Badge>
+              <span>Anthropic API</span>
+              <div className="flex items-center gap-2">
+                {settings.anthropic.enabled && settings.anthropic.apiKey ? (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Yapılandırıldı
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">
+                    Yapılandırılmadı
+                  </Badge>
+                )}
+              </div>
             </div>
-            <Slider
-              id="temperature"
-              min={0}
-              max={1}
-              step={0.1}
-              value={[config.temperature]}
-              onValueChange={([value]) => handleConfigChange('temperature', value)}
-              className="w-full"
-            />
-            <p className="text-xs text-muted-foreground">
-              Düşük değerler daha tutarlı, yüksek değerler daha yaratıcı yanıtlar verir
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="max-tokens">Maksimum Token</Label>
-              <Badge variant="outline">{config.maxTokens}</Badge>
-            </div>
-            <Slider
-              id="max-tokens"
-              min={500}
-              max={4000}
-              step={100}
-              value={[config.maxTokens]}
-              onValueChange={([value]) => handleConfigChange('maxTokens', value)}
-              className="w-full"
-            />
-            <p className="text-xs text-muted-foreground">
-              AI yanıtının maksimum uzunluğu (1 token ≈ 0.75 kelime)
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* API Usage Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Önemli Bilgiler</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-start gap-2">
-            <Warning className="w-4 h-4 text-amber-500 mt-0.5" />
-            <div className="text-sm">
-              <strong>Güvenlik:</strong> API anahtarları güvenli şekilde tarayıcınızda saklanır ve başka yere gönderilmez.
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <Warning className="w-4 h-4 text-amber-500 mt-0.5" />
-            <div className="text-sm">
-              <strong>Maliyet:</strong> Her AI çağrısı API sağlayıcınıza ücret getirir. Kullanım limitlerini kontrol edin.
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-            <div className="text-sm">
-              <strong>Önerilen:</strong> GPT-4 daha kaliteli kod üretir, GPT-3.5 daha hızlı ve ekonomiktir.
+            <div className="pt-2 border-t">
+              <div className="text-sm text-muted-foreground">
+                {aiService.isConfigured() ? (
+                  <div className="flex items-center gap-2 text-green-600">
+                    <CheckCircle className="w-4 h-4" />
+                    AI servisleri kullanıma hazır
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-amber-600">
+                    <AlertTriangle className="w-4 h-4" />
+                    En az bir API anahtarı gereklidir
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Separator />
-
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Ayarlar otomatik olarak kaydedilir ve tüm AI özellikleri için kullanılır
-        </div>
-        <div className="flex gap-2">
-          {onClose && (
-            <Button variant="outline" onClick={onClose}>
-              Kapat
-            </Button>
-          )}
-          <Button onClick={saveConfig} disabled={isLoading}>
-            {isLoading ? 'Kaydediliyor...' : 'Kaydet'}
-          </Button>
-        </div>
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={onClose}>
+          Kapat
+        </Button>
+        <Button onClick={() => {
+          toast.success('Ayarlar kaydedildi')
+          onClose?.()
+        }}>
+          Kaydet
+        </Button>
       </div>
     </div>
   )
