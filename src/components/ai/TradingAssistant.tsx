@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Button } from '@/components/ui/butto
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useKV } from '@github/spark/hooks'
+import { Brain, Send, Loader2, User } from '@phosphor-icons/react'
 
-  id: string
-
-}
+// Mesaj tipi tanımı
+interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
@@ -14,54 +16,62 @@ import { useKV } from '@github/spark/hooks'
 
 export function TradingAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([
-  con
-    anthropic:
-
+    {
+      id: '1',
+      role: 'assistant',
+      content: 'Merhaba! AI Trading Yöneticinizim. Size piyasa analizi, strateji önerileri ve portföy değerlendirmesi konularında yardımcı olabilirim. Nasıl yardımcı olabilirim?',
+      timestamp: new Date()
+    }
+  ])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [apiSettings] = useKV('api-settings', {})
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  // API anahtarı test etme
-    i
-    
-      // Geçici olarak API anahtarını ayarla ve test e
-        ...apiSettings,
 
-      
-      const testPrompt = spark.llmPrompt`Bu bir bağla
-
-      setApiSettings(testSettings)
-      setShowApiSettings(false)
-      // Başarı mesajı ekle
-   
-
-      }
-      
-      console.er
-
+  // Mesajlar değiştiğinde en alta kaydır
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  }, [messages])
   // AI ile mesaj gönderme
-    if (!inputMessa
-    // API ayarları yoksa uyarı gös
-      setShowApiSettings(tr
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return
+
+    // API ayarları kontrolü
+    if (!apiSettings?.openai?.apiKey && !apiSettings?.anthropic?.apiKey) {
+      // API ayarları sayfasına yönlendir
+      window.dispatchEvent(new CustomEvent('navigate-to-settings'))
+      return
     }
 
+    setIsLoading(true)
+
+    // Kullanıcı mesajını ekle
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
       role: 'user',
-      timestamp: new Da
+      content: inputMessage.trim(),
+      timestamp: new Date()
+    }
 
+    setMessages(prev => [...prev, userMessage])
+    setInputMessage('')
 
-
+    try {
       // AI prompt oluştur
+      const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
       - Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
+      - Ekonomik takvimi ve haber akışını takip edip yorumlamak
       - Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+      - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
       - Türkçe yanıtlar üretmek
-      Kullanıcı mesajı: ${userMessage.content}
-      Lütfen kısa, öz ve işe yarar bir yanıt ver. Gerekirse somut öneri
-      const aiResponse = await 
 
-        role: 'assistant',
-      
+      Kullanıcı mesajı: ${userMessage.content}
+
       Lütfen kısa, öz ve işe yarar bir yanıt ver. Gerekirse somut öneriler sun.`
 
       const aiResponse = await spark.llm(prompt)
@@ -126,58 +136,57 @@ export function TradingAssistant() {
             }`}>
               <p className="whitespace-pre-wrap break-words">{message.content}</p>
               <p className="text-xs opacity-60 mt-1">
+                {message.timestamp.toLocaleTimeString('tr-TR', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </p>
             </div>
-              <Loader2 className="w
-            </div>
-        )}
-        <div ref={
 
-      <div c
+            {message.role === 'user' && (
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-primary" />
+              </div>
+            )}
+          </div>
+        ))}
+        
+        {isLoading && (
+          <div className="flex justify-start gap-3 mb-4">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Brain className="w-4 h-4 text-primary" />
+            </div>
+            <div className="bg-muted px-2 py-1 rounded-md text-sm flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Düşünüyor...</span>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Mesaj yazma alanı - sabit alt kısım */}
+      <div className="border-t p-3 flex gap-2 items-center bg-background">
+        <Input
+          placeholder="AI'a mesaj yaz..."
           value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           className="flex-1 text-xs h-8"
         />
-          onCl
-          size="
+        <Button
+          onClick={sendMessage}
+          disabled={!inputMessage.trim() || isLoading}
+          size="icon"
+          className="h-8 w-8"
         >
-
-            <Send className="w
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
         </Button>
+      </div>
     </Card>
+  )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
