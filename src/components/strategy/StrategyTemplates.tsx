@@ -1,376 +1,343 @@
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { TrendingUp, TrendingDown, Activity, Grid3x3, Target, Zap } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
+import { ScrollArea } from '../ui/scroll-area'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Input } from '../ui/input'
+import { 
+  Search, 
+  TrendingUp, 
+  Activity, 
+  Target, 
+  BarChart3, 
+  Zap,
+  Lightning,
+  Shield,
+  Timer,
+  Brain
+} from '@phosphor-icons/react'
 
 interface StrategyTemplate {
   id: string
   name: string
   description: string
-  category: 'scalping' | 'grid' | 'trend' | 'breakout' | 'mean_reversion'
+  category: 'momentum' | 'reversal' | 'breakout' | 'trend' | 'scalping' | 'swing'
+  complexity: 'beginner' | 'intermediate' | 'advanced'
   indicators: string[]
+  timeframes: string[]
   code: string
-  icon: React.ReactNode
+  performance: {
+    winRate: number
+    profitFactor: number
+    drawdown: number
+  }
 }
 
 const templates: StrategyTemplate[] = [
   {
-    id: 'rsi-scalping',
-    name: 'RSI Scalping',
-    description: 'RSI aşırı alım/satım seviyelerini kullanan hızlı scalping stratejisi',
-    category: 'scalping',
-    indicators: ['RSI', 'EMA'],
-    icon: <Zap className="w-4 h-4" />,
+    id: '1',
+    name: 'RSI Mean Reversion',
+    description: 'Basit RSI aşırı alım/satım seviyelerine dayalı strateji',
+    category: 'reversal',
+    complexity: 'beginner',
+    indicators: ['RSI', 'SMA'],
+    timeframes: ['15m', '1h', '4h'],
+    performance: { winRate: 65, profitFactor: 1.4, drawdown: 8 },
     code: `using System;
 using MatriksIQ.API;
 
-public class RSIScalpingStrategy : Strategy
+public class RSIMeanReversionStrategy : Strategy
 {
-    private int rsiPeriod = 14;
-    private double oversoldLevel = 30;
-    private double overboughtLevel = 70;
-    private double stopLoss = 0.5; // %0.5
-    private double takeProfit = 1.0; // %1.0
-    
     private RSI rsi;
-    private EMA emaFast;
-    private EMA emaSlow;
-    
-    public override void OnStart()
-    {
-        rsi = RSI(rsiPeriod);
-        emaFast = EMA(9);
-        emaSlow = EMA(21);
-    }
-    
-    public override void OnBarUpdate()
-    {
-        if (Bars.Count < Math.Max(rsiPeriod, 21)) return;
-        
-        // Trend kontrolü
-        bool upTrend = emaFast.Value > emaSlow.Value;
-        bool downTrend = emaFast.Value < emaSlow.Value;
-        
-        // Alış sinyali: RSI oversold ve yukarı trend
-        if (rsi.Value < oversoldLevel && upTrend && Position.MarketPosition == MarketPosition.Flat)
-        {
-            EnterLong();
-            SetStopLoss(CalculationMode.Percent, stopLoss);
-            SetProfitTarget(CalculationMode.Percent, takeProfit);
-        }
-        
-        // Satış sinyali: RSI overbought ve aşağı trend
-        if (rsi.Value > overboughtLevel && downTrend && Position.MarketPosition == MarketPosition.Flat)
-        {
-            EnterShort();
-            SetStopLoss(CalculationMode.Percent, stopLoss);
-            SetProfitTarget(CalculationMode.Percent, takeProfit);
-        }
-    }
-}`
-  },
-  {
-    id: 'grid-bot',
-    name: 'Grid Bot',
-    description: 'Yatay piyasalarda alım-satım seviyeleri belirleyerek çalışan grid stratejisi',
-    category: 'grid',
-    indicators: ['Bollinger Bands', 'ATR'],
-    icon: <Grid3x3 className="w-4 h-4" />,
-    code: `using System;
-using System.Collections.Generic;
-using MatriksIQ.API;
-
-public class GridBotStrategy : Strategy
-{
-    private double gridSpacing = 1.0; // %1 grid aralığı
-    private int maxPositions = 5;
-    private double positionSize = 0.1;
-    
-    private BollingerBands bb;
-    private ATR atr;
-    private List<double> gridLevels = new List<double>();
-    
-    public override void OnStart()
-    {
-        bb = BollingerBands(20, 2);
-        atr = ATR(14);
-        CreateGridLevels();
-    }
-    
-    private void CreateGridLevels()
-    {
-        if (Bars.Count < 20) return;
-        
-        double currentPrice = Close[0];
-        double spacing = currentPrice * (gridSpacing / 100);
-        
-        gridLevels.Clear();
-        
-        // Grid seviyelerini oluştur
-        for (int i = -maxPositions; i <= maxPositions; i++)
-        {
-            gridLevels.Add(currentPrice + (i * spacing));
-        }
-    }
-    
-    public override void OnBarUpdate()
-    {
-        if (Bars.Count < 20) return;
-        
-        // Volatilite kontrolü - düşük volatilitede grid çalıştır
-        if (atr.Value > bb.Width * 0.5) return;
-        
-        double currentPrice = Close[0];
-        
-        foreach (double level in gridLevels)
-        {
-            // Alış seviyesi
-            if (currentPrice <= level && !HasPositionAtLevel(level, "Long"))
-            {
-                if (GetLongPositionCount() < maxPositions)
-                {
-                    EnterLong(positionSize, "Grid_Long_" + level.ToString("F2"));
-                }
-            }
-            
-            // Satış seviyesi
-            if (currentPrice >= level && !HasPositionAtLevel(level, "Short"))
-            {
-                if (GetShortPositionCount() < maxPositions)
-                {
-                    EnterShort(positionSize, "Grid_Short_" + level.ToString("F2"));
-                }
-            }
-        }
-    }
-    
-    private bool HasPositionAtLevel(double level, string direction)
-    {
-        // Pozisyon kontrol mantığı
-        return false;
-    }
-    
-    private int GetLongPositionCount() { return 0; }
-    private int GetShortPositionCount() { return 0; }
-}`
-  },
-  {
-    id: 'macd-trend',
-    name: 'MACD Trend Following',
-    description: 'MACD sinyalleri ile trend takip stratejisi',
-    category: 'trend',
-    indicators: ['MACD', 'SMA'],
-    icon: <TrendingUp className="w-4 h-4" />,
-    code: `using System;
-using MatriksIQ.API;
-
-public class MACDTrendStrategy : Strategy
-{
-    private int macdFast = 12;
-    private int macdSlow = 26;
-    private int macdSignal = 9;
-    private int smaPeriod = 50;
-    
-    private MACD macd;
-    private SMA sma50;
-    
-    public override void OnStart()
-    {
-        macd = MACD(macdFast, macdSlow, macdSignal);
-        sma50 = SMA(smaPeriod);
-    }
-    
-    public override void OnBarUpdate()
-    {
-        if (Bars.Count < smaPeriod) return;
-        
-        // Trend belirleme
-        bool longTrend = Close[0] > sma50.Value;
-        bool shortTrend = Close[0] < sma50.Value;
-        
-        // MACD sinyalleri
-        bool macdBullish = macd.Value > macd.Signal && macd.Value[1] <= macd.Signal[1];
-        bool macdBearish = macd.Value < macd.Signal && macd.Value[1] >= macd.Signal[1];
-        
-        // Long pozisyon
-        if (longTrend && macdBullish && Position.MarketPosition != MarketPosition.Long)
-        {
-            if (Position.MarketPosition == MarketPosition.Short)
-                ExitShort();
-            
-            EnterLong();
-            SetStopLoss(CalculationMode.Price, sma50.Value);
-        }
-        
-        // Short pozisyon
-        if (shortTrend && macdBearish && Position.MarketPosition != MarketPosition.Short)
-        {
-            if (Position.MarketPosition == MarketPosition.Long)
-                ExitLong();
-            
-            EnterShort();
-            SetStopLoss(CalculationMode.Price, sma50.Value);
-        }
-    }
-}`
-  },
-  {
-    id: 'breakout',
-    name: 'Breakout Strategy',
-    description: 'Bollinger Bands kırılımlarını takip eden breakout stratejisi',
-    category: 'breakout',
-    indicators: ['Bollinger Bands', 'Volume', 'RSI'],
-    icon: <Target className="w-4 h-4" />,
-    code: `using System;
-using MatriksIQ.API;
-
-public class BreakoutStrategy : Strategy
-{
-    private int bbPeriod = 20;
-    private double bbStdDev = 2.0;
-    private double volumeThreshold = 1.5; // Ortalama hacmin 1.5 katı
-    private int rsiPeriod = 14;
-    
-    private BollingerBands bb;
-    private SMA volumeAvg;
-    private RSI rsi;
-    
-    public override void OnStart()
-    {
-        bb = BollingerBands(bbPeriod, bbStdDev);
-        volumeAvg = SMA(Volume, 20);
-        rsi = RSI(rsiPeriod);
-    }
-    
-    public override void OnBarUpdate()
-    {
-        if (Bars.Count < Math.Max(bbPeriod, 20)) return;
-        
-        double currentPrice = Close[0];
-        double upperBand = bb.Upper;
-        double lowerBand = bb.Lower;
-        double currentVolume = Volume[0];
-        double avgVolume = volumeAvg.Value;
-        
-        // Hacim kontrolü
-        bool highVolume = currentVolume > avgVolume * volumeThreshold;
-        
-        // Üst band kırılımı (Bullish Breakout)
-        if (currentPrice > upperBand && 
-            Close[1] <= bb.Upper[1] && 
-            highVolume && 
-            rsi.Value < 80 &&
-            Position.MarketPosition == MarketPosition.Flat)
-        {
-            EnterLong();
-            SetStopLoss(CalculationMode.Price, bb.Middle);
-            SetProfitTarget(CalculationMode.Price, currentPrice + (currentPrice - bb.Middle));
-        }
-        
-        // Alt band kırılımı (Bearish Breakout)
-        if (currentPrice < lowerBand && 
-            Close[1] >= bb.Lower[1] && 
-            highVolume && 
-            rsi.Value > 20 &&
-            Position.MarketPosition == MarketPosition.Flat)
-        {
-            EnterShort();
-            SetStopLoss(CalculationMode.Price, bb.Middle);
-            SetProfitTarget(CalculationMode.Price, currentPrice - (bb.Middle - currentPrice));
-        }
-        
-        // Pozisyon çıkış kontrolü (Orta banda dönüş)
-        if (Position.MarketPosition == MarketPosition.Long && currentPrice <= bb.Middle)
-        {
-            ExitLong();
-        }
-        
-        if (Position.MarketPosition == MarketPosition.Short && currentPrice >= bb.Middle)
-        {
-            ExitShort();
-        }
-    }
-}`
-  },
-  {
-    id: 'mean-reversion',
-    name: 'Mean Reversion',
-    description: 'Ortalamaya dönüş stratejisi - aşırı sapmaları yakalayan strateji',
-    category: 'mean_reversion',
-    indicators: ['RSI', 'Bollinger Bands', 'SMA'],
-    icon: <Activity className="w-4 h-4" />,
-    code: `using System;
-using MatriksIQ.API;
-
-public class MeanReversionStrategy : Strategy
-{
-    private int rsiPeriod = 14;
-    private int bbPeriod = 20;
-    private double bbStdDev = 2.5;
-    private int smaPeriod = 200;
-    
-    private RSI rsi;
-    private BollingerBands bb;
     private SMA sma200;
     
     public override void OnStart()
     {
-        rsi = RSI(rsiPeriod);
-        bb = BollingerBands(bbPeriod, bbStdDev);
-        sma200 = SMA(smaPeriod);
+        rsi = RSI(14);
+        sma200 = SMA(200);
     }
     
     public override void OnBarUpdate()
     {
-        if (Bars.Count < smaPeriod) return;
+        if (Bars.Count < 200) return;
         
-        double currentPrice = Close[0];
-        double rsiValue = rsi.Value;
-        double lowerBand = bb.Lower;
-        double upperBand = bb.Upper;
-        double smaValue = sma200.Value;
+        // Trend filtresi - sadece trend yönünde işlem
+        bool upTrend = Close[0] > sma200[0];
+        bool downTrend = Close[0] < sma200[0];
         
-        // Genel trend (uzun vadeli)
-        bool inUpTrend = currentPrice > smaValue;
-        bool inDownTrend = currentPrice < smaValue;
-        
-        // Aşırı satım koşulları (Long girişi)
-        if (rsiValue < 25 && 
-            currentPrice < lowerBand && 
-            inUpTrend && // Uzun vadeli trend yukarı
-            Position.MarketPosition == MarketPosition.Flat)
+        // RSI aşırı satım bölgesinde ve trend yukarı
+        if (rsi[0] < 30 && upTrend && Position.MarketPosition == MarketPosition.Flat)
         {
-            EnterLong();
-            SetStopLoss(CalculationMode.Percent, 2.0);
-            SetProfitTarget(CalculationMode.Price, bb.Middle);
+            EnterLong(1, "RSI Long");
         }
         
-        // Aşırı alım koşulları (Short girişi)
-        if (rsiValue > 75 && 
-            currentPrice > upperBand && 
-            inDownTrend && // Uzun vadeli trend aşağı
-            Position.MarketPosition == MarketPosition.Flat)
+        // RSI aşırı alım bölgesinde ve trend aşağı
+        if (rsi[0] > 70 && downTrend && Position.MarketPosition == MarketPosition.Flat)
         {
-            EnterShort();
-            SetStopLoss(CalculationMode.Percent, 2.0);
-            SetProfitTarget(CalculationMode.Price, bb.Middle);
+            EnterShort(1, "RSI Short");
         }
         
-        // Erken çıkış koşulları
+        // Çıkış koşulları
+        if (Position.MarketPosition == MarketPosition.Long && rsi[0] > 70)
+        {
+            ExitLong(Position.Quantity, "RSI Exit Long");
+        }
+        
+        if (Position.MarketPosition == MarketPosition.Short && rsi[0] < 30)
+        {
+            ExitShort(Position.Quantity, "RSI Exit Short");
+        }
+    }
+}`
+  },
+  {
+    id: '2',
+    name: 'MACD Crossover Pro',
+    description: 'MACD histogram ve sinyal çizgisi kırılımları',
+    category: 'momentum',
+    complexity: 'intermediate',
+    indicators: ['MACD', 'EMA', 'Volume'],
+    timeframes: ['1h', '4h', '1d'],
+    performance: { winRate: 58, profitFactor: 1.8, drawdown: 12 },
+    code: `using System;
+using MatriksIQ.API;
+
+public class MACDCrossoverStrategy : Strategy
+{
+    private MACD macd;
+    private EMA ema50;
+    private VOL volume;
+    private double avgVolume;
+    
+    public override void OnStart()
+    {
+        macd = MACD(12, 26, 9);
+        ema50 = EMA(50);
+        volume = VOL();
+    }
+    
+    public override void OnBarUpdate()
+    {
+        if (Bars.Count < 50) return;
+        
+        // Ortalama hacmi hesapla
+        avgVolume = SMA(volume, 20)[0];
+        
+        // MACD bullish crossover
+        if (macd.Default[0] > macd.Avg[0] && 
+            macd.Default[1] <= macd.Avg[1] &&
+            Close[0] > ema50[0] &&
+            volume[0] > avgVolume * 1.2 &&
+            Position.MarketPosition == MarketPosition.Flat)
+        {
+            EnterLong(1, "MACD Bull Cross");
+        }
+        
+        // MACD bearish crossover
+        if (macd.Default[0] < macd.Avg[0] && 
+            macd.Default[1] >= macd.Avg[1] &&
+            Close[0] < ema50[0] &&
+            volume[0] > avgVolume * 1.2 &&
+            Position.MarketPosition == MarketPosition.Flat)
+        {
+            EnterShort(1, "MACD Bear Cross");
+        }
+        
+        // Stop Loss ve Take Profit
         if (Position.MarketPosition == MarketPosition.Long)
         {
-            if (rsiValue > 60 || currentPrice >= bb.Middle)
+            double stopPrice = Position.AveragePrice * 0.97; // %3 stop
+            double targetPrice = Position.AveragePrice * 1.06; // %6 target
+            
+            ExitLongStopMarket(Position.Quantity, stopPrice, "Stop Loss");
+            ExitLongLimitMarket(Position.Quantity, targetPrice, "Take Profit");
+        }
+        
+        if (Position.MarketPosition == MarketPosition.Short)
+        {
+            double stopPrice = Position.AveragePrice * 1.03;
+            double targetPrice = Position.AveragePrice * 0.94;
+            
+            ExitShortStopMarket(Position.Quantity, stopPrice, "Stop Loss");
+            ExitShortLimitMarket(Position.Quantity, targetPrice, "Take Profit");
+        }
+    }
+}`
+  },
+  {
+    id: '3',
+    name: 'Bollinger Bands Breakout',
+    description: 'Volatilite kırılımları ve geri dönüş stratejisi',
+    category: 'breakout',
+    complexity: 'intermediate',
+    indicators: ['Bollinger Bands', 'ATR', 'Volume'],
+    timeframes: ['5m', '15m', '1h'],
+    performance: { winRate: 72, profitFactor: 2.1, drawdown: 15 },
+    code: `using System;
+using MatriksIQ.API;
+
+public class BollingerBreakoutStrategy : Strategy
+{
+    private Bollinger bollinger;
+    private ATR atr;
+    private VOL volume;
+    private double avgVolume;
+    
+    public override void OnStart()
+    {
+        bollinger = Bollinger(Close, 20, 2);
+        atr = ATR(14);
+        volume = VOL();
+    }
+    
+    public override void OnBarUpdate()
+    {
+        if (Bars.Count < 50) return;
+        
+        avgVolume = SMA(volume, 20)[0];
+        double bandWidth = (bollinger.Upper[0] - bollinger.Lower[0]) / bollinger.Middle[0];
+        
+        // Düşük volatilite sonrası kırılım
+        if (bandWidth < 0.02) // Dar bantlar
+        {
+            // Üst bant kırılımı
+            if (Close[0] > bollinger.Upper[0] && 
+                Close[1] <= bollinger.Upper[1] &&
+                volume[0] > avgVolume * 1.5 &&
+                Position.MarketPosition == MarketPosition.Flat)
             {
-                ExitLong();
+                EnterLong(1, "BB Upper Breakout");
+            }
+            
+            // Alt bant kırılımı
+            if (Close[0] < bollinger.Lower[0] && 
+                Close[1] >= bollinger.Lower[1] &&
+                volume[0] > avgVolume * 1.5 &&
+                Position.MarketPosition == MarketPosition.Flat)
+            {
+                EnterShort(1, "BB Lower Breakout");
+            }
+        }
+        
+        // ATR tabanlı stop loss
+        if (Position.MarketPosition == MarketPosition.Long)
+        {
+            double stopPrice = Position.AveragePrice - (atr[0] * 2);
+            double targetPrice = Position.AveragePrice + (atr[0] * 3);
+            
+            ExitLongStopMarket(Position.Quantity, stopPrice, "ATR Stop");
+            ExitLongLimitMarket(Position.Quantity, targetPrice, "ATR Target");
+        }
+        
+        if (Position.MarketPosition == MarketPosition.Short)
+        {
+            double stopPrice = Position.AveragePrice + (atr[0] * 2);
+            double targetPrice = Position.AveragePrice - (atr[0] * 3);
+            
+            ExitShortStopMarket(Position.Quantity, stopPrice, "ATR Stop");
+            ExitShortLimitMarket(Position.Quantity, targetPrice, "ATR Target");
+        }
+    }
+}`
+  },
+  {
+    id: '4',
+    name: 'Scalping EMA Grid',
+    description: 'Hızlı EMA kırılımları ile scalping',
+    category: 'scalping',
+    complexity: 'advanced',
+    indicators: ['EMA', 'Stochastic', 'Volume'],
+    timeframes: ['1m', '5m'],
+    performance: { winRate: 68, profitFactor: 1.6, drawdown: 18 },
+    code: `using System;
+using MatriksIQ.API;
+
+public class ScalpingEMAStrategy : Strategy
+{
+    private EMA ema8, ema13, ema21;
+    private Stochastic stoch;
+    private VOL volume;
+    private int tradeCount = 0;
+    
+    public override void OnStart()
+    {
+        ema8 = EMA(8);
+        ema13 = EMA(13);
+        ema21 = EMA(21);
+        stoch = Stochastic(5, 3, 3);
+        volume = VOL();
+    }
+    
+    public override void OnBarUpdate()
+    {
+        if (Bars.Count < 25) return;
+        
+        bool emaUpTrend = ema8[0] > ema13[0] && ema13[0] > ema21[0];
+        bool emaDownTrend = ema8[0] < ema13[0] && ema13[0] < ema21[0];
+        
+        // Long koşulları - EMA sıralaması + Stochastic
+        if (emaUpTrend && 
+            stoch.K[0] > stoch.D[0] && 
+            stoch.K[1] <= stoch.D[1] &&
+            stoch.K[0] < 80 &&
+            Position.MarketPosition == MarketPosition.Flat)
+        {
+            EnterLong(1, "Scalp Long");
+            tradeCount++;
+        }
+        
+        // Short koşulları
+        if (emaDownTrend && 
+            stoch.K[0] < stoch.D[0] && 
+            stoch.K[1] >= stoch.D[1] &&
+            stoch.K[0] > 20 &&
+            Position.MarketPosition == MarketPosition.Flat)
+        {
+            EnterShort(1, "Scalp Short");
+            tradeCount++;
+        }
+        
+        // Hızlı çıkışlar - scalping için
+        if (Position.MarketPosition == MarketPosition.Long)
+        {
+            double stopPrice = Position.AveragePrice * 0.995; // %0.5 stop
+            double targetPrice = Position.AveragePrice * 1.01; // %1 target
+            
+            // EMA tersine döndüyse çık
+            if (ema8[0] < ema13[0])
+            {
+                ExitLong(Position.Quantity, "EMA Reverse");
+            }
+            else
+            {
+                ExitLongStopMarket(Position.Quantity, stopPrice, "Quick Stop");
+                ExitLongLimitMarket(Position.Quantity, targetPrice, "Quick Target");
             }
         }
         
         if (Position.MarketPosition == MarketPosition.Short)
         {
-            if (rsiValue < 40 || currentPrice <= bb.Middle) 
+            double stopPrice = Position.AveragePrice * 1.005;
+            double targetPrice = Position.AveragePrice * 0.99;
+            
+            if (ema8[0] > ema13[0])
             {
-                ExitShort();
+                ExitShort(Position.Quantity, "EMA Reverse");
+            }
+            else
+            {
+                ExitShortStopMarket(Position.Quantity, stopPrice, "Quick Stop");
+                ExitShortLimitMarket(Position.Quantity, targetPrice, "Quick Target");
+            }
+        }
+        
+        // Günlük işlem limiti
+        if (tradeCount >= 20)
+        {
+            if (Position.MarketPosition != MarketPosition.Flat)
+            {
+                ExitLong(Position.Quantity, "Daily Limit");
+                ExitShort(Position.Quantity, "Daily Limit");
             }
         }
     }
@@ -383,77 +350,164 @@ interface StrategyTemplatesProps {
 }
 
 export function StrategyTemplates({ onSelectTemplate }: StrategyTemplatesProps) {
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'scalping': return 'bg-red-100 text-red-700 border-red-200'
-      case 'grid': return 'bg-blue-100 text-blue-700 border-blue-200'
-      case 'trend': return 'bg-green-100 text-green-700 border-green-200'
-      case 'breakout': return 'bg-purple-100 text-purple-700 border-purple-200'
-      case 'mean_reversion': return 'bg-orange-100 text-orange-700 border-orange-200'
-      default: return 'bg-gray-100 text-gray-700 border-gray-200'
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+  const categories = [
+    { id: 'all', label: 'Tümü', icon: <BarChart3 className="h-4 w-4" /> },
+    { id: 'momentum', label: 'Momentum', icon: <TrendingUp className="h-4 w-4" /> },
+    { id: 'reversal', label: 'Reversal', icon: <Target className="h-4 w-4" /> },
+    { id: 'breakout', label: 'Breakout', icon: <Zap className="h-4 w-4" /> },
+    { id: 'scalping', label: 'Scalping', icon: <Lightning className="h-4 w-4" /> },
+    { id: 'trend', label: 'Trend', icon: <Activity className="h-4 w-4" /> }
+  ]
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.indicators.some(ind => ind.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory
+
+    return matchesSearch && matchesCategory
+  })
+
+  const getComplexityColor = (complexity: string) => {
+    switch (complexity) {
+      case 'beginner': return 'bg-green-100 text-green-800'
+      case 'intermediate': return 'bg-yellow-100 text-yellow-800'
+      case 'advanced': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const getCategoryName = (category: string) => {
-    switch (category) {
-      case 'scalping': return 'Scalping'
-      case 'grid': return 'Grid Bot'
-      case 'trend': return 'Trend Takip'
-      case 'breakout': return 'Breakout'
-      case 'mean_reversion': return 'Mean Reversion'
-      default: return category
+  const getComplexityIcon = (complexity: string) => {
+    switch (complexity) {
+      case 'beginner': return <Shield className="h-3 w-3" />
+      case 'intermediate': return <Timer className="h-3 w-3" />
+      case 'advanced': return <Brain className="h-3 w-3" />
+      default: return null
     }
   }
 
   return (
-    <ScrollArea className="h-full p-3">
-      <div className="space-y-3">
-        <div className="text-sm font-medium text-muted-foreground px-1">
-          Hazır Strateji Şablonları
+    <div className="h-full flex flex-col">
+      {/* Search */}
+      <div className="p-4 border-b space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Şablon ara..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-8"
+          />
         </div>
-        
-        {templates.map((template) => (
-          <Card 
-            key={template.id} 
-            className="p-3 cursor-pointer hover:bg-accent transition-colors border-l-4 border-l-primary"
-          >
-            <div className="space-y-2">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  {template.icon}
-                  <h4 className="font-medium text-sm">{template.name}</h4>
-                </div>
-                <Badge 
-                  variant="outline" 
-                  className={`text-xs ${getCategoryColor(template.category)}`}
-                >
-                  {getCategoryName(template.category)}
-                </Badge>
-              </div>
-              
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {template.description}
-              </p>
-              
-              <div className="flex flex-wrap gap-1">
-                {template.indicators.map((indicator, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {indicator}
-                  </Badge>
-                ))}
-              </div>
-              
-              <Button
-                size="sm"
-                className="w-full h-7 text-xs"
-                onClick={() => onSelectTemplate(template)}
-              >
-                Şablonu Kullan
-              </Button>
-            </div>
-          </Card>
-        ))}
+
+        {/* Category Filters */}
+        <div className="flex flex-wrap gap-1">
+          {categories.map(category => (
+            <Button
+              key={category.id}
+              variant={selectedCategory === category.id ? "default" : "outline"}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectedCategory(category.id)}
+            >
+              {category.icon}
+              <span className="ml-1">{category.label}</span>
+            </Button>
+          ))}
+        </div>
       </div>
-    </ScrollArea>
+
+      {/* Templates List */}
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-4">
+          {filteredTemplates.map(template => (
+            <Card key={template.id} className="cursor-pointer hover:shadow-md transition-all">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <CardTitle className="text-sm font-medium">{template.name}</CardTitle>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {template.description}
+                    </p>
+                  </div>
+                  <Badge className={`${getComplexityColor(template.complexity)} flex items-center gap-1`}>
+                    {getComplexityIcon(template.complexity)}
+                    {template.complexity}
+                  </Badge>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-3">
+                {/* Indicators */}
+                <div className="flex flex-wrap gap-1">
+                  {template.indicators.slice(0, 3).map((indicator, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs">
+                      {indicator}
+                    </Badge>
+                  ))}
+                  {template.indicators.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{template.indicators.length - 3}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Performance Metrics */}
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="text-center">
+                    <div className="font-semibold text-green-600">
+                      {template.performance.winRate}%
+                    </div>
+                    <div className="text-muted-foreground">Win Rate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-blue-600">
+                      {template.performance.profitFactor}
+                    </div>
+                    <div className="text-muted-foreground">Profit Factor</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-red-600">
+                      {template.performance.drawdown}%
+                    </div>
+                    <div className="text-muted-foreground">Drawdown</div>
+                  </div>
+                </div>
+
+                {/* Timeframes */}
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground">Zaman:</span>
+                  {template.timeframes.map((tf, idx) => (
+                    <Badge key={idx} variant="secondary" className="text-xs">
+                      {tf}
+                    </Badge>
+                  ))}
+                </div>
+
+                <Button 
+                  onClick={() => onSelectTemplate(template)}
+                  size="sm" 
+                  className="w-full"
+                >
+                  Şablonu Kullan
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+
+          {filteredTemplates.length === 0 && (
+            <div className="text-center py-8">
+              <div className="text-muted-foreground text-sm">
+                Arama kriterlerinize uygun şablon bulunamadı
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
   )
 }

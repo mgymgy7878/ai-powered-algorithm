@@ -7,16 +7,17 @@ import { BacktestEngine } from './components/backtest/BacktestEngine'
 import { LiveTrading } from './components/live/LiveTrading'
 import { PortfolioView } from './components/portfolio/PortfolioView'
 import { MarketAnalysis } from './components/analysis/MarketAnalysis'
+import { APISettings } from './components/settings/APISettings'
 import { Toaster } from './components/ui/sonner'
 import { aiService } from './services/aiService'
-import { APISettings } from './types/api'
+import { APISettings as APISettingsType } from './types/api'
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
   const [strategies] = useKV('trading-strategies', [])
-  const [apiSettings] = useKV<APISettings>('api-settings', {
+  const [apiSettings] = useKV<APISettingsType>('api-settings', {
     openai: {
       apiKey: '',
       model: 'gpt-4',
@@ -48,6 +49,8 @@ function App() {
         return <PortfolioView />
       case 'analysis':
         return <MarketAnalysis />
+      case 'settings':
+        return <APISettings />
       default:
         return <Dashboard />
     }

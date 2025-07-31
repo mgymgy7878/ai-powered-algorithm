@@ -130,45 +130,43 @@ export class AIService {
     return this.generateCode(prompt, provider)
   }
 
-  testConnection(provider: 'openai' | 'anthropic', apiKey: string): Promise<boolean> {
-    return new Promise(async (resolve) => {
-      try {
-        const testPrompt = 'Merhaba, test mesajı'
-        
-        if (provider === 'openai') {
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-              model: 'gpt-3.5-turbo',
-              messages: [{ role: 'user', content: testPrompt }],
-              max_tokens: 10
-            })
+  async testConnection(provider: 'openai' | 'anthropic', apiKey: string): Promise<boolean> {
+    try {
+      const testPrompt = 'Test mesajı - sadece "OK" diye yanıt ver'
+      
+      if (provider === 'openai') {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: testPrompt }],
+            max_tokens: 10
           })
-          resolve(response.ok)
-        } else {
-          const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-API-Key': apiKey,
-              'anthropic-version': '2023-06-01'
-            },
-            body: JSON.stringify({
-              model: 'claude-3-haiku-20240307',
-              max_tokens: 10,
-              messages: [{ role: 'user', content: testPrompt }]
-            })
+        })
+        return response.ok
+      } else {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-haiku-20240307',
+            max_tokens: 10,
+            messages: [{ role: 'user', content: testPrompt }]
           })
-          resolve(response.ok)
-        }
-      } catch {
-        resolve(false)
+        })
+        return response.ok
       }
-    })
+    } catch {
+      return false
+    }
   }
 }
 

@@ -355,6 +355,147 @@ public class ${strategyName.replace(/\s+/g, '')}Strategy : Strategy
       default: return <Code className="h-3 w-3" />
     }
   }
+
+  const getStatusColor = (status: TradingStrategy['status']) => {
+    switch (status) {
+      case 'active': return 'bg-accent text-accent-foreground'
+      case 'live': return 'bg-green-500 text-white'
+      case 'paused': return 'bg-secondary text-secondary-foreground'
+      case 'generating': return 'bg-primary text-primary-foreground'
+      case 'error': return 'bg-destructive text-destructive-foreground'
+      case 'testing': return 'bg-blue-500 text-white'
+      case 'optimizing': return 'bg-purple-500 text-white'
+      default: return 'bg-muted text-muted-foreground'
+    }
+  }
+
+  const getComplexityColor = (complexity: string) => {
+    switch (complexity) {
+      case 'simple': return 'bg-green-100 text-green-800'
+      case 'moderate': return 'bg-yellow-100 text-yellow-800'
+      case 'complex': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getMatrixGradeColor = (grade: string) => {
+    switch (grade) {
+      case 'A+': return 'bg-green-500 text-white'
+      case 'A': return 'bg-green-400 text-white'
+      case 'B+': return 'bg-blue-400 text-white'
+      case 'B': return 'bg-blue-300 text-white'
+      case 'C': return 'bg-yellow-400 text-white'
+      default: return 'bg-gray-400 text-white'
+    }
+  }
+
+  const toggleIndicator = (indicatorName: string) => {
+    setIndicators(current =>
+      current.map(ind =>
+        ind.name === indicatorName ? { ...ind, enabled: !ind.enabled } : ind
+      )
+    )
+  }
+
+  const updateIndicatorParameter = (indicatorName: string, param: string, value: number) => {
+    setIndicators(current =>
+      current.map(ind =>
+        ind.name === indicatorName
+          ? { ...ind, parameters: { ...ind.parameters, [param]: value } }
+          : ind
+      )
+    )
+  }
+
+  const applyTemplate = (template: any) => {
+    setStrategyName(template.name)
+    setStrategyPrompt(template.prompt)
+    
+    // Enable required indicators
+    setIndicators(current =>
+      current.map(ind => ({
+        ...ind,
+        enabled: template.indicators.includes(ind.name)
+      }))
+    )
+    
+    setActiveTab('generate')
+    toast.success(`${template.name} şablonu uygulandı`)
+  }
+
+  const runBacktest = (strategy: TradingStrategy) => {
+    toast.info(`${strategy.name} için backtest başlatılıyor...`)
+    // Implement backtest functionality
+  }
+
+  const optimizeStrategy = (strategy: TradingStrategy) => {
+    toast.info(`${strategy.name} AI optimizasyonu başlatılıyor...`)
+    // Implement optimization functionality
+  }
+
+  const fixStrategyErrors = async (strategy: TradingStrategy) => {
+    if (!strategy.errors || strategy.errors.length === 0) return
+    
+    try {
+      toast.info('AI hataları düzeltiyor...')
+      const errorContext = strategy.errors.join('; ')
+      const fixedCode = await aiService.fixCode(strategy.code, errorContext)
+      
+      const updatedStrategy = {
+        ...strategy,
+        code: fixedCode,
+        errors: [],
+        lastModified: new Date().toISOString()
+      }
+      
+      setStrategies(current =>
+        current.map(s => s.id === strategy.id ? updatedStrategy : s)
+      )
+      
+      toast.success('Hatalar AI tarafından düzeltildi!')
+    } catch (error) {
+      toast.error('Hata düzeltme başarısız: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'))
+    }
+  }
+
+  const duplicateStrategy = (strategy: TradingStrategy) => {
+    const newStrategy = {
+      ...strategy,
+      id: Date.now().toString(),
+      name: `${strategy.name} (Kopya)`,
+      createdAt: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+      status: 'ready' as const
+    }
+    
+    setStrategies(current => [...current, newStrategy])
+    toast.success('Strateji kopyalandı')
+  }
+
+  const goLive = (strategy: TradingStrategy) => {
+    const updatedStrategy = {
+      ...strategy,
+      status: 'live' as const,
+      liveStats: {
+        isRunning: true,
+        startDate: new Date().toISOString(),
+        currentPnL: 0,
+        activePositions: 0,
+        todayTrades: 0
+      }
+    }
+    
+    setStrategies(current =>
+      current.map(s => s.id === strategy.id ? updatedStrategy : s)
+    )
+    
+    toast.success(`${strategy.name} canlı modda başlatıldı!`)
+  }
+
+  const deleteStrategy = (strategyId: string) => {
+    setStrategies(current => current.filter(s => s.id !== strategyId))
+    toast.success('Strateji silindi')
+  }
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">

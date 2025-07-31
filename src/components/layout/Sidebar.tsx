@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { AppView } from '../../App'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
@@ -11,7 +10,6 @@ import {
   HomeIcon,
   CogIcon
 } from '@heroicons/react/24/outline'
-import { APISettingsModal } from '../settings/APISettingsModal'
 
 interface SidebarProps {
   currentView: AppView
@@ -20,7 +18,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, onViewChange, strategyCount }: SidebarProps) {
-  const [showSettings, setShowSettings] = useState(false)
   
   const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
@@ -29,6 +26,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount }: SidebarPro
     { id: 'live', label: 'Live Trading', icon: PlayIcon },
     { id: 'portfolio', label: 'Portfolio', icon: ChartPieIcon },
     { id: 'analysis', label: 'Market Analysis', icon: MagnifyingGlassIcon },
+    { id: 'settings', label: 'API Settings', icon: CogIcon },
   ] as const
 
   return (
@@ -63,17 +61,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount }: SidebarPro
           })}
         </nav>
         
-        <div className="p-4 border-t border-border space-y-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start"
-            onClick={() => setShowSettings(true)}
-          >
-            <CogIcon className="h-4 w-4 mr-2" />
-            API Ayarları
-          </Button>
-          
+        <div className="p-4 border-t border-border space-y-3">          
           <div className="bg-muted rounded-lg p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">System Status</span>
@@ -83,11 +71,6 @@ export function Sidebar({ currentView, onViewChange, strategyCount }: SidebarPro
           </div>
         </div>
       </div>
-      
-      <APISettingsModal 
-        isOpen={showSettings} 
-        onClose={() => setShowSettings(false)} 
-      />
     </>
   )
 }
