@@ -27,9 +27,9 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
     { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
     { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
     { id: 'backtest', label: 'Backtesting', icon: ChartBar },
-    { id: 'portfolio', label: 'Portfolio', icon: ChartPie },
-    { id: 'analysis', label: 'Market Analysis', icon: MagnifyingGlass },
-    { id: 'settings', label: 'API Settings', icon: Gear },
+    { id: 'portfolio', label: 'Portföy', icon: ChartPie },
+    { id: 'analysis', label: 'Piyasa Analizi', icon: MagnifyingGlass },
+    { id: 'settings', label: 'API Ayarları', icon: Gear },
   ] as const
 
   return (
@@ -37,7 +37,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
       <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
-          <p className="text-sm text-muted-foreground mt-1">Algorithmic Trading Platform</p>
+          <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
         </div>
         
         <nav className="flex-1 p-4 space-y-2">
@@ -67,10 +67,10 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
         <div className="p-4 border-t border-border space-y-3">          
           <div className="bg-muted rounded-lg p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">System Status</span>
+              <span className="text-sm font-medium">Sistem Durumu</span>
               <div className="h-2 w-2 bg-accent rounded-full animate-pulse"></div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">AI Engine Active</p>
+            <p className="text-xs text-muted-foreground mt-1">AI Motor Aktif</p>
           </div>
         </div>
       </div>

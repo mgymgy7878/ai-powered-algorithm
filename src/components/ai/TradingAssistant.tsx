@@ -1,28 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
   Bot, 
   User,
   Send,
-  Loader2, 
-  Brain, 
-  TrendingUp,
-  TrendingDown, 
-  DollarSign,
-  CheckCircle,
-  Clock,
-  Zap,
-  Activity,
-  AlertTriangle
+  Loader2
 } from 'lucide-react'
-import { useKV } from '@github/spark/hooks'
-import { aiService } from '@/services/aiService'
 
 interface ChatMessage {
   id: string
@@ -36,15 +22,6 @@ export function TradingAssistant() {
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [strategies] = useKV('trading-strategies', [])
-  const [liveStrategies] = useKV('live-strategies', [])
-
-  const quickCommands = [
-    { label: 'Piyasa Analizi (1H)', icon: TrendingUp, command: 'BTC ve ETH için 1 saatlik teknik analiz yap' },
-    { label: 'Strateji Önerisi', icon: Brain, command: 'Mevcut piyasa koşullarına uygun strateji öner' },
-    { label: 'Risk Analizi', icon: AlertTriangle, command: 'Portföy risk analizimi yap' },
-    { label: 'Günlük Özet', icon: Activity, command: 'Bugün için piyasa özetini ver' }
-  ]
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -106,13 +83,6 @@ Lütfen detaylı ve yardımcı bir yanıt ver.`
     }
   }
 
-  const useQuickCommand = (command: string) => {
-    setInputMessage(command)
-    setTimeout(() => {
-      sendMessage()
-    }, 100)
-  }
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -121,209 +91,81 @@ Lütfen detaylı ve yardımcı bir yanıt ver.`
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div className="border-b bg-card p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-            <Brain className="w-4 h-4 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold">AI Trading Yöneticisi</h1>
-            <p className="text-xs text-muted-foreground">Yapay zeka destekli trading asistanınız</p>
-          </div>
-        </div>
+    <Card className="w-full h-full flex flex-col">
+      <div className="p-4 border-b">
+        <h3 className="text-lg font-bold">AI Trading Yöneticisi</h3>
       </div>
-
-      <Tabs defaultValue="chat" className="flex-1 flex flex-col">
-        <TabsList className="mx-4 mt-2">
-          <TabsTrigger value="chat" className="text-xs">Sohbet</TabsTrigger>
-          <TabsTrigger value="analysis" className="text-xs">Analiz</TabsTrigger>
-          <TabsTrigger value="insights" className="text-xs">Öngörüler</TabsTrigger>
-        </TabsList>
-
-        {/* Chat Tab */}
-        <TabsContent value="chat" className="flex-1 p-3">
-          <div className="flex-1 flex gap-3">
-            {/* Ana Sohbet Alanı */}
-            <div className="flex-1">
-              <Card className="h-[350px] flex flex-col">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-sm">
-                    <Brain className="w-4 h-4" />
-                    AI Asistan Sohbeti
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col p-3">
-                  {/* Mesajlar */}
-                  <ScrollArea className="flex-1 pr-2 mb-3">
-                    <div className="space-y-2">
-                      {messages.length === 0 && (
-                        <div className="text-center text-muted-foreground py-4">
-                          <Bot className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <p className="text-xs">Merhaba! Ben AI Trading Yöneticinizim.</p>
-                          <p className="text-xs">Size piyasa analizi ve strateji önerileri konularında yardımcı olabilirim.</p>
-                        </div>
-                      )}
-                      
-                      {messages.map((message) => (
-                        <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[80%] rounded-lg p-2 ${
-                            message.role === 'user' 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-muted'
-                          }`}>
-                            <div className="flex items-start gap-1">
-                              {message.role === 'assistant' && <Bot className="w-3 h-3 mt-1 flex-shrink-0" />}
-                              {message.role === 'user' && <User className="w-3 h-3 mt-1 flex-shrink-0" />}
-                              <div className="flex-1">
-                                <p className="whitespace-pre-wrap text-xs">{message.content}</p>
-                                <div className="text-xs opacity-70 mt-1">
-                                  {message.timestamp.toLocaleTimeString('tr-TR')}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-muted rounded-lg p-3">
-                            <div className="flex items-center gap-2">
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <span>AI düşünüyor...</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div ref={messagesEndRef} />
-                  </ScrollArea>
-
-                  {/* Mesaj Input */}
-                  <div className="flex gap-1">
-                    <Input
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="AI'a mesaj yazın..."
-                      disabled={isLoading}
-                      className="flex-1 text-xs"
-                    />
-                    <Button 
-                      onClick={sendMessage}
-                      disabled={isLoading || !inputMessage.trim()}
-                      size="sm"
-                    >
-                      {isLoading ? (
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <Send className="w-3 h-3" />
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+      <ScrollArea className="flex-1 p-4 pr-2">
+        <div className="space-y-3">
+          {messages.length === 0 && (
+            <div className="text-center text-muted-foreground py-8">
+              <Bot className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm font-medium mb-1">Merhaba! Ben AI Trading Yöneticinizim.</p>
+              <p className="text-sm">Size piyasa analizi ve strateji önerileri konularında yardımcı olabilirim.</p>
             </div>
-
-            {/* Sağ Panel - Hızlı Komutlar */}
-            <div className="w-32">
-              <div className="space-y-2">
-                {/* Hızlı Komutlar */}
-                <Card>
-                  <CardHeader className="pb-1">
-                    <CardTitle className="text-xs">Hızlı Komutlar</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-2">
-                    <div className="space-y-1">
-                      {quickCommands.slice(0, 2).map((cmd, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => useQuickCommand(cmd.command)}
-                          className="w-full justify-start gap-1 text-xs h-6"
-                        >
-                          <cmd.icon className="w-3 h-3" />
-                        </Button>
-                      ))}
+          )}
+          
+          {messages.map((message) => (
+            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[85%] rounded-lg p-3 ${
+                message.role === 'user' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted'
+              }`}>
+                <div className="flex items-start gap-2">
+                  {message.role === 'assistant' && <Bot className="w-4 h-4 mt-1 flex-shrink-0" />}
+                  {message.role === 'user' && <User className="w-4 h-4 mt-1 flex-shrink-0" />}
+                  <div className="flex-1">
+                    <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+                    <div className="text-xs opacity-70 mt-2">
+                      {message.timestamp.toLocaleTimeString('tr-TR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
                     </div>
-                  </CardContent>
-                </Card>
-
-                {/* Sistem Durumu */}
-                <Card>
-                  <CardHeader className="pb-1">
-                    <CardTitle className="text-xs">Durum</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-2">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs">Strateji</span>
-                        <Badge variant="secondary" className="text-xs h-4">{strategies.length}</Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs">Aktif</span>
-                        <Badge variant="default" className="text-xs h-4">{liveStrategies.length}</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* Analysis Tab */}
-        <TabsContent value="analysis" className="flex-1 p-3">
-          <div className="space-y-2">
-            <Card>
-              <CardHeader className="pb-1">
-                <CardTitle className="flex items-center gap-1 text-sm">
-                  <TrendingUp className="w-3 h-3" />
-                  Piyasa Durumu
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-2">
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div>
-                    <div className="text-sm font-bold text-green-600">+2.4%</div>
-                    <div className="text-xs text-muted-foreground">BTC</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-red-600">-1.2%</div>
-                    <div className="text-xs text-muted-foreground">ETH</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-green-600">+0.8%</div>
-                    <div className="text-xs text-muted-foreground">BNB</div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* Insights Tab */}
-        <TabsContent value="insights" className="flex-1 p-3">
-          <div className="space-y-2">
-            <Alert>
-              <AlertTriangle className="h-3 w-3" />
-              <AlertDescription className="text-xs">
-                <strong>Volatilite Uyarısı:</strong> BTC'de yüksek volatilite bekleniyor.
-              </AlertDescription>
-            </Alert>
-
-            <Alert>
-              <Brain className="h-3 w-3" />
-              <AlertDescription className="text-xs">
-                <strong>AI Önerisi:</strong> Grid bot stratejileri daha uygun görünüyor.
-              </AlertDescription>
-            </Alert>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+              </div>
+            </div>
+          ))}
+          
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg p-3 max-w-[85%]">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">AI düşünüyor...</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        <div ref={messagesEndRef} />
+      </ScrollArea>
+      
+      <div className="p-4 border-t">
+        <div className="flex gap-2">
+          <Input
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="AI'a mesaj yazın..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button 
+            onClick={sendMessage}
+            disabled={isLoading || !inputMessage.trim()}
+            size="icon"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+    </Card>
   )
 }

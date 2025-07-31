@@ -52,10 +52,8 @@ export function Dashboard() {
   return (
     <div className="relative p-6 space-y-6">
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
-      <div className="absolute top-4 right-4 w-[360px] h-[500px] bg-background border rounded-lg shadow-md overflow-hidden z-50">
-        <div className="h-full scale-75 origin-top-left transform">
-          <TradingAssistant />
-        </div>
+      <div className="absolute top-4 right-4 w-[360px] max-h-[500px] bg-background border rounded-lg shadow-md p-4 overflow-auto z-50">
+        <TradingAssistant />
       </div>
 
       <div className="flex items-center justify-between pr-[380px]">
@@ -78,11 +76,11 @@ export function Dashboard() {
           </Button>
           <Button variant="outline" size="sm">
             <CpuChipIcon className="h-4 w-4 mr-2" />
-            Generate Strategy
+            Strateji Üret
           </Button>
           <Button size="sm">
             <PlayIcon className="h-4 w-4 mr-2" />
-            Start Trading
+            Trading Başlat
           </Button>
         </div>
       </div>
@@ -91,7 +89,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pr-[380px]">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Portfolio Value</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Portföy Değeri</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(portfolioMetrics.totalValue)}</div>
@@ -100,7 +98,7 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Daily P&L</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Günlük K/Z</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
@@ -118,7 +116,7 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total P&L</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Toplam K/Z</CardTitle>
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${portfolioMetrics.totalPnL >= 0 ? 'text-accent' : 'text-destructive'}`}>
@@ -129,7 +127,7 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Win Rate</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Başarı Oranı</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatPercentage(portfolioMetrics.winRate)}</div>
@@ -138,7 +136,7 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Strategies</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Aktif Stratejiler</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
@@ -153,7 +151,7 @@ export function Dashboard() {
       <div className="pr-[380px]">
         <Card>
         <CardHeader>
-          <CardTitle>Recent Trades</CardTitle>
+          <CardTitle>Son İşlemler</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
