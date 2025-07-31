@@ -27,7 +27,7 @@ import {
   Settings,
   Zap,
   Pause
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { StrategyEditor } from './StrategyEditor'
 import { TradingStrategy } from '../../types/trading'

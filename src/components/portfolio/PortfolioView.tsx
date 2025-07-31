@@ -1,7 +1,7 @@
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { ChartPieIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline'
+import { PieChart, TrendingUp, TrendingDown } from 'lucide-react'
 
 interface Position {
   symbol: string
@@ -111,9 +111,9 @@ export function PortfolioView() {
                 {portfolioData.totalPnL >= 0 ? '+' : ''}{formatCurrency(portfolioData.totalPnL)}
               </div>
               {portfolioData.totalPnL >= 0 ? (
-                <ArrowTrendingUpIcon className="h-5 w-5 text-accent" />
+                <TrendingUp className="h-5 w-5 text-accent" />
               ) : (
-                <ArrowTrendingDownIcon className="h-5 w-5 text-destructive" />
+                <TrendingDown className="h-5 w-5 text-destructive" />
               )}
             </div>
             <div className={`text-sm ${portfolioData.totalPnLPercent >= 0 ? 'text-accent' : 'text-destructive'}`}>
@@ -136,7 +136,7 @@ export function PortfolioView() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ChartPieIcon className="h-5 w-5" />
+            <PieChart className="h-5 w-5" />
             Portfolio Allocation
           </CardTitle>
         </CardHeader>
@@ -169,7 +169,7 @@ export function PortfolioView() {
         <CardContent>
           {portfolioData.positions.length === 0 ? (
             <div className="py-12 text-center">
-              <ChartPieIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <PieChart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">No open positions</h3>
               <p className="text-muted-foreground">Your active trading positions will appear here</p>
             </div>

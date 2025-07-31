@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
 
 interface PortfolioMetrics {
@@ -81,9 +81,9 @@ export function Dashboard() {
                 {formatCurrency(portfolioMetrics.dailyPnL)}
               </span>
               {portfolioMetrics.dailyPnL >= 0 ? (
-                <ArrowTrendingUpIcon className="h-3 w-3 text-green-600" />
+                <TrendingUp className="h-3 w-3 text-green-600" />
               ) : (
-                <ArrowTrendingDownIcon className="h-3 w-3 text-red-600" />
+                <TrendingDown className="h-3 w-3 text-red-600" />
               )}
             </div>
           </div>

@@ -3,18 +3,18 @@ import { AppView } from '../../App'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { 
-  ChartBar, 
+  BarChart, 
   Cpu, 
   Play, 
-  ChartPie,
-  MagnifyingGlass,
-  House,
-  Gear,
+  PieChart,
+  Search,
+  Home,
+  Settings,
   Rocket,
   Brain,
   List,
   X
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 
 interface SidebarProps {
   currentView: AppView
@@ -32,13 +32,13 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
   }, [isSidebarOpen])
   
   const navigation = [
-    { id: 'dashboard', label: 'Anasayfa', icon: House },
+    { id: 'dashboard', label: 'Anasayfa', icon: Home },
     { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
     { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
-    { id: 'backtest', label: 'Backtesting', icon: ChartBar },
-    { id: 'portfolio', label: 'Portföy', icon: ChartPie },
-    { id: 'analysis', label: 'Piyasa Analizi', icon: MagnifyingGlass },
-    { id: 'settings', label: 'API Ayarları', icon: Gear },
+    { id: 'backtest', label: 'Backtesting', icon: BarChart },
+    { id: 'portfolio', label: 'Portföy', icon: PieChart },
+    { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
+    { id: 'settings', label: 'API Ayarları', icon: Settings },
   ] as const
 
   return (

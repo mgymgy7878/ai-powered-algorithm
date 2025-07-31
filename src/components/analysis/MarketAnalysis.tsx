@@ -2,7 +2,7 @@ import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { MagnifyingGlassIcon, CpuChipIcon, ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import { Search, Cpu, AlertTriangle, CheckCircle } from 'lucide-react'
 
 interface MarketInsight {
   id: string
@@ -95,10 +95,10 @@ export function MarketAnalysis() {
 
   const getInsightIcon = (type: MarketInsight['type']) => {
     switch (type) {
-      case 'bullish': return <CheckCircleIcon className="h-5 w-5 text-accent" />
-      case 'bearish': return <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />
-      case 'warning': return <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />
-      default: return <CpuChipIcon className="h-5 w-5 text-muted-foreground" />
+      case 'bullish': return <CheckCircle className="h-5 w-5 text-accent" />
+      case 'bearish': return <AlertTriangle className="h-5 w-5 text-destructive" />
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-destructive" />
+      default: return <Cpu className="h-5 w-5 text-muted-foreground" />
     }
   }
 
@@ -142,7 +142,7 @@ export function MarketAnalysis() {
           <p className="text-muted-foreground">Real-time market insights and trading opportunities powered by AI</p>
         </div>
         <Button>
-          <MagnifyingGlassIcon className="h-4 w-4 mr-2" />
+          <Search className="h-4 w-4 mr-2" />
           Deep Analysis
         </Button>
       </div>
@@ -184,7 +184,7 @@ export function MarketAnalysis() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CpuChipIcon className="h-5 w-5" />
+            <Cpu className="h-5 w-5" />
             AI Market Insights
           </CardTitle>
         </CardHeader>
@@ -313,7 +313,7 @@ export function MarketAnalysis() {
                   </p>
                 </div>
                 <Button size="sm">
-                  <CpuChipIcon className="h-4 w-4 mr-1" />
+                  <Cpu className="h-4 w-4 mr-1" />
                   Generate
                 </Button>
               </div>
@@ -328,7 +328,7 @@ export function MarketAnalysis() {
                   </p>
                 </div>
                 <Button variant="outline" size="sm">
-                  <CpuChipIcon className="h-4 w-4 mr-1" />
+                  <Cpu className="h-4 w-4 mr-1" />
                   Generate
                 </Button>
               </div>

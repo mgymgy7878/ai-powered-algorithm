@@ -10,7 +10,7 @@ import { Progress } from '../ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { toast } from 'sonner'
-import { ChartBarIcon, PlayIcon, CogIcon, ClockIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline'
+import { BarChart, Play, Settings, Clock, TrendingUp, TrendingDown } from 'lucide-react'
 import { TradingChart, ChartData, TradeSignal } from '../charts/TradingChart'
 import { dataService, HistoricalDataRequest } from '../../services/dataService'
 import { backtestEngine, BacktestResult, BacktestConfiguration, OptimizationConfiguration, OptimizationParameter } from '../../services/backtestEngine'
@@ -243,7 +243,7 @@ export function BacktestEngine() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CogIcon className="h-5 w-5" />
+                <Settings className="h-5 w-5" />
                 Backtest Yapılandırması
               </CardTitle>
             </CardHeader>
@@ -365,7 +365,7 @@ export function BacktestEngine() {
                     </>
                   ) : (
                     <>
-                      <ClockIcon className="h-4 w-4 mr-2" />
+                      <Clock className="h-4 w-4 mr-2" />
                       Geçmiş Veri İndir
                     </>
                   )}
@@ -383,7 +383,7 @@ export function BacktestEngine() {
                     </>
                   ) : (
                     <>
-                      <PlayIcon className="h-4 w-4 mr-2" />
+                      <Play className="h-4 w-4 mr-2" />
                       Backtest Başlat
                     </>
                   )}
@@ -488,7 +488,7 @@ export function BacktestEngine() {
                   </>
                 ) : (
                   <>
-                    <ArrowTrendingUpIcon className="h-4 w-4 mr-2" />
+                    <TrendingUp className="h-4 w-4 mr-2" />
                     Optimizasyonu Başlat
                   </>
                 )}
@@ -520,7 +520,7 @@ export function BacktestEngine() {
           {backtestResults.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <ChartBarIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <BarChart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">Henüz test sonucu yok</h3>
                 <p className="text-muted-foreground">İlk backtest'inizi çalıştırarak performans metrikleri görün</p>
               </CardContent>

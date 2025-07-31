@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from '../ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { toast } from 'sonner'
-import { PlayIcon, PauseIcon, StopIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline'
+import { Play, Pause, Square, AlertTriangle, Plus } from 'lucide-react'
 import { TradingChart, ChartData } from '../charts/TradingChart'
 import { binanceService } from '../../services/binanceService'
 import { dataService } from '../../services/dataService'
@@ -342,7 +342,7 @@ export function LiveTrading() {
         <Card className="border-destructive">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-destructive">
-              <ExclamationTriangleIcon className="h-5 w-5" />
+              <AlertTriangle className="h-5 w-5" />
               <span className="font-medium">Binance API Ayarları Gerekli</span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
@@ -422,7 +422,7 @@ export function LiveTrading() {
           
           {!riskManagement && (
             <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />
+              <AlertTriangle className="h-5 w-5 text-destructive" />
               <span className="text-sm text-destructive">
                 Risk yönetimi devre dışı. Bu önemli kayıplara yol açabilir.
               </span>
@@ -499,7 +499,7 @@ export function LiveTrading() {
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
               <Button>
-                <PlusIcon className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2" />
                 Strateji Ekle
               </Button>
             </DialogTrigger>
@@ -611,7 +611,7 @@ export function LiveTrading() {
         {liveStrategies.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <PlayIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <Play className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">Aktif strateji yok</h3>
               <p className="text-muted-foreground">Test edilmiş stratejilerinizi canlı trading için dağıtın</p>
             </CardContent>
@@ -652,7 +652,7 @@ export function LiveTrading() {
                           onClick={() => startStrategy(strategy.id)}
                           disabled={!isBinanceConfigured}
                         >
-                          <PlayIcon className="h-4 w-4 mr-1" />
+                          <Play className="h-4 w-4 mr-1" />
                           Başlat
                         </Button>
                       ) : (
@@ -661,7 +661,7 @@ export function LiveTrading() {
                           size="sm"
                           onClick={() => pauseStrategy(strategy.id)}
                         >
-                          <PauseIcon className="h-4 w-4 mr-1" />
+                          <Pause className="h-4 w-4 mr-1" />
                           Duraklat
                         </Button>
                       )}
@@ -670,7 +670,7 @@ export function LiveTrading() {
                         size="sm"
                         onClick={() => stopStrategy(strategy.id)}
                       >
-                        <StopIcon className="h-4 w-4 mr-1" />
+                        <Square className="h-4 w-4 mr-1" />
                         Durdur
                       </Button>
                       <Button
@@ -756,7 +756,7 @@ export function LiveTrading() {
             {liveStrategies.some(s => s.pnl < -500) && (
               <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <ExclamationTriangleIcon className="h-4 w-4 text-destructive" />
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
                   <span className="font-medium text-destructive">Risk Uyarısı</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
