@@ -22,7 +22,7 @@ interface SidebarProps {
 export function Sidebar({ currentView, onViewChange, strategyCount, runningStrategiesCount = 0 }: SidebarProps) {
   
   const navigation = [
-    { id: 'dashboard', label: 'Dashboard', icon: House },
+    { id: 'dashboard', label: 'Anasayfa', icon: House },
     { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
     { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
     { id: 'backtest', label: 'Backtesting', icon: ChartBar },
