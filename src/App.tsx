@@ -18,8 +18,8 @@ export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfo
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
-  const [strategies] = useKV('trading-strategies', [])
-  const [liveStrategies] = useKV('live-strategies', [])
+  const [strategies] = useKV<any[]>('trading-strategies', [])
+  const [liveStrategies] = useKV<any[]>('live-strategies', [])
   const [apiSettings] = useKV<APISettingsType>('api-settings', {
     openai: {
       apiKey: '',
@@ -97,8 +97,8 @@ function App() {
         <Sidebar 
           currentView={currentView} 
           onViewChange={setCurrentView}
-          strategyCount={strategies.length}
-          runningStrategiesCount={liveStrategies.length}
+          strategyCount={strategies?.length ?? 0}
+          runningStrategiesCount={liveStrategies?.length ?? 0}
         />
         <main className="flex-1 overflow-hidden">
           {renderView()}
