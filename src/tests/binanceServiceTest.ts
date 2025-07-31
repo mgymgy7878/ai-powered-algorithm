@@ -1,11 +1,11 @@
 // TypeScript Binance Service Test
-import { binanceService, KlineData, PositionInfo, OrderInfo, AccountInfo, Ticker24hr } from '../services/binanceService';
+import { binanceService, KlineData, PositionInfo, BinanceOrder, AccountInfo, Ticker24hr } from '../services/binanceService';
 
 // Test that the service exports are working correctly
 export const testBinanceService = async () => {
   try {
     // Test basic connectivity (doesn't require API keys)
-    const isConnected = await binanceService.testConnectivity();
+    const isConnected = await binanceService.testConnection();
     console.log('Binance bağlantı testi:', isConnected ? 'Başarılı' : 'Başarısız');
 
     // Test server time (doesn't require API keys)
@@ -17,24 +17,19 @@ export const testBinanceService = async () => {
     console.log('BTCUSDT 24hr ticker:', tickerData);
 
     // Test symbol prices (doesn't require API keys)
-    const priceData = await binanceService.getSymbolPrices('BTCUSDT');
-    console.log('BTCUSDT fiyat verisi:', priceData);
+    const symbolData = await binanceService.getSymbols();
+    console.log('Sembol sayısı:', symbolData.length);
 
     // Test kline data (doesn't require API keys)
     const klineData = await binanceService.getKlineData('BTCUSDT', '1h', 10);
     console.log('BTCUSDT kline verisi (10 adet):', klineData.length);
 
-    // Test multi-timeframe data (doesn't require API keys)
-    const multiData = await binanceService.getMultiTimeframeData('BTCUSDT', ['1m', '5m', '1h'], 5);
-    console.log('Çoklu zaman dilimi verisi:', Object.keys(multiData));
-
     return {
       connectivity: isConnected,
       serverTime,
       tickerData,
-      priceData,
-      klineDataCount: klineData.length,
-      multiTimeframes: Object.keys(multiData)
+      symbolCount: symbolData.length,
+      klineDataCount: klineData.length
     };
   } catch (error) {
     console.error('Binance service test hatası:', error);
@@ -45,29 +40,22 @@ export const testBinanceService = async () => {
 // Test authenticated methods (requires API keys)
 export const testAuthenticatedMethods = async () => {
   try {
-    // These methods require valid API keys
-    const isValidCredentials = binanceService.validateCredentials();
-    console.log('API anahtarları geçerli:', isValidCredentials);
+    // Test API keys
+    const authTest = await binanceService.testApiKeys();
+    console.log('API anahtarları geçerli:', authTest);
 
-    if (isValidCredentials) {
-      // Test authenticated connection
-      const authTest = await binanceService.testConnection();
-      console.log('Authenticated bağlantı testi:', authTest ? 'Başarılı' : 'Başarısız');
+    if (authTest) {
+      // Test account info
+      const accountInfo = await binanceService.getAccountInformation();
+      console.log('Hesap bilgileri:', accountInfo);
 
-      if (authTest) {
-        // Test account info
-        const accountInfo = await binanceService.getAccountInfo();
-        console.log('Hesap bilgileri:', accountInfo);
-
-        // Test position info
-        const positions = await binanceService.getPositionInfo();
-        console.log('Pozisyon sayısı:', positions.length);
-      }
+      // Test position info
+      const positions = await binanceService.getPositionInformation();
+      console.log('Pozisyon sayısı:', positions.length);
     }
 
     return {
-      hasCredentials: isValidCredentials,
-      authenticationWorking: isValidCredentials ? await binanceService.testConnection() : false
+      authenticationWorking: authTest
     };
   } catch (error) {
     console.error('Authenticated methods test hatası:', error);
@@ -79,7 +67,6 @@ export const testAuthenticatedMethods = async () => {
 export const testTypes = () => {
   // Test that all interfaces are properly exported and typed
   const klineExample: KlineData = {
-    symbol: 'BTCUSDT',
     openTime: Date.now(),
     open: '50000',
     high: '51000',
