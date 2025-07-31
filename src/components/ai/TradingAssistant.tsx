@@ -1,189 +1,184 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/but
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { 
   Bot, 
+  User,
+  Send,
   Loader2, 
   Brain, 
+  TrendingUp,
   TrendingDown, 
-  DollarS
-  Check
+  DollarSign,
+  CheckCircle,
   Clock,
-  Zap
-import {
-interface
-  role: 'user'
-  timestamp: Dat
+  Zap,
+  Activity,
+  AlertTriangle
+} from 'lucide-react'
+import { useKV } from '@github/spark/hooks'
+import { aiService } from '@/services/aiService'
 
-  const [messa
-  const [isLoadi
-  const [liveS
+interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+}
 
-  const 
-    { lab
-    {
+export function TradingAssistant() {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [strategies] = useKV('trading-strategies', [])
+  const [liveStrategies] = useKV('live-strategies', [])
+
+  const quickCommands = [
+    { label: 'Piyasa Analizi (1H)', icon: TrendingUp, command: 'BTC ve ETH için 1 saatlik teknik analiz yap' },
+    { label: 'Strateji Önerisi', icon: Brain, command: 'Mevcut piyasa koşullarına uygun strateji öner' },
+    { label: 'Risk Analizi', icon: AlertTriangle, command: 'Portföy risk analizimi yap' },
+    { label: 'Günlük Özet', icon: Activity, command: 'Bugün için piyasa özetini ver' }
+  ]
 
   useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
-  // AI mesaj gönderme 
-    if (!inp
-    const userMessage: ChatM
-      role: 'user
-      timestamp: 
+  // AI mesaj gönderme fonksiyonu
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return
 
-
-
-      // AI sistem promptu - Türkçe trading asistanı
-- Farklı zaman dilimlerinde (1D, 4H, 1H, 15M, 1M) tüm 
-- Kullanıcının portföyünü değerlendirerek özet çıka
-- Türkçe yanıtlar üretmek
-Kullanıcıya profesyonel, anlaşılır ve eyleme dönük öneriler sun.`
-      const prompt = spark.llmPrompt`${systemPrompt}
-
-Lütfen detaylı ve y
-      const response = aw
-      const assistantMessage: ChatMessage = {
-        role: 'assistant',
-        timestamp: new Date()
-      
-   
-
-        id: (Date.now() + 1).toS
-        content: 'Ü
-      }
-    } finally {
-
-
-    setInputMessage(command)
-      sendMessage()
-
-  const handleKeyPress = (e: React.Key
-      e.preventDefault()
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: inputMessage,
+      timestamp: new Date()
     }
 
-    <div className="flex fl
-     
+    setMessages(prev => [...prev, userMessage])
+    setInputMessage('')
+    setIsLoading(true)
 
-          </div>
-            <h1 classNa
-          </div>
+    try {
+      // AI sistem promptu - Türkçe trading asistanı
+      const systemPrompt = `Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
+- Farklı zaman dilimlerinde (1D, 4H, 1H, 15M, 1M) tüm piyasa enstrümanlarını analiz etmek
+- Ekonomik takvimi ve haber akışını takip edip yorumlamak
+- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+- Türkçe yanıtlar üretmek
 
-      <Ta
-          <TabsTrigger value="chat">Sohbet</TabsTrig
-          <TabsTrigger value="insights">Öngörüler</TabsTrigger>
+Kullanıcıya profesyonel, anlaşılır ve eyleme dönük öneriler sun.`
 
-        <TabsContent value="chat" className="flex-1 p-4">
-            {/* Ana Sohbet Alanı */}
-              <Card className="h-[600px] flex flex-col">
-                  <CardTi
+      const prompt = spark.llmPrompt`${systemPrompt}
 
-                </CardHeader>
+Kullanıcı sorusu: ${inputMessage}
 
-                    <div className="space-y-4">
+Lütfen detaylı ve yardımcı bir yanıt ver.`
 
-                          <p>Merhaba! Be
-
-                      
-
-                            message.role === '
+      const response = await spark.llm(prompt)
       
-                            <div className="f
-                              {message.r
-                          
-                          
-                             
-       
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: response,
+        timestamp: new Date()
+      }
       
-                      {isLoading && (
-      
-                     
-                            </div>
-                        </div>
-                    </div>
-                  </Scroll
-                  {/* Mesaj Input */}
-                    <Input
-       
-                      placeholder="AI'a mesaj yazı
-               
-                    <Butt
-     
-   
+      setMessages(prev => [...prev, assistantMessage])
+    } catch (error) {
+      console.error('AI yanıt hatası:', error)
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-                        <Send className="w-4 h-4
-                    </Button
-                </Card
-            </div>
-           
-   
+  const useQuickCommand = (command: string) => {
+    setInputMessage(command)
+    setTimeout(() => {
+      sendMessage()
+    }, 100)
+  }
 
-                    <CardTitle className="text-sm">Hız
-                  <CardContent>
-                      {q
-                   
-     
-   
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
 
-          
-    <div className="flex flex-col h-screen bg-background">
+  return (
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="border-b bg-card p-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-            <Brain className="w-5 h-5 text-primary" />
+      <div className="border-b bg-card p-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <Brain className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">AI Trading Yöneticisi</h1>
-            <p className="text-sm text-muted-foreground">Yapay zeka destekli trading asistanınız</p>
+            <h1 className="text-lg font-semibold">AI Trading Yöneticisi</h1>
+            <p className="text-xs text-muted-foreground">Yapay zeka destekli trading asistanınız</p>
           </div>
         </div>
       </div>
 
       <Tabs defaultValue="chat" className="flex-1 flex flex-col">
-        <TabsList className="mx-6 mt-4">
-          <TabsTrigger value="chat">Sohbet</TabsTrigger>
-          <TabsTrigger value="analysis">Analiz</TabsTrigger>
-          <TabsTrigger value="insights">Öngörüler</TabsTrigger>
+        <TabsList className="mx-4 mt-2">
+          <TabsTrigger value="chat" className="text-xs">Sohbet</TabsTrigger>
+          <TabsTrigger value="analysis" className="text-xs">Analiz</TabsTrigger>
+          <TabsTrigger value="insights" className="text-xs">Öngörüler</TabsTrigger>
         </TabsList>
 
         {/* Chat Tab */}
-        <TabsContent value="chat" className="flex-1 p-6">
-          <div className="flex-1 flex gap-6">
+        <TabsContent value="chat" className="flex-1 p-3">
+          <div className="flex-1 flex gap-3">
             {/* Ana Sohbet Alanı */}
             <div className="flex-1">
-              <Card className="h-[calc(100vh-200px)] flex flex-col">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="w-5 h-5" />
+              <Card className="h-[350px] flex flex-col">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <Brain className="w-4 h-4" />
                     AI Asistan Sohbeti
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
+                <CardContent className="flex-1 flex flex-col p-3">
                   {/* Mesajlar */}
-                  <ScrollArea className="flex-1 pr-4 mb-4">
-                    <div className="space-y-4">
+                  <ScrollArea className="flex-1 pr-2 mb-3">
+                    <div className="space-y-2">
                       {messages.length === 0 && (
-                        <div className="text-center text-muted-foreground py-8">
-                          <Bot className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>Merhaba! Ben AI Trading Yöneticinizim.</p>
-                          <p>Size piyasa analizi, strateji önerileri ve portföy yönetimi konularında yardımcı olabilirim.</p>
+                        <div className="text-center text-muted-foreground py-4">
+                          <Bot className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-xs">Merhaba! Ben AI Trading Yöneticinizim.</p>
+                          <p className="text-xs">Size piyasa analizi ve strateji önerileri konularında yardımcı olabilirim.</p>
                         </div>
                       )}
                       
                       {messages.map((message) => (
                         <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[80%] rounded-lg p-3 ${
+                          <div className={`max-w-[80%] rounded-lg p-2 ${
                             message.role === 'user' 
                               ? 'bg-primary text-primary-foreground' 
                               : 'bg-muted'
                           }`}>
-                            <div className="flex items-start gap-2">
-                              {message.role === 'assistant' && <Bot className="w-4 h-4 mt-1 flex-shrink-0" />}
-                              {message.role === 'user' && <User className="w-4 h-4 mt-1 flex-shrink-0" />}
+                            <div className="flex items-start gap-1">
+                              {message.role === 'assistant' && <Bot className="w-3 h-3 mt-1 flex-shrink-0" />}
+                              {message.role === 'user' && <User className="w-3 h-3 mt-1 flex-shrink-0" />}
                               <div className="flex-1">
-                                <p className="whitespace-pre-wrap">{message.content}</p>
-                                <div className="text-xs opacity-70 mt-2">
+                                <p className="whitespace-pre-wrap text-xs">{message.content}</p>
+                                <div className="text-xs opacity-70 mt-1">
                                   {message.timestamp.toLocaleTimeString('tr-TR')}
                                 </div>
                               </div>
@@ -202,29 +197,29 @@ Lütfen detaylı ve y
                           </div>
                         </div>
                       )}
-
+                    </div>
                     <div ref={messagesEndRef} />
                   </ScrollArea>
 
                   {/* Mesaj Input */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <Input
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="AI'a mesaj yazın... (örn: 'BTC'nin teknik analizini yap')"
+                      placeholder="AI'a mesaj yazın..."
                       disabled={isLoading}
-                      className="flex-1"
+                      className="flex-1 text-xs"
                     />
                     <Button 
                       onClick={sendMessage}
                       disabled={isLoading || !inputMessage.trim()}
-                      size="icon"
+                      size="sm"
                     >
                       {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3 h-3 animate-spin" />
                       ) : (
-                        <Send className="w-4 h-4" />
+                        <Send className="w-3 h-3" />
                       )}
                     </Button>
                   </div>
@@ -232,157 +227,103 @@ Lütfen detaylı ve y
               </Card>
             </div>
 
-            {/* Sağ Panel - Hızlı Komutlar ve Bilgiler */}
-            <div className="w-80">
-              <div className="space-y-4">
+            {/* Sağ Panel - Hızlı Komutlar */}
+            <div className="w-32">
+              <div className="space-y-2">
                 {/* Hızlı Komutlar */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">Hızlı Komutlar</CardTitle>
+                  <CardHeader className="pb-1">
+                    <CardTitle className="text-xs">Hızlı Komutlar</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {quickCommands.map((cmd, index) => (
+                  <CardContent className="p-2">
+                    <div className="space-y-1">
+                      {quickCommands.slice(0, 2).map((cmd, index) => (
                         <Button
                           key={index}
                           variant="outline"
                           size="sm"
                           onClick={() => useQuickCommand(cmd.command)}
-                          className="w-full justify-start gap-2"
+                          className="w-full justify-start gap-1 text-xs h-6"
                         >
-                          <cmd.icon className="w-4 h-4" />
-                          {cmd.label}
+                          <cmd.icon className="w-3 h-3" />
                         </Button>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
 
-
+                {/* Sistem Durumu */}
                 <Card>
-
-                    <CardTitle className="text-sm">Sistem Durumu</CardTitle>
-
-                  <CardContent>
-
+                  <CardHeader className="pb-1">
+                    <CardTitle className="text-xs">Durum</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-2">
+                    <div className="space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm">Toplam Strateji</span>
-                        <Badge variant="secondary">{strategies.length}</Badge>
+                        <span className="text-xs">Strateji</span>
+                        <Badge variant="secondary" className="text-xs h-4">{strategies.length}</Badge>
                       </div>
                       <div className="flex items-center justify-between">
-
-                        <Badge variant="default">{liveStrategies.length}</Badge>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">AI Durumu</span>
-                        <Badge variant="outline" className="text-green-600">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Aktif
-                        </Badge>
+                        <span className="text-xs">Aktif</span>
+                        <Badge variant="default" className="text-xs h-4">{liveStrategies.length}</Badge>
                       </div>
-                    </div>
-                  </CardContent>
-
-
-
-                <Card>
-
-                    <CardTitle className="text-sm">AI Önerileri</CardTitle>
-
-                  <CardContent>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>• Piyasa analizi için zaman dilimi belirtin</p>
-                      <p>• Strateji önerileri ve optimizasyon</p>
-                      <p>• Risk yönetimi tavsiyeleri</p>
-                      <p>• Portföy dengeleme önerileri</p>
                     </div>
                   </CardContent>
                 </Card>
-
+              </div>
             </div>
-
+          </div>
         </TabsContent>
 
         {/* Analysis Tab */}
-        <TabsContent value="analysis" className="flex-1 p-6">
-          <div className="grid gap-4">
-
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-
-                </CardTitle>
-
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">+2.4%</div>
-                    <div className="text-sm text-muted-foreground">BTC/USDT</div>
-
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">-1.2%</div>
-                    <div className="text-sm text-muted-foreground">ETH/USDT</div>
-
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">+0.8%</div>
-                    <div className="text-sm text-muted-foreground">BNB/USDT</div>
-
-                </div>
-
-            </Card>
-
+        <TabsContent value="analysis" className="flex-1 p-3">
+          <div className="space-y-2">
             <Card>
-
-                <CardTitle className="flex items-center gap-2">
-
-                  Strateji Performansı
-
+              <CardHeader className="pb-1">
+                <CardTitle className="flex items-center gap-1 text-sm">
+                  <TrendingUp className="w-3 h-3" />
+                  Piyasa Durumu
+                </CardTitle>
               </CardHeader>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Aktif Stratejiler</span>
-                    <Badge variant="default">{liveStrategies.length}</Badge>
+              <CardContent className="p-2">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <div className="text-sm font-bold text-green-600">+2.4%</div>
+                    <div className="text-xs text-muted-foreground">BTC</div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Toplam Stratejiler</span>
-
+                  <div>
+                    <div className="text-sm font-bold text-red-600">-1.2%</div>
+                    <div className="text-xs text-muted-foreground">ETH</div>
                   </div>
-
+                  <div>
+                    <div className="text-sm font-bold text-green-600">+0.8%</div>
+                    <div className="text-xs text-muted-foreground">BNB</div>
+                  </div>
+                </div>
               </CardContent>
-
+            </Card>
           </div>
+        </TabsContent>
 
-
-
-        <TabsContent value="insights" className="flex-1 p-6">
-          <div className="space-y-4">
+        {/* Insights Tab */}
+        <TabsContent value="insights" className="flex-1 p-3">
+          <div className="space-y-2">
             <Alert>
-
-              <AlertDescription>
-
-                Yüksek volatilite bekleniyor.
-
-            </Alert>
-
-            <Alert>
-
-              <AlertDescription>
-                <strong>AI Önerisi:</strong> Mevcut piyasa koşullarında grid bot stratejileri 
-                daha uygun görünüyor. Volatilite düşük seviyelerde.
-
-            </Alert>
-
-            <Alert>
-              <DollarSign className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Risk Uyarısı:</strong> Portföy toplam değerinin %15'i tek bir varlıkta. 
-                Çeşitlendirme önerilir.
+              <AlertTriangle className="h-3 w-3" />
+              <AlertDescription className="text-xs">
+                <strong>Volatilite Uyarısı:</strong> BTC'de yüksek volatilite bekleniyor.
               </AlertDescription>
             </Alert>
 
+            <Alert>
+              <Brain className="h-3 w-3" />
+              <AlertDescription className="text-xs">
+                <strong>AI Önerisi:</strong> Grid bot stratejileri daha uygun görünüyor.
+              </AlertDescription>
+            </Alert>
+          </div>
         </TabsContent>
-
+      </Tabs>
     </div>
-
+  )
 }
