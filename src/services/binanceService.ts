@@ -1,11 +1,11 @@
 import CryptoJS from 'crypto-js'
 
-// Binance Kline (mum çubuğu) verisi interface
-export interface KlineData {
   symbol: string
-  openTime: number
   open: string
-  high: string
+  low: string
+  volume: string
+  quoteAssetVo
+  takerBuyBase
   low: string
   close: string
   volume: string
@@ -20,15 +20,15 @@ export interface KlineData {
 // Binance emir bilgisi interface
 export interface OrderInfo {
   orderId: number
-  symbol: string
+  closePosition:
   status: string
-  clientOrderId: string
+  stopPrice: string
   price: string
-  avgPrice: string
+  origType: string
   origQty: string
-  executedQty: string
+}
   cumQuote: string
-  timeInForce: string
+export interface Acco
   type: string
   reduceOnly: boolean
   closePosition: boolean
@@ -36,17 +36,17 @@ export interface OrderInfo {
   positionSide: string
   stopPrice: string
   workingType: string
-  priceProtect: boolean
+  totalOpenOrderInitial
   origType: string
-  time: number
+  availableBal
   updateTime: number
-}
+ 
 
 // Binance hesap bilgisi interface
 export interface AccountInfo {
   feeTier: number
   canTrade: boolean
-  canDeposit: boolean
+  unRealizedProfit: s
   canWithdraw: boolean
   updateTime: number
   totalInitialMargin: string
@@ -62,176 +62,176 @@ export interface AccountInfo {
   maxWithdrawAmount: string
   assets: any[]
   positions: any[]
-}
+ 
 
 // Pozisyon bilgisi interface
 export interface PositionInfo {
   symbol: string
   positionAmt: string
-  entryPrice: string
+  firstId: number
   markPrice: string
   unRealizedProfit: string
   liquidationPrice: string
-  leverage: string
+  private apiKey: 
   maxNotionalValue: string
-  marginType: string
+  private baseUrl: s
   isolatedMargin: string
   isAutoAddMargin: string
   positionSide: string
   notional: string
   isolatedWallet: string
-  updateTime: number
+      : 'https://fap
 }
 
 // 24 saatlik ticker bilgisi interface
 export interface Ticker24hr {
   symbol: string
-  priceChange: string
+  private createSigna
   priceChangePercent: string
-  weightedAvgPrice: string
+
   prevClosePrice: string
   lastPrice: string
   lastQty: string
-  bidPrice: string
+  // HTTP istekler
   bidQty: string
-  askPrice: string
+      'X-MBX-APIKE
   askQty: string
-  openPrice: string
+    return headers
   highPrice: string
-  lowPrice: string
+  // Kline (mum çu
   volume: string
-  quoteVolume: string
+    interval: string 
   openTime: number
-  closeTime: number
+    endTime?: numbe
   firstId: number
-  lastId: number
+      const para
   count: number
-}
+ 
 
-class BinanceService {
+      if (startTime) p
   private apiKey: string = ''
-  private secretKey: string = ''
+      const url = `${this.baseUr
   private testnet: boolean = true
   private baseUrl: string = 'https://testnet.binancefuture.com'
 
   // API anahtarlarını ve ayarları belirleme
   setCredentials(apiKey: string, secretKey: string, isTestnet: boolean = true) {
-    this.apiKey = apiKey
+        symbol,
     this.secretKey = secretKey
     this.testnet = isTestnet
     this.baseUrl = isTestnet 
       ? 'https://testnet.binancefuture.com'
       : 'https://fapi.binance.com'
+  a
+
+
+    } catch (error: any) {
+      throw new Error(`Pozisyon bilgileri alınamadı: $
   }
 
-  // API anahtarı doğrulaması
-  validateCredentials(): boolean {
-    return this.apiKey !== '' && this.secretKey !== ''
-  }
+    symbol: string,
+    quantity: string,
+  ): Promise<OrderInfo> {
+   
 
-  // İmza oluşturma (Binance API için gerekli)
-  private createSignature(queryString: string): string {
-    return CryptoJS.HmacSHA256(queryString, this.secretKey).toString(CryptoJS.enc.Hex)
-  }
+      const timestamp = this
+        symbol: symbol.toUpperCase
+        type: 'MARKET
+   
 
-  // Zaman damgası oluşturma
-  private getTimestamp(): number {
-    return Date.now()
-  }
+        params.positionSide = positionSid
 
-  // HTTP istekleri için header oluşturma
-  private getHeaders(includeSignature: boolean = false): HeadersInit {
-    const headers: HeadersInit = {
-      'X-MBX-APIKEY': this.apiKey,
-      'Content-Type': 'application/json',
+      const signature = this.creat
+      const response = await fetch
+        headers: this.getHeaders(true),
+     
+      if (!respons
+   
+
+    } catch (error: any) {
+      throw new Error
+  }
+  // Limit emir verme
+    symbol: string,
+    quantity: string,
+    positionSide?: '
+    if (!this.validateCrede
     }
-    return headers
-  }
-
-  // Kline (mum çubuğu) verilerini getirme
-  async getKlineData(
-    symbol: string, 
-    interval: string = '1m', 
-    limit: number = 500,
-    startTime?: number,
-    endTime?: number
-  ): Promise<KlineData[]> {
     try {
-      const params = new URLSearchParams({
-        symbol: symbol.toUpperCase(),
-        interval,
-        limit: limit.toString()
-      })
+      const params: any = {
+        side,
+        quantity,
+        
 
-      if (startTime) params.append('startTime', startTime.toString())
-      if (endTime) params.append('endTime', endTime.toString())
-      
-      const url = `${this.baseUrl}/fapi/v1/klines?${params.toString()}`
-      const response = await fetch(url)
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (positionSide) {
       }
       
-      const data = await response.json()
-      return data.map((kline: any[]): KlineData => ({
-        symbol,
-        openTime: kline[0],
-        open: kline[1],
-        high: kline[2],
-        low: kline[3],
-        close: kline[4],
-        volume: kline[5],
-        closeTime: kline[6],
-        quoteAssetVolume: kline[7],
-        numberOfTrades: kline[8],
-        takerBuyBaseAssetVolume: kline[9],
-        takerBuyQuoteAssetVolume: kline[10],
-        ignore: kline[11]
-      }))
-    } catch (error: any) {
-      console.error('Kline verisi alınırken hata:', error)
-      throw new Error(`Kline verisi alınamadı: ${error.message}`)
-    }
-  }
 
-  // Hesap bilgileri getirme
-  async getAccountInfo(): Promise<AccountInfo> {
-    if (!this.validateCredentials()) {
-      throw new Error('API anahtarları ayarlanmamış')
-    }
-
-    try {
-      const timestamp = this.getTimestamp()
-      const queryString = `timestamp=${timestamp}`
-      const signature = this.createSignature(queryString)
+        method: 'POST',
       
-      const url = `${this.baseUrl}/fapi/v2/account?${queryString}&signature=${signature}`
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: this.getHeaders(true)
-      })
 
-      if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(`API Hatası: ${errorData.msg || response.statusText}`)
       }
-
-      return await response.json()
-    } catch (error: any) {
-      console.error('Hesap bilgileri alınırken hata:', error)
-      throw new Error(`Hesap bilgileri alınamadı: ${error.message}`)
+      
+      console.error('Limit emir verilirk
     }
+
+  async testConnection(): P
+      const response = 
+    } catch (error) {
+      return false
   }
-
-  // Pozisyon bilgilerini getirme
-  async getPositionInfo(symbol?: string): Promise<PositionInfo[]> {
-    if (!this.validateCredentials()) {
-      throw new Error('API anahtarları ayarlanmamış')
-    }
-
+  // Server zamanını geti
     try {
-      const timestamp = this.getTimestamp()
+      const data = await response.j
+    } catch (error) {
+      throw error
+  }
+  // 24 saatlik ticker ve
+    try {
+        ? `${this.baseUrl}
+
+
+     
+
+
+      throw error
+  }
+  // Exchange bilgilerini getirme
+    try {
+     
+
+    } cat
+      throw error
+  }
+  // Çoklu zaman dilimi için kline verisi getirme
+    sy
+    limit: number = 100
+    const result: Record<string, KlineDat
+    try {
+        const data = await this.getKli
+      })
+
+      results.forEach(({ 
+      })
+      return result
+      c
+
+}
+// Singleton instance
+
+
+
+
+
+
+
+
+
+
+
+
+
       let queryString = `timestamp=${timestamp}`
       
       if (symbol) {
@@ -258,15 +258,15 @@ class BinanceService {
     }
   }
 
-  // Market emir verme
+
   async placeMarketOrder(
     symbol: string,
     side: 'BUY' | 'SELL',
     quantity: string,
     positionSide?: 'LONG' | 'SHORT'
-  ): Promise<OrderInfo> {
+
     if (!this.validateCredentials()) {
-      throw new Error('API anahtarları ayarlanmamış')
+
     }
 
     try {
@@ -274,7 +274,7 @@ class BinanceService {
       const params: any = {
         symbol: symbol.toUpperCase(),
         side,
-        type: 'MARKET',
+
         quantity,
         timestamp: timestamp.toString()
       }
@@ -286,13 +286,13 @@ class BinanceService {
       const queryString = new URLSearchParams(params).toString()
       const signature = this.createSignature(queryString)
       
-      const response = await fetch(`${this.baseUrl}/fapi/v1/order`, {
+
         method: 'POST',
         headers: this.getHeaders(true),
         body: `${queryString}&signature=${signature}`
-      })
 
-      if (!response.ok) {
+
+
         const errorData = await response.json()
         throw new Error(`Emir Hatası: ${errorData.msg || response.statusText}`)
       }
@@ -302,83 +302,83 @@ class BinanceService {
       console.error('Emir verilirken hata:', error)
       throw new Error(`Emir verilemedi: ${error.message}`)
     }
-  }
 
-  // Limit emir verme
+
+
   async placeLimitOrder(
-    symbol: string,
+
     side: 'BUY' | 'SELL',
-    quantity: string,
+
     price: string,
     positionSide?: 'LONG' | 'SHORT'
   ): Promise<OrderInfo> {
     if (!this.validateCredentials()) {
       throw new Error('API anahtarları ayarlanmamış')
-    }
 
-    try {
+
+
       const timestamp = this.getTimestamp()
       const params: any = {
         symbol: symbol.toUpperCase(),
-        side,
+
         type: 'LIMIT',
-        quantity,
+
         price,
         timeInForce: 'GTC',
         timestamp: timestamp.toString()
-      }
+
 
       if (positionSide) {
         params.positionSide = positionSide
       }
 
-      const queryString = new URLSearchParams(params).toString()
+
       const signature = this.createSignature(queryString)
 
       const response = await fetch(`${this.baseUrl}/fapi/v1/order`, {
         method: 'POST',
         headers: this.getHeaders(true),
-        body: `${queryString}&signature=${signature}`
+
       })
 
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(`Emir Hatası: ${errorData.msg || response.statusText}`)
-      }
 
-      return await response.json()
+
+
     } catch (error: any) {
       console.error('Limit emir verilirken hata:', error)
       throw new Error(`Limit emir verilemedi: ${error.message}`)
-    }
+
   }
 
   // Bağlantı testi
-  async testConnection(): Promise<boolean> {
+
     try {
       const response = await fetch(`${this.baseUrl}/fapi/v1/ping`)
       return response.ok
-    } catch (error) {
+
       console.error('Bağlantı testi başarısız:', error)
-      return false
+
     }
-  }
+
 
   // Server zamanını getirme
   async getServerTime(): Promise<number> {
-    try {
+
       const response = await fetch(`${this.baseUrl}/fapi/v1/time`)
       const data = await response.json()
       return data.serverTime
-    } catch (error) {
-      console.error('Server zamanı alınamadı:', error)
-      throw error
-    }
-  }
 
-  // 24 saatlik ticker verisi getirme
+      console.error('Server zamanı alınamadı:', error)
+
+    }
+
+
+
   async get24hrTicker(symbol?: string): Promise<Ticker24hr | Ticker24hr[]> {
-    try {
+
       const url = symbol 
         ? `${this.baseUrl}/fapi/v1/ticker/24hr?symbol=${symbol.toUpperCase()}`
         : `${this.baseUrl}/fapi/v1/ticker/24hr`
@@ -393,36 +393,36 @@ class BinanceService {
     } catch (error) {
       console.error('24hr ticker verisi alınamadı:', error)
       throw error
-    }
+
   }
 
   // Exchange bilgilerini getirme
   async getExchangeInfo(): Promise<any> {
-    try {
+
       const response = await fetch(`${this.baseUrl}/fapi/v1/exchangeInfo`)
-      if (!response.ok) {
+
         throw new Error(`HTTP error! status: ${response.status}`)
-      }
+
       return await response.json()
     } catch (error) {
       console.error('Exchange bilgisi alınamadı:', error)
       throw error
-    }
-  }
+
+
 
   // Çoklu zaman dilimi için kline verisi getirme
   async getMultiTimeframeData(
-    symbol: string,
+
     intervals: string[] = ['1m', '5m', '15m', '1h', '4h', '1d'],
-    limit: number = 100
+
   ): Promise<Record<string, KlineData[]>> {
     const result: Record<string, KlineData[]> = {}
     
-    try {
+
       const promises = intervals.map(async (interval) => {
         const data = await this.getKlineData(symbol, interval, limit)
         return { interval, data }
-      })
+
 
       const results = await Promise.all(promises)
       
@@ -430,13 +430,13 @@ class BinanceService {
         result[interval] = data
       })
 
-      return result
+
     } catch (error) {
       console.error('Çoklu zaman dilimi verisi alınırken hata:', error)
       throw error
-    }
+
   }
-}
+
 
 // Singleton instance
 export const binanceService = new BinanceService()
