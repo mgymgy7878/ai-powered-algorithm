@@ -37,7 +37,7 @@ interface MarketSummary {
   price: number
   change: number
   trend: 'up' | 'down' | 'sideways'
-- Teknik indikatörle
+}
 
 export function TradingAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
