@@ -86,6 +86,9 @@ export function APISettings() {
   }
 
   const generateTestStrategy = async () => {
+    // Update AI service with current settings first
+    aiService.setSettings(apiSettings)
+    
     if (!aiService.isConfigured()) {
       toast.error('Lütfen önce en az bir AI servisini yapılandırın')
       return
@@ -96,8 +99,9 @@ export function APISettings() {
     try {
       const prompt = "Basit bir RSI stratejisi oluştur. RSI 30'un altına düştüğünde al, 70'in üzerine çıktığında sat sinyali versin. Türkçe açıklamalarla C# kodu yaz."
       
-      const provider = apiSettings.openai.enabled && apiSettings.openai.apiKey ? 'openai' : 'anthropic'
-      const code = await aiService.generateStrategy(prompt, provider)
+      // Update AI service with current settings before using
+      aiService.setSettings(apiSettings)
+      const code = await aiService.generateStrategy(prompt)
       
       console.log('Üretilen test stratejisi:', code)
       toast.success('Test stratejisi başarıyla üretildi! Konsolu kontrol edin.')

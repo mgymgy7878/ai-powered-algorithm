@@ -22,12 +22,28 @@ export class AIService {
   }
 
   isConfigured(): boolean {
-    return !!(this.settings?.openai.apiKey || this.settings?.anthropic.apiKey)
+    if (!this.settings) return false
+    
+    const openaiReady = this.settings.openai.enabled && this.settings.openai.apiKey?.trim()
+    const anthropicReady = this.settings.anthropic.enabled && this.settings.anthropic.apiKey?.trim()
+    
+    return !!(openaiReady || anthropicReady)
   }
 
-  async generateCode(prompt: string, provider: 'openai' | 'anthropic' = 'openai'): Promise<string> {
+  async generateCode(prompt: string, provider?: 'openai' | 'anthropic'): Promise<string> {
     if (!this.settings) {
       throw new Error('AI servisleri yapılandırılmamış. Lütfen API anahtarlarını ayarlayın.')
+    }
+
+    // Auto-select provider if not specified
+    if (!provider) {
+      if (this.settings.openai.enabled && this.settings.openai.apiKey) {
+        provider = 'openai'
+      } else if (this.settings.anthropic.enabled && this.settings.anthropic.apiKey) {
+        provider = 'anthropic'
+      } else {
+        throw new Error('Hiçbir AI servisi etkin değil. Lütfen en az birini etkinleştirin.')
+      }
     }
 
     const config = provider === 'openai' ? this.settings.openai : this.settings.anthropic
@@ -110,22 +126,22 @@ export class AIService {
     return data.content[0]?.text || 'Kod üretilemedi'
   }
 
-  async explainCode(code: string, provider: 'openai' | 'anthropic' = 'openai'): Promise<string> {
+  async explainCode(code: string, provider?: 'openai' | 'anthropic'): Promise<string> {
     const prompt = `Aşağıdaki C# trading stratejisi kodunu Türkçe olarak açıkla. Kodun ne yaptığını, hangi indikatörleri kullandığını ve nasıl çalıştığını detaylı bir şekilde anlat:\n\n${code}`
     return this.generateCode(prompt, provider)
   }
 
-  async optimizeCode(code: string, provider: 'openai' | 'anthropic' = 'openai'): Promise<string> {
+  async optimizeCode(code: string, provider?: 'openai' | 'anthropic'): Promise<string> {
     const prompt = `Aşağıdaki C# trading stratejisi kodunu optimize et. Performansı artır, gereksiz hesaplamaları kaldır ve daha temiz hale getir. Optimizasyonları Türkçe açıklama satırları ile belirt:\n\n${code}`
     return this.generateCode(prompt, provider)
   }
 
-  async fixCode(code: string, error: string, provider: 'openai' | 'anthropic' = 'openai'): Promise<string> {
+  async fixCode(code: string, error: string, provider?: 'openai' | 'anthropic'): Promise<string> {
     const prompt = `Aşağıdaki C# trading stratejisi kodunda hata var. Hatayı düzelt ve çalışır hale getir. Hata mesajı: "${error}"\n\nKod:\n${code}\n\nDüzeltilen kodu ve neyin değiştirildiğini Türkçe açıklama satırları ile ver.`
     return this.generateCode(prompt, provider)
   }
 
-  async generateStrategy(description: string, provider: 'openai' | 'anthropic' = 'openai'): Promise<string> {
+  async generateStrategy(description: string, provider?: 'openai' | 'anthropic'): Promise<string> {
     const prompt = `Aşağıdaki strateji açıklamasına göre tam bir C# trading stratejisi kodu yaz. Kod, OnBarUpdate() metodunu içermeli ve trading mantığını gerçekleştirmeli. Açıklama: "${description}"`
     return this.generateCode(prompt, provider)
   }

@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { Bot, TestTube, CheckCircle, X, Warning } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { aiService } from '@/lib/ai-service'
+import { aiService } from '@/services/aiService'
 
 export function AITestPanel() {
   const [testInput, setTestInput] = useState('Basit bir RSI stratejisi oluştur')

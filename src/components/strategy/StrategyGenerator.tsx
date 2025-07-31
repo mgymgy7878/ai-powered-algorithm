@@ -27,6 +27,10 @@ import {
 
 export function StrategyGenerator() {
   const [strategies, setStrategies] = useKV<TradingStrategy[]>('trading-strategies', [])
+  const [apiSettings] = useKV<any>('api-settings', {
+    openai: { apiKey: '', model: 'gpt-4', enabled: true },
+    anthropic: { apiKey: '', model: 'claude-3-sonnet', enabled: false }
+  })
   const [isGenerating, setIsGenerating] = useState(false)
   const [strategyPrompt, setStrategyPrompt] = useState('')
   const [strategyName, setStrategyName] = useState('')
@@ -35,6 +39,11 @@ export function StrategyGenerator() {
   const [generationProgress, setGenerationProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState('')
   const [showAIConfig, setShowAIConfig] = useState(false)
+
+  // Keep AI service synchronized with settings
+  useEffect(() => {
+    aiService.setSettings(apiSettings)
+  }, [apiSettings])
 
   const availableIndicators: Indicator[] = [
     { name: 'RSI', type: 'momentum', parameters: { period: 14, overbought: 70, oversold: 30 }, enabled: true },
@@ -153,9 +162,26 @@ export function StrategyGenerator() {
       return
     }
 
-    // Check AI configuration
+    // Ensure AI service has latest settings
+    aiService.setSettings(apiSettings)
+
+    // Check AI configuration with detailed error messages
     if (!aiService.isConfigured()) {
-      toast.error('AI API anahtarı bulunamadı. Lütfen ayarlardan API anahtarınızı girin.')
+      console.log('API Settings:', apiSettings)
+      console.log('OpenAI enabled:', apiSettings.openai?.enabled)
+      console.log('OpenAI key exists:', !!apiSettings.openai?.apiKey)
+      console.log('Anthropic enabled:', apiSettings.anthropic?.enabled)
+      console.log('Anthropic key exists:', !!apiSettings.anthropic?.apiKey)
+      
+      if (!apiSettings.openai?.apiKey && !apiSettings.anthropic?.apiKey) {
+        toast.error('AI API anahtarı bulunamadı. Lütfen ayarlardan API anahtarınızı girin.')
+      } else if (apiSettings.openai?.apiKey && !apiSettings.openai?.enabled && 
+                 apiSettings.anthropic?.apiKey && !apiSettings.anthropic?.enabled) {
+        toast.error('API anahtarları mevcut ancak hiçbiri etkin değil. Lütfen en az birini etkinleştirin.')
+      } else {
+        toast.error('AI servisi yapılandırılmamış. Ayarları kontrol edin.')
+      }
+      
       setShowAIConfig(true)
       return
     }
@@ -185,7 +211,10 @@ Lütfen profesyonel bir C# trading stratejisi oluştur. Kod şu özellikleri iç
 5. Türkçe açıklayıcı yorumlar
 `
 
-      const aiResponse = await aiService.generateStrategy(fullPrompt, selectedModel as 'openai' | 'anthropic')
+      console.log('Generating strategy with settings:', apiSettings)
+      console.log('AI service configured:', aiService.isConfigured())
+      
+      const aiResponse = await aiService.generateStrategy(fullPrompt)
       
       setGenerationProgress(70)
       setCurrentStep('Strateji optimize ediliyor...')
