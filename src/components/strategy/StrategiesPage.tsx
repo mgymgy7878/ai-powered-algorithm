@@ -1,28 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scr
-import { Dialog, DialogContent, DialogHeader,
-import { TradingStrategy } from '../../types/
-import { 
-  Play, 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
 import { TradingStrategy } from '../../types/trading'
 import { StrategyEditor } from './StrategyEditor'
 import { 
   Plus, 
   Play, 
   Pause, 
-  Bot 
+  Bot,
   Copy, 
-
+  Trash,
   MoreHorizontal,
-  const [selec
+  TrendingUp,
   TrendingDown, 
-  const [fil
-  Zap, 
-  cons
+  Activity,
+  Zap,
+  Settings
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -54,77 +54,74 @@ export function StrategiesPage() {
       code: '',
       language: 'csharp',
       category: 'custom',
-      name: `${strate
+      status: 'draft',
       parameters: {},
-      lastModified: ne
+      lastModified: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-    toast.success('Strateji kopyalandı')
     }
-  //
+    
     setSelectedStrategy(newStrategy)
-  // Performans ikonu a
-   
+    setShowEditor(true)
+  }
 
+  // Strateji düzenle
+  const handleEditStrategy = (strategy: TradingStrategy) => {
+    setSelectedStrategy(strategy)
+    setShowEditor(true)
+  }
 
-  const activeStrategiesCount = strategies.filter(s => s.stat
-  const totalPerformance = strate
-    .reduce((sum, s) =>
-  r
+  // Strateji kaydet
+  const handleSaveStrategy = (strategy: TradingStrategy) => {
+    const existingIndex = strategies.findIndex(s => s.id === strategy.id)
+    if (existingIndex >= 0) {
+      const updatedStrategies = [...strategies]
+      updatedStrategies[existingIndex] = { ...strategy, lastModified: new Date().toISOString() }
+      setStrategies(updatedStrategies)
+    } else {
+      setStrategies([...strategies, { ...strategy, createdAt: new Date().toISOString() }])
+    }
+    
+    setShowEditor(false)
+    setSelectedStrategy(null)
+    toast.success('Strateji kaydedildi')
+  }
 
-        <div>
-          <p className="text-muted-foreground">
-          </p>
-        <Button onClick={handleCreate
-   
+  // Strateji kopyala
+  const handleDuplicateStrategy = (strategy: TradingStrategy) => {
+    const duplicatedStrategy: TradingStrategy = {
+      ...strategy,
+      id: Date.now().toString(),
+      name: `${strategy.name} (Kopya)`,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      lastModified: new Date().toISOString()
+    }
+    
+    setStrategies([...strategies, duplicatedStrategy])
+    toast.success('Strateji kopyalandı')
+  }
 
-      {/* Search and 
-        <Input
-          value={searchTerm}
-          classNam
-        <Tabs value={filterStatu
-            <TabsTrigger value="all">Tü
-            <TabsTrigg
-        </Tabs>
+  // Strateji sil
+  const handleDeleteStrategy = (strategyId: string) => {
+    setStrategies(strategies.filter(s => s.id !== strategyId))
+    toast.success('Strateji silindi')
+  }
 
-     
-          <CardHeader className="pb-2">
-          </CardHeader>
-   
-
-        <Card>
-            <CardTitle className="text-sm font-medium text-mu
-          <CardContent>
-          </CardContent>
-        
-          <CardHeader className="pb-2">
-       
-            
-        </Card>
-     
-            <CardTitle c
-          <CardContent>
-              {totalPerformance > 0 ? '+
-   
-
-      {/* Strategies 
-        <CardHeader>
-        </CardHeader>
-          <ScrollA
-              <div className="text-center py-12">
-                <h3 c
-                  İlk trading stratejinizi oluşturmak için AI asistanından yar
-                <But
-                  İlk Stratejiyi Oluştur
-              </div
-              <div className="space-y-4">
-                  <
-                      <div className="flex items-center justify-between">
-                        
-                            <div>
-              
-                              </p>
-     
-   
+  // Strateji durum rozeti
+  const getStrategyStatusBadge = (strategy: TradingStrategy) => {
+    switch (strategy.status) {
+      case 'live':
+        return <Badge className="bg-green-100 text-green-800">Canlı</Badge>
+      case 'testing':
+        return <Badge className="bg-blue-100 text-blue-800">Test</Badge>
+      case 'ready':
+        return <Badge className="bg-orange-100 text-orange-800">Hazır</Badge>
+      case 'draft':
+        return <Badge variant="outline">Taslak</Badge>
+      default:
+        return <Badge variant="secondary">Bilinmeyen</Badge>
+    }
+  }
 
   // Performans ikonu al
   const getPerformanceIcon = (performance?: { totalReturn: number }) => {
@@ -256,13 +253,13 @@ export function StrategiesPage() {
                             <Badge variant="outline" className="text-xs">
                               {strategy.performance.totalReturn > 0 ? '+' : ''}
                               {strategy.performance.totalReturn}% Getiri
-
+                            </Badge>
                           )}
-
+                          <Badge variant="secondary" className="text-xs">
                             {strategy.category}
-
+                          </Badge>
                           
-
+                          <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm">
                                 <MoreHorizontal className="h-4 w-4" />
@@ -270,15 +267,15 @@ export function StrategiesPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() => handleEditStrategy(strategy)}>
-
+                                <Settings className="h-4 w-4 mr-2" />
                                 Düzenle
-
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleDuplicateStrategy(strategy)}>
                                 <Copy className="h-4 w-4 mr-2" />
                                 Kopyala
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-
+                              <DropdownMenuItem
                                 onClick={() => handleDeleteStrategy(strategy.id)}
                                 className="text-red-600"
                               >
@@ -288,23 +285,23 @@ export function StrategiesPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
-
+              </div>
             )}
-
+          </ScrollArea>
         </CardContent>
-
+      </Card>
 
       {/* Strategy Editor Dialog */}
       <Dialog open={showEditor} onOpenChange={setShowEditor}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
           <DialogHeader className="sr-only">
-
+            <DialogTitle>Strateji Editörü</DialogTitle>
           </DialogHeader>
-
+          {selectedStrategy && (
             <StrategyEditor 
               strategy={selectedStrategy}
               onSave={handleSaveStrategy}
@@ -314,7 +311,8 @@ export function StrategiesPage() {
               }}
             />
           )}
-
+        </DialogContent>
       </Dialog>
-
+    </div>
   )
+}
