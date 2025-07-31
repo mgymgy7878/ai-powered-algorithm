@@ -51,7 +51,7 @@ export function TradingAssistant() {
   }>>([])
   
   const [inputMessage, setInputMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)})
+  const [isLoading, setIsLoading] = useState(false)
  
 
   // KV storage'dan stratejileri al
