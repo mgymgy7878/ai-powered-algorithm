@@ -34,18 +34,23 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
   useEffect(() => {
-    if (apiSettings.binance.enabled && apiSettings.binance.apiKey && apiSettings.binance.secretKey) {
+    if (apiSettings?.binance?.enabled && apiSettings?.binance?.apiKey && apiSettings?.binance?.secretKey) {
       binanceService.setCredentials(
         apiSettings.binance.apiKey,
         apiSettings.binance.secretKey,
-        apiSettings.binance.testnet
+        apiSettings.binance.testnet ?? true
       )
     }
-  }, [apiSettings.binance])
+  }, [apiSettings?.binance])
 
   const fetchMarketData = async () => {
-    if (!apiSettings.binance.enabled) {
+    if (!apiSettings.binance?.enabled) {
       toast.error('Binance API ayarları yapılandırılmamış')
+      return
+    }
+
+    if (!apiSettings.binance?.apiKey || !apiSettings.binance?.secretKey) {
+      toast.error('Binance API anahtarları eksik')
       return
     }
 
@@ -53,19 +58,28 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
     try {
       // Fiyat verilerini al
       const prices = await binanceService.getSymbolPrices()
-      const targetSymbol = prices.find(p => p.symbol === symbol)
       
-      if (targetSymbol) {
-        setMarketData(targetSymbol)
+      // Güvenli erişim kontrolü ekle
+      if (prices && Array.isArray(prices)) {
+        const targetSymbol = prices.find(p => p?.symbol === symbol)
+        
+        if (targetSymbol) {
+          setMarketData(targetSymbol)
+        } else {
+          toast.error(`${symbol} sembolü bulunamadı`)
+        }
       }
 
       // Kline verilerini al (son 100 saatlik)
       const klines = await binanceService.getKlineData(symbol, '1h', 100)
-      setKlineData(klines)
+      if (klines && Array.isArray(klines)) {
+        setKlineData(klines)
+      }
       
       setLastUpdate(new Date())
       toast.success('Piyasa verileri güncellendi')
     } catch (error) {
+      console.error('Market data fetch error:', error)
       toast.error(`Veri alınamadı: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`)
     } finally {
       setLoading(false)

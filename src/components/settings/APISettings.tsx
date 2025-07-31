@@ -157,7 +157,7 @@ export function APISettings() {
       aiService.setSettings(apiSettings)
     }
 
-    if (!aiService?.isConfigured()) {
+    if (!aiService?.isConfigured?.()) {
       toast.error('Lütfen önce en az bir AI servisini yapılandırın')
       return
     }
@@ -584,7 +584,7 @@ export function APISettings() {
             )}
           </Button>
           
-          {!aiService?.isConfigured() && (
+          {!(aiService?.isConfigured?.() ?? true) && (
             <p className="text-sm text-muted-foreground mt-2 text-center">
               Test etmek için en az bir AI servisinin API anahtarını girin ve etkinleştirin
             </p>

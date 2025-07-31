@@ -443,6 +443,68 @@ class BinanceService {
       return false
     }
   }
+
+  // Sembol fiyatlarını getirme
+  async getSymbolPrices(): Promise<Array<{
+    symbol: string;
+    price: number;
+    change24h: number;
+    high24h: number;
+    low24h: number;
+    volume24h: number;
+  }>> {
+    try {
+      const tickers = await this.get24hrTicker()
+      
+      return tickers.map(ticker => ({
+        symbol: ticker.symbol,
+        price: parseFloat(ticker.lastPrice),
+        change24h: parseFloat(ticker.priceChangePercent),
+        high24h: parseFloat(ticker.highPrice),
+        low24h: parseFloat(ticker.lowPrice),
+        volume24h: parseFloat(ticker.volume)
+      }))
+    } catch (error: any) {
+      console.error('Sembol fiyatları alınırken hata:', error)
+      throw new Error(`Sembol fiyatları alınamadı: ${error.message}`)
+    }
+  }
+
+  // Pozisyonu kapatma
+  async closePosition(symbol: string): Promise<BinanceOrder | null> {
+    if (!this.validateCredentials()) {
+      throw new Error('API anahtarları ayarlanmamış')
+    }
+
+    try {
+      // Önce pozisyon bilgilerini al
+      const positions = await this.getPositionRisk(symbol)
+      const position = positions.find(p => p.symbol === symbol.toUpperCase())
+      
+      if (!position || parseFloat(position.positionAmt) === 0) {
+        console.log(`${symbol} için açık pozisyon bulunamadı`)
+        return null
+      }
+
+      const positionAmt = parseFloat(position.positionAmt)
+      const side = positionAmt > 0 ? 'SELL' : 'BUY'
+      const quantity = Math.abs(positionAmt).toString()
+
+      // Market emriyle pozisyonu kapat
+      return await this.newOrder(
+        symbol,
+        side,
+        'MARKET',
+        quantity,
+        undefined, // price - market emri için gerekli değil
+        undefined, // timeInForce
+        true // reduceOnly - pozisyonu kapatmak için
+      )
+    } catch (error: any) {
+      console.error('Pozisyon kapatılırken hata:', error)
+      throw new Error(`Pozisyon kapatılamadı: ${error.message}`)
+    }
+  }
 }
 
 // Singleton instance

@@ -74,12 +74,12 @@ export function LiveTrading() {
       try {
         const prices = await binanceService.get24hrTicker()
         const filteredPrices = prices
-          .filter(p => symbols.includes(p.symbol))
+          .filter(p => p && p.symbol && symbols.includes(p.symbol)) // Güvenli erişim kontrolü ekle
           .map(p => ({
             symbol: p.symbol,
-            price: parseFloat(p.lastPrice),
-            change24h: parseFloat(p.priceChangePercent),
-            volume24h: parseFloat(p.volume),
+            price: parseFloat(p.lastPrice || '0'),
+            change24h: parseFloat(p.priceChangePercent || '0'),
+            volume24h: parseFloat(p.volume || '0'),
             lastUpdate: new Date()
           }))
         setMarketData(filteredPrices)
@@ -223,7 +223,7 @@ export function LiveTrading() {
       // Pozisyonları kapat
       const strategy = liveStrategies.find(s => s.id === strategyId)
       if (strategy && strategy.positionSize && strategy.positionSize !== 0) {
-        if (isBinanceConfigured) {
+        if (isBinanceConfigured && strategy.symbol) { // symbol kontrolü ekle
           // Pozisyonu kapat
           try {
             await binanceService.closePosition(strategy.symbol)
