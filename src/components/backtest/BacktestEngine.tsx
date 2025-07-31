@@ -561,25 +561,25 @@ export function BacktestEngine() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="text-lg font-semibold text-primary">
-                                      {selectedResult.metrics.totalTrades}
+                                      {selectedResult?.metrics?.totalTrades ?? 0}
                                     </div>
                                     <div className="text-xs text-muted-foreground">Toplam İşlem</div>
                                   </div>
                                   <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="text-lg font-semibold text-accent">
-                                      {formatPercentage(selectedResult.metrics.winRate)}
+                                      {formatPercentage(selectedResult?.metrics?.winRate)}
                                     </div>
                                     <div className="text-xs text-muted-foreground">Başarı Oranı</div>
                                   </div>
                                   <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="text-lg font-semibold text-primary">
-                                      {formatNumber(selectedResult.metrics.sharpeRatio)}
+                                      {formatNumber(selectedResult?.metrics?.sharpeRatio)}
                                     </div>
                                     <div className="text-xs text-muted-foreground">Sharpe Oranı</div>
                                   </div>
                                   <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="text-lg font-semibold text-destructive">
-                                      -{formatPercentage(selectedResult.metrics.maxDrawdown)}
+                                      -{formatPercentage(selectedResult?.metrics?.maxDrawdown)}
                                     </div>
                                     <div className="text-xs text-muted-foreground">Max Düşüş</div>
                                   </div>
@@ -604,43 +604,43 @@ export function BacktestEngine() {
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                       <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className={`text-lg font-semibold ${(result.metrics.totalReturnPercentage ?? 0) >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                          {formatPercentage(result.metrics.totalReturnPercentage)}
+                        <div className={`text-lg font-semibold ${(result?.metrics?.totalReturnPercentage ?? 0) >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                          {formatPercentage(result?.metrics?.totalReturnPercentage)}
                         </div>
                         <div className="text-xs text-muted-foreground">Toplam Getiri</div>
                       </div>
                       
                       <div className="text-center p-3 bg-muted rounded-lg">
                         <div className="text-lg font-semibold text-accent">
-                          {formatPercentage(result.metrics.winRate)}
+                          {formatPercentage(result?.metrics?.winRate)}
                         </div>
                         <div className="text-xs text-muted-foreground">Başarı Oranı</div>
                       </div>
                       
                       <div className="text-center p-3 bg-muted rounded-lg">
                         <div className="text-lg font-semibold text-primary">
-                          {formatNumber(result.metrics.sharpeRatio)}
+                          {formatNumber(result?.metrics?.sharpeRatio)}
                         </div>
                         <div className="text-xs text-muted-foreground">Sharpe Oranı</div>
                       </div>
                       
                       <div className="text-center p-3 bg-muted rounded-lg">
                         <div className="text-lg font-semibold text-destructive">
-                          -{formatPercentage(result.metrics.maxDrawdown)}
+                          -{formatPercentage(result?.metrics?.maxDrawdown)}
                         </div>
                         <div className="text-xs text-muted-foreground">Max Düşüş</div>
                       </div>
                       
                       <div className="text-center p-3 bg-muted rounded-lg">
                         <div className="text-lg font-semibold">
-                          {result.metrics.totalTrades ?? 0}
+                          {result?.metrics?.totalTrades ?? 0}
                         </div>
                         <div className="text-xs text-muted-foreground">Toplam İşlem</div>
                       </div>
                       
                       <div className="text-center p-3 bg-muted rounded-lg">
                         <div className="text-lg font-semibold text-primary">
-                          {formatNumber(result.metrics.profitFactor)}
+                          {formatNumber(result?.metrics?.profitFactor)}
                         </div>
                         <div className="text-xs text-muted-foreground">Kar Faktörü</div>
                       </div>
