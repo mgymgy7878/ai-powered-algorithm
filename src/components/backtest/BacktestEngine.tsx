@@ -10,7 +10,7 @@ import { Progress } from '../ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { toast } from 'sonner'
-import { ChartBarIcon, PlayIcon, CogIcon, ClockIcon, TrendingUpIcon, TrendingDownIcon } from '@heroicons/react/24/outline'
+import { ChartBarIcon, PlayIcon, CogIcon, ClockIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline'
 import { TradingChart, ChartData, TradeSignal } from '../charts/TradingChart'
 import { dataService, HistoricalDataRequest } from '../../services/dataService'
 import { backtestEngine, BacktestResult, BacktestConfiguration, OptimizationConfiguration, OptimizationParameter } from '../../services/backtestEngine'
@@ -488,7 +488,7 @@ export function BacktestEngine() {
                   </>
                 ) : (
                   <>
-                    <TrendingUpIcon className="h-4 w-4 mr-2" />
+                    <ArrowTrendingUpIcon className="h-4 w-4 mr-2" />
                     Optimizasyonu Başlat
                   </>
                 )}
