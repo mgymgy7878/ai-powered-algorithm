@@ -36,12 +36,6 @@ export function Dashboard() {
     winRate: 68.5,
     activeStrategies: 3
   })
-  
-  const [recentTrades] = useKV('recent-trades', [
-    { id: 1, pair: 'BTC/USDT', side: 'BUY', amount: 0.15, price: 43250, pnl: 325.50, time: '10:45:23' },
-    { id: 2, pair: 'ETH/USDT', side: 'SELL', amount: 2.5, price: 2650, pnl: -125.25, time: '10:32:15' },
-    { id: 3, pair: 'SOL/USDT', side: 'BUY', amount: 25, price: 98.50, pnl: 245.75, time: '10:18:42' }
-  ])
 
   const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
@@ -110,47 +104,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Trades */}
-      <div className={contentPadding}>
-        <Card>
-        <CardHeader>
-          <CardTitle>Son İşlemler</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {/* Son 2 işlemi güvenli şekilde göster */}
-            {(recentTrades || []).slice(0, 2).map((trade) => (
-              <div key={trade.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-4">
-                  <Badge variant={trade.side === 'BUY' ? 'default' : 'secondary'}>
-                    {trade.side}
-                  </Badge>
-                  <div>
-                    <div className="font-medium">{trade.pair}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {trade.amount} @ {formatCurrency(trade.price)}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`font-medium ${trade.pnl >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                    {trade.pnl >= 0 ? '+' : ''}{formatCurrency(trade.pnl)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">{trade.time}</div>
-                </div>
-              </div>
-            ))}
-            {/* Eğer hiç işlem yoksa boş durum mesajı göster */}
-            {(!recentTrades || recentTrades.length === 0) && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Henüz işlem bulunmuyor</p>
-                <p className="text-sm">İlk işleminizi gerçekleştirdiğinizde burada görünecektir</p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-      </div>
+
     </div>
   )
 }
