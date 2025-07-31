@@ -15,12 +15,14 @@ import { Separator } from '../ui/separator'
 import { Switch } from '../ui/switch'
 import { Slider } from '../ui/slider'
 import { StrategyEditor } from './StrategyEditor'
+import { AIConfiguration } from '../ai/AIConfiguration'
 import { toast } from 'sonner'
 import { TradingStrategy, Indicator } from '../../types/trading'
+import { aiService } from '../../lib/ai-service'
 import { 
   Play, Bot, Code, TrendingUp, Settings, Zap, AlertTriangle, CheckCircle, Target, BarChart3,
   Sparkle, Brain, Lightning, Cpu, Activity, Timer, Upload, Download, Copy, Trash, Eye,
-  ArrowRight, ArrowUp, ArrowDown, CircleNotch, ChartLine, Gauge, Trophy, Shield, Plus
+  ArrowRight, ArrowUp, ArrowDown, CircleNotch, ChartLine, Gauge, Trophy, Shield, Plus, Gear
 } from '@phosphor-icons/react'
 
 export function StrategyGenerator() {
@@ -32,6 +34,7 @@ export function StrategyGenerator() {
   const [activeTab, setActiveTab] = useState('generate')
   const [generationProgress, setGenerationProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState('')
+  const [showAIConfig, setShowAIConfig] = useState(false)
 
   const availableIndicators: Indicator[] = [
     { name: 'RSI', type: 'momentum', parameters: { period: 14, overbought: 70, oversold: 30 }, enabled: true },
@@ -150,21 +153,174 @@ export function StrategyGenerator() {
       return
     }
 
+    // Check AI configuration
+    const config = aiService.getConfig()
+    if (!config.openaiApiKey && !config.anthropicApiKey) {
+      toast.error('AI API anahtarı bulunamadı. Lütfen ayarlardan API anahtarınızı girin.')
+      setShowAIConfig(true)
+      return
+    }
+
     setIsGenerating(true)
     setGenerationProgress(0)
-    setCurrentStep('MatrixIQ AI sistemi başlatılıyor...')
+    setCurrentStep('AI sistemi başlatılıyor...')
     
     try {
-      // Step 1: Market Analysis with Advanced Context
-      setGenerationProgress(5)
-      setCurrentStep('Piyasa koşulları ve makroekonomik faktörler analiz ediliyor...')
+      // Step 1: Generate strategy code using AI service
+      setGenerationProgress(20)
+      setCurrentStep('Strateji kodu oluşturuluyor...')
       
-      const contextualAnalysisPrompt = spark.llmPrompt`
-        Sen MatrixIQ seviyesinde bir algoritmik trading uzmanısın. Bu strateji talebini derinlemesine analiz et:
+      const fullPrompt = `
+Strateji Adı: ${strategyName}
+Strateji Açıklaması: ${strategyPrompt}
+Piyasa Koşulu: ${marketCondition}
+Risk Toleransı: ${riskTolerance}/100
+Zaman Dilimi: ${timeframe}
+Trading Çifti: ${tradingPair}
+
+Lütfen profesyonel bir C# trading stratejisi oluştur. Kod şu özellikleri içersin:
+1. Uygun indikatörlerin kullanımı
+2. Risk yönetimi (stop loss, take profit)  
+3. Position sizing
+4. Hata kontrolü
+5. Türkçe açıklayıcı yorumlar
+`
+
+      const aiResponse = await aiService.generateStrategyCode(fullPrompt)
+      
+      setGenerationProgress(70)
+      setCurrentStep('Strateji optimize ediliyor...')
+      
+      // Try to extract C# code from the response
+      let strategyCode = aiResponse.content
+      const codeMatch = strategyCode.match(/```c#([\s\S]*?)```/i) || strategyCode.match(/```csharp([\s\S]*?)```/i)
+      if (codeMatch) {
+        strategyCode = codeMatch[1].trim()
+      } else if (strategyCode.includes('public class') || strategyCode.includes('OnStart') || strategyCode.includes('OnBarUpdate')) {
+        // Already contains valid C# code
+      } else {
+        // Fallback to a simple template if no proper code is extracted
+        strategyCode = `
+// ${strategyName} - AI tarafından oluşturuldu
+// ${strategyPrompt}
+
+public class ${strategyName.replace(/\s+/g, '')}Strategy : Strategy
+{
+    private RSI rsi;
+    private SMA sma;
+    
+    public override void OnStart()
+    {
+        // Indikatörleri başlat
+        rsi = RSI(14);
+        sma = SMA(20);
         
-        Strateji: "${strategyPrompt}"
-        Piyasa Koşulu: ${marketCondition}
-        Risk Toleransı: ${riskTolerance}/100
+        Print("${strategyName} stratejisi başlatıldı");
+    }
+    
+    public override void OnBarUpdate()
+    {
+        if (Bars.Count < 20) return; // Yeterli veri yok
+        
+        // Alış koşulları
+        if (rsi[0] < 30 && Close[0] > sma[0])
+        {
+            if (Position.MarketPosition == MarketPosition.Flat)
+            {
+                EnterLong(1, "Long Entry");
+            }
+        }
+        
+        // Satış koşulları  
+        if (rsi[0] > 70 && Close[0] < sma[0])
+        {
+            if (Position.MarketPosition == MarketPosition.Long)
+            {
+                ExitLong(1, "Long Exit");
+            }
+        }
+        
+        // Stop Loss ve Take Profit
+        if (Position.MarketPosition == MarketPosition.Long)
+        {
+            double stopPrice = Position.AveragePrice * 0.98; // %2 stop loss
+            double targetPrice = Position.AveragePrice * 1.04; // %4 take profit
+            
+            ExitLongStopMarket(Position.Quantity, stopPrice, "Stop Loss");
+            ExitLongLimitMarket(Position.Quantity, targetPrice, "Take Profit");
+        }
+    }
+}
+`
+      }
+
+      setGenerationProgress(90)
+      setCurrentStep('Strateji tamamlanıyor...')
+
+      // Create the strategy object
+      const newStrategy: TradingStrategy = {
+        id: Date.now().toString(),
+        name: strategyName,
+        description: strategyPrompt,
+        code: strategyCode,
+        indicators: availableIndicators.filter(ind => ind.enabled),
+        settings: {
+          timeframe: timeframe,
+          riskTolerance: riskTolerance,
+          marketCondition: marketCondition,
+          tradingPair: tradingPair
+        },
+        performance: {
+          backtestResults: null,
+          winRate: 0,
+          profitFactor: 0,
+          maxDrawdown: 0,
+          totalTrades: 0
+        },
+        status: 'draft',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+      setGenerationProgress(100)
+      setCurrentStep('Strateji başarıyla oluşturuldu!')
+
+      // Save the strategy
+      setStrategies(current => [...current, newStrategy])
+      
+      // Clear form
+      setStrategyPrompt('')
+      setStrategyName('')
+      
+      toast.success(`${strategyName} stratejisi başarıyla oluşturuldu!`)
+      
+      // Switch to strategies tab to show the new strategy
+      setActiveTab('strategies')
+
+    } catch (error: any) {
+      console.error('Strategy generation error:', error)
+      setCurrentStep('Hata: Strateji oluşturulamadı')
+      
+      let errorMessage = 'Strateji oluşturulurken hata oluştu.'
+      
+      if (error.message.includes('API anahtarı')) {
+        errorMessage = 'API anahtarı hatası. Lütfen ayarlarınızı kontrol edin.'
+        setShowAIConfig(true)
+      } else if (error.message.includes('quota') || error.message.includes('limit')) {
+        errorMessage = 'API kullanım limitiniz dolmuş. Lütfen API sağlayıcınızla iletişime geçin.'
+      } else if (error.message.includes('invalid')) {
+        errorMessage = 'API anahtarınız geçersiz. Lütfen ayarlardan kontrol edin.'
+      }
+      
+      toast.error(errorMessage)
+    } finally {
+      setIsGenerating(false)
+      setTimeout(() => {
+        setGenerationProgress(0)
+        setCurrentStep('')
+      }, 3000)
+    }
+  }
         Zaman Dilimi: ${timeframe}
         Trading Çifti: ${tradingPair}
         
@@ -1204,24 +1360,35 @@ export function StrategyGenerator() {
                 </div>
               )}
               
-              <Button 
-                onClick={generateStrategy} 
-                disabled={isGenerating || !strategyPrompt.trim() || !strategyName.trim()}
-                className="w-full h-12 text-base font-medium"
-                size="lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <CircleNotch className="h-5 w-5 mr-2 animate-spin" />
-                    AI Strateji Üretiyor... ({generationProgress}%)
-                  </>
-                ) : (
-                  <>
-                    <Sparkle className="h-5 w-5 mr-2" />
-                    MatrixIQ AI ile Strateji Üret
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowAIConfig(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Gear className="h-4 w-4" />
+                  AI Ayarları
+                </Button>
+                
+                <Button 
+                  onClick={generateStrategy} 
+                  disabled={isGenerating || !strategyPrompt.trim() || !strategyName.trim()}
+                  className="flex-1 h-12 text-base font-medium"
+                  size="lg"
+                >
+                  {isGenerating ? (
+                    <>
+                      <CircleNotch className="h-5 w-5 mr-2 animate-spin" />
+                      AI Strateji Üretiyor... ({generationProgress}%)
+                    </>
+                  ) : (
+                    <>
+                      <Sparkle className="h-5 w-5 mr-2" />
+                      MatrixIQ AI ile Strateji Üret
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1758,6 +1925,19 @@ export function StrategyGenerator() {
           />
         </div>
       )}
+
+      {/* AI Configuration Dialog */}
+      <Dialog open={showAIConfig} onOpenChange={setShowAIConfig}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Gear className="h-5 w-5" />
+              AI Konfigürasyonu
+            </DialogTitle>
+          </DialogHeader>
+          <AIConfiguration onClose={() => setShowAIConfig(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

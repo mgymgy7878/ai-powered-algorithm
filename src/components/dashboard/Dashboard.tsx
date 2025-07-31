@@ -1,8 +1,13 @@
+import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, CpuChipIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { Gear, TestTube } from '@phosphor-icons/react'
+import { AIConfiguration } from '../ai/AIConfiguration'
+import { AITestPanel } from '../ai/AITestPanel'
 
 interface PortfolioMetrics {
   totalValue: number
@@ -13,6 +18,9 @@ interface PortfolioMetrics {
 }
 
 export function Dashboard() {
+  const [showAIConfig, setShowAIConfig] = useState(false)
+  const [showAITest, setShowAITest] = useState(false)
+  
   const [portfolioMetrics] = useKV<PortfolioMetrics>('portfolio-metrics', {
     totalValue: 50000,
     dailyPnL: 1250.50,
@@ -46,6 +54,14 @@ export function Dashboard() {
           <p className="text-muted-foreground">Real-time portfolio overview and trading activity</p>
         </div>
         <div className="flex gap-3">
+          <Button variant="outline" size="sm" onClick={() => setShowAITest(true)}>
+            <TestTube className="h-4 w-4 mr-2" />
+            AI Test
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setShowAIConfig(true)}>
+            <Gear className="h-4 w-4 mr-2" />
+            AI Ayarları
+          </Button>
           <Button variant="outline" size="sm">
             <CpuChipIcon className="h-4 w-4 mr-2" />
             Generate Strategy
@@ -187,6 +203,26 @@ export function Dashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* AI Configuration Dialog */}
+      <Dialog open={showAIConfig} onOpenChange={setShowAIConfig}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>AI Konfigürasyonu</DialogTitle>
+          </DialogHeader>
+          <AIConfiguration onClose={() => setShowAIConfig(false)} />
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Test Dialog */}
+      <Dialog open={showAITest} onOpenChange={setShowAITest}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>AI API Test</DialogTitle>
+          </DialogHeader>
+          <AITestPanel />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

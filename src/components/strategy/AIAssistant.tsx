@@ -5,8 +5,11 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Bot, User, PaperPlaneRight, Lightbulb, Code, TrendingUp, X, Sparkle } from '@phosphor-icons/react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Bot, User, PaperPlaneRight, Lightbulb, Code, TrendingUp, X, Sparkle, Gear, Warning } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { aiService } from '@/lib/ai-service'
+import { AIConfiguration } from '@/components/ai/AIConfiguration'
 
 interface Message {
   id: string
@@ -71,6 +74,7 @@ Nasıl yardımcı olmamı istersiniz?`,
   ])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showConfig, setShowConfig] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -96,80 +100,62 @@ Nasıl yardımcı olmamı istersiniz?`,
     setIsLoading(true)
 
     try {
-      // Simulate AI response
-      await new Promise(resolve => setTimeout(resolve, 1500))
-
       let response = ''
       let updatedCode = strategy.code
 
-      // Simple AI responses based on user input
+      // Check AI configuration
+      const config = aiService.getConfig()
+      if (!config.openaiApiKey && !config.anthropicApiKey) {
+        throw new Error('AI API anahtarı bulunamadı. Lütfen ayarlardan API anahtarınızı girin.')
+      }
+
+      // Determine the type of request and call appropriate AI method
       if (content.toLowerCase().includes('açıkla') || content.toLowerCase().includes('explain')) {
-        response = `Bu strateji şu şekilde çalışıyor:
-
-1. **OnStart()** metodunda RSI ve SMA indikatörleri tanımlanıyor
-2. **OnBarUpdate()** her yeni bar geldiğinde çalışıyor
-3. RSI değeri 70'in üzerindeyken satış sinyali oluşturuyor
-4. RSI değeri 30'un altındayken alış sinyali oluşturuyor
-
-Bu basit bir aşırı alım/aşırı satım stratejisidir. RSI indikatörü momentum değişimlerini yakalamaya çalışır.`
-
-      } else if (content.toLowerCase().includes('hata') || content.toLowerCase().includes('error')) {
-        response = `Kodunuzu inceledim ve şu iyileştirmeleri öneriyorum:
-
-1. **Risk Yönetimi Eksik**: Stop loss ve take profit seviyeleriniz yok
-2. **Position Size**: Pozisyon büyüklüğü tanımlanmamış
-3. **Hata Kontrolü**: İndikatör değerlerinin geçerliliği kontrol edilmiyor
-
-Bu düzeltmeleri yapmak ister misiniz?`
-
-      } else if (content.toLowerCase().includes('rsi') || content.toLowerCase().includes('macd')) {
-        const indicator = content.toLowerCase().includes('rsi') ? 'RSI' : 'MACD'
-        updatedCode = strategy.code.replace(
-          'public override void OnStart()',
-          `// ${indicator} indikatörü eklendi
-    private ${indicator.toLowerCase()} ${indicator.toLowerCase()};
-    
-    public override void OnStart()`
-        )
-        response = `${indicator} indikatörü başarıyla eklendi! Kodunuz güncellendi. 
-
-Yeni özellikler:
-• ${indicator} hesaplaması eklendi
-• Gerekli değişkenler tanımlandı
-• OnStart metodunda indikatör başlatıldı
-
-Şimdi ${indicator} değerlerini strateji mantığınızda kullanabilirsiniz.`
-
-      } else if (content.toLowerCase().includes('optimize') || content.toLowerCase().includes('iyileştir')) {
-        response = `Strateji optimizasyonu için önerilerim:
-
-**Performans İyileştirmeleri:**
-1. Çoklu zaman dilimi analizi ekleyin
-2. Volume filtreleme kullanın
-3. Trend yönü kontrolü ekleyin
-
-**Risk Yönetimi:**
-1. Stop Loss: %2
-2. Take Profit: %4  
-3. Maksimum günlük kayıp limiti
-
-**Parametre Optimizasyonu:**
-• RSI period: 10-20 arasında test edin
-• SMA period: 15-25 arasında deneyin
-
-Bu değişiklikleri uygulamak ister misiniz?`
-
-      } else {
-        response = `Anlıyorum. Bu konuda size yardımcı olabilirim.
-
-Daha spesifik yardım için şunları deneyebilirsiniz:
-• "Bu stratejiyi açıkla"
-• "Hataları bul ve düzelt" 
-• "RSI indikatörü ekle"
-• "Risk yönetimi ekle"
-• "Performansı iyileştir"
-
-Başka nasıl yardımcı olabilirim?`
+        const aiResponse = await aiService.explainStrategy(strategy.code)
+        response = aiResponse.content
+      } 
+      else if (content.toLowerCase().includes('hata') || content.toLowerCase().includes('error') || content.toLowerCase().includes('düzelt')) {
+        const aiResponse = await aiService.findAndFixErrors(strategy.code)
+        response = aiResponse.content
+        
+        // Try to extract improved code if AI provided it
+        const codeMatch = response.match(/```c#([\s\S]*?)```/i)
+        if (codeMatch) {
+          updatedCode = codeMatch[1].trim()
+        }
+      }
+      else if (content.toLowerCase().includes('optimize') || content.toLowerCase().includes('iyileştir') || content.toLowerCase().includes('performans')) {
+        const aiResponse = await aiService.optimizeStrategy(strategy.code)
+        response = aiResponse.content
+        
+        // Try to extract optimized code if AI provided it
+        const codeMatch = response.match(/```c#([\s\S]*?)```/i)
+        if (codeMatch) {
+          updatedCode = codeMatch[1].trim()
+        }
+      }
+      else if (content.toLowerCase().includes('rsi') || content.toLowerCase().includes('macd') || 
+               content.toLowerCase().includes('sma') || content.toLowerCase().includes('ema') ||
+               content.toLowerCase().includes('bollinger') || content.toLowerCase().includes('stoch')) {
+        // Extract indicator name
+        const indicators = ['RSI', 'MACD', 'SMA', 'EMA', 'Bollinger', 'Stochastic']
+        const mentionedIndicator = indicators.find(ind => 
+          content.toLowerCase().includes(ind.toLowerCase())
+        ) || 'belirtilen indikatör'
+        
+        const aiResponse = await aiService.addIndicator(strategy.code, mentionedIndicator)
+        response = aiResponse.content
+        
+        // Try to extract updated code if AI provided it
+        const codeMatch = response.match(/```c#([\s\S]*?)```/i)
+        if (codeMatch) {
+          updatedCode = codeMatch[1].trim()
+        }
+      }
+      else {
+        // General question
+        const aiResponse = await aiService.generalQuestion(content, `Mevcut strateji: ${strategy.name}`)
+        response = aiResponse.content
       }
 
       const assistantMessage: Message = {
@@ -179,7 +165,7 @@ Başka nasıl yardımcı olabilirim?`
         timestamp: new Date(),
         suggestions: [
           "Backtest yap",
-          "Parametreleri optimize et",
+          "Parametreleri optimize et", 
           "Stop loss ekle",
           "Kodu temizle"
         ]
@@ -188,13 +174,47 @@ Başka nasıl yardımcı olabilirim?`
       setMessages(prev => [...prev, assistantMessage])
 
       // Update strategy if code was modified
-      if (updatedCode !== strategy.code) {
+      if (updatedCode !== strategy.code && updatedCode.length > 100) {
         onUpdateStrategy(prev => ({ ...prev, code: updatedCode }))
-        toast.success('Strateji kodu güncellendi')
+        toast.success('Strateji kodu AI tarafından güncellendi')
       }
 
-    } catch (error) {
-      toast.error('AI asistanı ile bağlantı kurulamadı')
+    } catch (error: any) {
+      console.error('AI Assistant Error:', error)
+      
+      let errorMessage = 'AI asistanı ile bağlantı kurulamadı.'
+      
+      if (error.message.includes('API anahtarı')) {
+        errorMessage = error.message + ' AI ayarlarını yapılandırmak için ayarlar butonuna tıklayın.'
+      } else if (error.message.includes('quota') || error.message.includes('limit')) {
+        errorMessage = 'API kullanım limitiniz dolmuş. Lütfen API sağlayıcınızla iletişime geçin.'
+      } else if (error.message.includes('invalid')) {
+        errorMessage = 'API anahtarınız geçersiz. Lütfen ayarlardan kontrol edin.'
+      }
+      
+      const errorMessage_obj: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: `❌ **Hata:** ${errorMessage}
+
+AI özelliklerini kullanmak için:
+1. Ayarlar butonuna tıklayın (⚙️)
+2. OpenAI veya Anthropic API anahtarınızı girin  
+3. "Test Et" butonu ile bağlantıyı doğrulayın
+4. Tekrar deneyin
+
+API anahtarları güvenli şekilde tarayıcınızda saklanır.`,
+        timestamp: new Date(),
+        suggestions: [
+          "Ayarları aç",
+          "API anahtarı nedir?",
+          "Hangi modeli seçmeliyim?",
+          "Tekrar dene"
+        ]
+      }
+      
+      setMessages(prev => [...prev, errorMessage_obj])
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -202,6 +222,14 @@ Başka nasıl yardımcı olabilirim?`
 
   const handleQuickPrompt = (prompt: string) => {
     sendMessage(prompt)
+  }
+
+  const handleSuggestionClick = (suggestion: string) => {
+    if (suggestion === "Ayarları aç") {
+      setShowConfig(true)
+      return
+    }
+    sendMessage(suggestion)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -219,9 +247,19 @@ Başka nasıl yardımcı olabilirim?`
           <Bot className="w-5 h-5 text-primary" />
           <h2 className="font-semibold">AI Strateji Asistanı</h2>
         </div>
-        <Button variant="ghost" size="sm" onClick={onClose}>
-          <X className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowConfig(true)}
+            title="AI Ayarları"
+          >
+            <Gear className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -282,7 +320,7 @@ Başka nasıl yardımcı olabilirim?`
                             key={index}
                             variant="secondary"
                             className="cursor-pointer hover:bg-accent text-xs"
-                            onClick={() => sendMessage(suggestion)}
+                            onClick={() => handleSuggestionClick(suggestion)}
                           >
                             {suggestion}
                           </Badge>
@@ -348,6 +386,16 @@ Başka nasıl yardımcı olabilirim?`
           AI asistanı kodunuzu analiz edebilir, hatalarınızı düzeltebilir ve optimizasyon önerileri sunabilir.
         </div>
       </div>
+
+      {/* AI Configuration Dialog */}
+      <Dialog open={showConfig} onOpenChange={setShowConfig}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>AI Konfigürasyonu</DialogTitle>
+          </DialogHeader>
+          <AIConfiguration onClose={() => setShowConfig(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
