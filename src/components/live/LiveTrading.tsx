@@ -439,15 +439,15 @@ export function LiveTrading() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {marketData.slice(0, 6).map((market) => (
+              {marketData.slice(0, 6).map((market) => market && market.symbol ? (
                 <div key={market.symbol} className="text-center p-3 bg-muted rounded-lg">
                   <div className="font-medium">{market.symbol}</div>
-                  <div className="text-lg font-semibold">${market.price.toFixed(2)}</div>
-                  <div className={`text-sm ${market.change24h >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                    {market.change24h >= 0 ? '+' : ''}{market.change24h.toFixed(2)}%
+                  <div className="text-lg font-semibold">${(market.price || 0).toFixed(2)}</div>
+                  <div className={`text-sm ${(market.change24h || 0) >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                    {(market.change24h || 0) >= 0 ? '+' : ''}{(market.change24h || 0).toFixed(2)}%
                   </div>
                 </div>
-              ))}
+              ) : null)}
             </div>
           </CardContent>
         </Card>
@@ -618,7 +618,7 @@ export function LiveTrading() {
                     <div className="space-y-1">
                       <CardTitle className="flex items-center gap-2">
                         {strategy.name}
-                        <Badge variant="outline">{strategy.symbol}</Badge>
+                        <Badge variant="outline">{strategy?.symbol || 'N/A'}</Badge>
                         <Badge className={getStatusColor(strategy.status)}>
                           {strategy.status === 'running' ? 'Çalışıyor' : 
                            strategy.status === 'paused' ? 'Duraklatıldı' : 'Durduruldu'}

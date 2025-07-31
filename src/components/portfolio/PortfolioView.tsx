@@ -179,7 +179,7 @@ export function PortfolioView() {
                 <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg">
                   <div className="flex items-center gap-4">
                     <div>
-                      <div className="font-semibold text-lg">{position.symbol}</div>
+                      <div className="font-semibold text-lg">{position?.symbol || 'Bilinmeyen Sembol'}</div>
                       <div className="flex items-center gap-2">
                         <Badge variant={position.side === 'long' ? 'default' : 'secondary'}>
                           {position.side.toUpperCase()}

@@ -16,6 +16,7 @@ import { binanceService } from '../../services/binanceService'
 import { APISettings } from '../../types/api'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
+import { safeMarketData } from '../../utils/safeAccess'
 
 interface MarketDataProps {
   symbol?: string
@@ -59,15 +60,18 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
       // Fiyat verilerini al
       const prices = await binanceService.getSymbolPrices()
       
-      // Güvenli erişim kontrolü ekle
+      // Güvenli erişim kontrolü ekle - 'symbol' özelliği için
       if (prices && Array.isArray(prices)) {
-        const targetSymbol = prices.find(p => p?.symbol === symbol)
+        const targetSymbol = prices.find(p => p && p.symbol && p.symbol === symbol)
         
         if (targetSymbol) {
-          setMarketData(targetSymbol)
+          // Güvenli piyasa verisi formatla
+          setMarketData(safeMarketData(targetSymbol))
         } else {
           toast.error(`${symbol} sembolü bulunamadı`)
         }
+      } else {
+        toast.error('Piyasa verileri alınamadı veya geçersiz format')
       }
 
       // Kline verilerini al (son 100 saatlik)
@@ -112,15 +116,21 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
     toast.success('Veriler CSV olarak indirildi')
   }
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | string) => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price
+    if (isNaN(numPrice)) return '0.00'
+    
     return new Intl.NumberFormat('tr-TR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 8
-    }).format(price)
+    }).format(numPrice)
   }
 
-  const formatPercent = (percent: number) => {
-    return `${percent > 0 ? '+' : ''}${percent.toFixed(2)}%`
+  const formatPercent = (percent: number | string) => {
+    const numPercent = typeof percent === 'string' ? parseFloat(percent) : percent
+    if (isNaN(numPercent)) return '0.00%'
+    
+    return `${numPercent > 0 ? '+' : ''}${numPercent.toFixed(2)}%`
   }
 
   return (

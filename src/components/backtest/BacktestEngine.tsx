@@ -533,16 +533,16 @@ export function BacktestEngine() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <CardTitle className="flex items-center gap-2">
-                          {result.configuration.symbol}
-                          <Badge variant="outline">{result.configuration.timeframe}</Badge>
-                          <Badge variant={result.status === 'completed' ? 'default' : 'destructive'}>
-                            {result.status === 'completed' ? 'Tamamlandı' : 'Başarısız'}
+                          {result?.configuration?.symbol || 'Bilinmeyen Sembol'}
+                          <Badge variant="outline">{result?.configuration?.timeframe || 'N/A'}</Badge>
+                          <Badge variant={result?.status === 'completed' ? 'default' : 'destructive'}>
+                            {result?.status === 'completed' ? 'Tamamlandı' : 'Başarısız'}
                           </Badge>
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">
-                          {result.configuration.startDate} - {result.configuration.endDate} • 
-                          Süre: {(result.duration / 1000).toFixed(1)}s • 
-                          {new Date(result.runDate).toLocaleDateString('tr-TR')}
+                          {result?.configuration?.startDate || 'N/A'} - {result?.configuration?.endDate || 'N/A'} • 
+                          Süre: {((result?.duration || 0) / 1000).toFixed(1)}s • 
+                          {result?.runDate ? new Date(result.runDate).toLocaleDateString('tr-TR') : 'N/A'}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -590,8 +590,8 @@ export function BacktestEngine() {
                                     data={chartData}
                                     width={700}
                                     height={300}
-                                    symbol={selectedResult.configuration.symbol}
-                                    timeframe={selectedResult.configuration.timeframe}
+                                    symbol={selectedResult?.configuration?.symbol || 'Bilinmeyen'}
+                                    timeframe={selectedResult?.configuration?.timeframe || 'N/A'}
                                   />
                                 )}
                               </div>

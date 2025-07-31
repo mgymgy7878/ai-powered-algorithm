@@ -287,20 +287,20 @@ class BinanceService {
 
       const rawData = await response.json()
       
-      // Raw array verisini KlineData nesnesine dönüştür
+      // Raw array verisini KlineData nesnesine dönüştür - güvenli erişim ile
       return rawData.map((item: any[]) => ({
-        openTime: item[0],
-        open: item[1],
-        high: item[2],
-        low: item[3],
-        close: item[4],
-        volume: item[5],
-        closeTime: item[6],
-        quoteAssetVolume: item[7],
-        numberOfTrades: item[8],
-        takerBuyBaseAssetVolume: item[9],
-        takerBuyQuoteAssetVolume: item[10],
-        ignore: item[11]
+        openTime: item?.[0] || 0,
+        open: item?.[1] || '0',
+        high: item?.[2] || '0',
+        low: item?.[3] || '0',
+        close: item?.[4] || '0',
+        volume: item?.[5] || '0',
+        closeTime: item?.[6] || 0,
+        quoteAssetVolume: item?.[7] || '0',
+        numberOfTrades: item?.[8] || 0,
+        takerBuyBaseAssetVolume: item?.[9] || '0',
+        takerBuyQuoteAssetVolume: item?.[10] || '0',
+        ignore: item?.[11] || '0'
       }))
     } catch (error) {
       console.error('Kline verileri alınırken hata:', error)
