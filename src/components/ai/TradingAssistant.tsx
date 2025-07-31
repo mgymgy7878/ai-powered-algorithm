@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { useKV } from '@github/spark/hooks'
 
   id: string
@@ -21,6 +20,7 @@ interface ChatMessage {
 
     if (!inputMessage.trim() || isLoading) return
     const userMessage: ChatMessage = {
+    const userMessage: ChatMessage = {
 
       timestamp: ne
 
@@ -40,7 +40,6 @@ Kullanıcı sorusu: ${userMessage.c
      
 
 
-      const errorMessage: ChatMessa
         role: 'assistant',
 
       setMessages(prev => [...prev, er
