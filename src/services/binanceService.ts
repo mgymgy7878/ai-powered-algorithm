@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js'
 
-  openTime: number              /
-  high: string              
+// Kline (mum grafiği) verisi interface'i
+export interface KlineData {
   openTime: number              // Açılış zamanı
   open: string                  // Açılış fiyatı
   high: string                  // En yüksek fiyat
@@ -10,122 +10,115 @@ import CryptoJS from 'crypto-js'
   volume: string                // Hacim
   closeTime: number             // Kapanış zamanı
   quoteAssetVolume: string      // Quote varlık hacmi
-// Emir verisi interface'i
+  numberOfTrades: number        // İşlem sayısı
   takerBuyBaseAssetVolume: string    // Taker alım base varlık hacmi
   takerBuyQuoteAssetVolume: string   // Taker alım quote varlık hacmi
   ignore: string                // Yoksay
- 
-
-  workingType: string     
-  origType: string          
 }
-// Pozisyon bilgisi interface'i
-  symbol: string                // Sembo
-  entryPrice: string            // Giriş fiyatı
-  unRealizedProfit: string      // Gerçe
-  leverage: string              // Kaldıraç
-  marginType: string            // Marj tipi
-  isAutoAddMargin: string       // Otomatik marj ekleme
-  notional: string              // Nominal
+
+// Emir verisi interface'i
+export interface OrderData {
+  orderId: number               // Emir ID
+  symbol: string                // Sembol
+  status: string                // Durum
+  clientOrderId: string         // Müşteri emir ID
+  price: string                 // Fiyat
+  origQty: string               // Orijinal miktar
+  executedQty: string           // Çalıştırılan miktar
+  cummulativeQuoteQty: string   // Birikimli quote miktar
+  timeInForce: string           // Geçerlilik süresi
+  type: string                  // Emir tipi
+  reduceOnly: boolean           // Sadece azalt
+  closePosition: boolean        // Pozisyon kapat
+  side: string                  // Taraf (BUY/SELL)
+  positionSide: string          // Pozisyon tarafı
+  stopPrice: string             // Stop fiyat
+  workingType: string           // Çalışma tipi
+  priceProtect: boolean         // Fiyat koruma
+  origType: string              // Orijinal tip
   updateTime: number            // Güncelleme zamanı
+}
 
+// Pozisyon bilgisi interface'i
+export interface PositionInfo {
+  symbol: string                // Sembol
+  positionAmt: string           // Pozisyon miktarı
+  entryPrice: string            // Giriş fiyatı
+  markPrice: string             // Mark fiyat
+  unRealizedProfit: string      // Gerçekleşmemiş kar/zarar
+  liquidationPrice: string      // Tasfiye fiyatı
+  leverage: string              // Kaldıraç
+  maxNotionalValue: string      // Maksimum nominal değer
+  marginType: string            // Marj tipi
+  isolatedMargin: string        // İzole marj
+  isAutoAddMargin: string       // Otomatik marj ekleme
+  positionSide: string          // Pozisyon tarafı
+  notional: string              // Nominal
+  isolatedWallet: string        // İzole cüzdan
+  updateTime: number            // Güncelleme zamanı
+}
+
+// Sembol fiyat bilgisi interface'i  
 export interface SymbolPrice {
-  price: string
-  priceChangePercent: string
-  prevClosePrice: string
-  lastQty: string
-  askPrice: string
-  highPrice: string
-  volume: string
-  openTime: number
- 
+  symbol: string                // Sembol
+  price: string                 // Fiyat
+  priceChangePercent: string    // Fiyat değişim yüzdesi
+  prevClosePrice: string        // Önceki kapanış fiyatı
+  lastPrice: string             // Son fiyat
+  lastQty: string               // Son miktar
+  bidPrice: string              // Alış fiyatı
+  askPrice: string              // Satış fiyatı
+  openPrice: string             // Açılış fiyatı
+  highPrice: string             // En yüksek fiyat
+  lowPrice: string              // En düşük fiyat
+  volume: string                // Hacim
+  quoteVolume: string           // Quote hacim
+  openTime: number              // Açılış zamanı
+  closeTime: number             // Kapanış zamanı
+  count: number                 // İşlem sayısı
+}
 
+// Hesap bilgisi interface'i
 export interface AccountInfo {
-  canTrade: boolean            
-  canWithdraw: boolean          // Para ç
-  totalInitialMargin: string    // Toplam başlangıç
-  totalWalletBalance: string    // Toplam cüzda
-  totalMarginBalance: string    // Toplam marj b
-  totalOpenOrderInitialMargin: string   // Toplam açık emir
-  totalCrossUnPnl: string       // Toplam çapraz 
-  maxWithdrawAmount: string     // Maksimum
+  feeTier: number               // Ücret seviyesi
+  canTrade: boolean             // İşlem yapabilir
+  canDeposit: boolean           // Para yatırabilir
+  canWithdraw: boolean          // Para çekebilir
+  updateTime: number            // Güncelleme zamanı
+  totalInitialMargin: string    // Toplam başlangıç marjı
+  totalMaintMargin: string      // Toplam bakım marjı
+  totalWalletBalance: string    // Toplam cüzdan bakiyesi
+  totalUnrealizedProfit: string // Toplam gerçekleşmemiş kar/zarar
+  totalMarginBalance: string    // Toplam marj bakiyesi
+  totalPositionInitialMargin: string // Toplam pozisyon başlangıç marjı
+  totalOpenOrderInitialMargin: string // Toplam açık emir başlangıç marjı
+  totalCrossWalletBalance: string // Toplam çapraz cüzdan bakiyesi
+  totalCrossUnPnl: string       // Toplam çapraz gerçekleşmemiş kar/zarar
+  availableBalance: string      // Kullanılabilir bakiye
+  maxWithdrawAmount: string     // Maksimum çekim miktarı
+  assets: Array<{
     asset: string               // Varlık
-    unrealizedProfit: string    // Gerçekleş
-    maintMargin: string         // Bakım marj
-    positionInitialMargin: string       // Pozisyon baş
-    crossWalletBalance: string  // Çapraz cüzdan b
-    availableBalance: string    // Kullanı
-    marginAvailable: boolean    // Marj kullanı
+    walletBalance: string       // Cüzdan bakiyesi
+    unrealizedProfit: string    // Gerçekleşmemiş kar/zarar
+    marginBalance: string       // Marj bakiyesi
+    maintMargin: string         // Bakım marjı
+    initialMargin: string       // Başlangıç marjı
+    positionInitialMargin: string       // Pozisyon başlangıç marjı
+    openOrderInitialMargin: string      // Açık emir başlangıç marjı
+    crossWalletBalance: string  // Çapraz cüzdan bakiyesi
+    crossUnPnl: string          // Çapraz gerçekleşmemiş kar/zarar
+    availableBalance: string    // Kullanılabilir bakiye
+    maxWithdrawAmount: string   // Maksimum çekim miktarı
+    marginAvailable: boolean    // Marj kullanılabilir
+    updateTime: number          // Güncelleme zamanı
   }>
 }
 
+// Binance servis sınıfı
+class BinanceService {
+  private baseUrl: string = 'https://testnet.binancefuture.com'
+  private apiKey: string = ''
   private secretKey: string = ''
-
-    this.baseUrl
-
-  setCredentials(apiK
-    this.secretKey = secretK
-      ? 'https://testnet.b
-  }
-  // Kimlik bilgile
-    return !!(thi
-
-  private getTimes
-  }
-  // İmza oluştur
-    return CryptoJ
-
-  async getAccountInf
-      throw new Er
-
-      const times
-      const sign
-
- 
-          'X-MBX-APIKEY': this
-      })
-      if (!response.ok) {
-      }
-      return await response.json()
-      console.error('Hesap bilgileri alınırken hata:
-    }
-
-  async placeOrder(
-    side: string,
-    quantity: string,
-    timeInForce?: string,
-    callbackRate?: string
-    if (!this.validateCredentials()) {
-    }
-    try {
-      let queryString = `symbol=${symbol}&side=${side}&ty
-      if (price) 
-      if (stopPrice) queryString += `&sto
-
-      const finalQuery = `${queryString}&signature=${signat
-      const response = await fetch(`${this.baseU
-        headers: {
-          'Content-Type': 'application/x-www-form-
-        body: finalQuery,
-
-        const errorData = await response.json()
-      }
-      return await response.json()
-      console.error('Emir verirken hata:', error)
-    }
-
-  as
-      const response = await fetch(`${this.bas
- 
-
-  }
-  // API anahtarı testi
-    if (!this.validateCredential
-    }
-
-      const query
-
-   
 
   // API kimlik bilgilerini ayarlama
   setCredentials(apiKey: string, secretKey: string, isTestnet: boolean = true) {
@@ -168,7 +161,7 @@ export interface AccountInfo {
         headers: {
           'X-MBX-APIKEY': this.apiKey,
         },
-        
+      })
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -233,11 +226,11 @@ export interface AccountInfo {
   async testConnection(): Promise<boolean> {
     try {
       const response = await fetch(`${this.baseUrl}/fapi/v1/ping`)
-
+      return response.ok
     } catch (error) {
       console.error('Bağlantı testi hatası:', error)
       return false
-
+    }
   }
 
   // API anahtarı testi
@@ -265,10 +258,10 @@ export interface AccountInfo {
     }
   }
 
-  // Kline verilerini getir
-
+  // Kline verilerini getir (geçmiş fiyat verileri)
+  async getKlines(
     symbol: string,
-
+    interval: string,
     limit: number = 500,
     startTime?: number,
     endTime?: number
@@ -296,23 +289,23 @@ export interface AccountInfo {
         close: item?.[4] || '0',
         volume: item?.[5] || '0',
         closeTime: item?.[6] || 0,
-
+        quoteAssetVolume: item?.[7] || '0',
         numberOfTrades: item?.[8] || 0,
-
+        takerBuyBaseAssetVolume: item?.[9] || '0',
         takerBuyQuoteAssetVolume: item?.[10] || '0',
         ignore: item?.[11] || '0'
       }))
     } catch (error) {
       console.error('Kline verileri alınırken hata:', error)
-
+      return []
     }
+  }
 
-
-
+  // Pozisyon bilgilerini getir
   async getPositions(symbol?: string): Promise<PositionInfo[]> {
-
+    if (!this.validateCredentials()) {
       throw new Error('API kimlik bilgileri ayarlanmamış')
-
+    }
 
     try {
       const timestamp = this.getTimestamp()
@@ -324,15 +317,15 @@ export interface AccountInfo {
       const finalQuery = `${queryString}&signature=${signature}`
 
       const response = await fetch(`${this.baseUrl}/fapi/v2/positionRisk?${finalQuery}`, {
-
+        method: 'GET',
         headers: {
           'X-MBX-APIKEY': this.apiKey,
         },
-
+      })
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
-
+      }
 
       const positions = await response.json()
       // Sadece açık pozisyonları filtrele
@@ -344,21 +337,21 @@ export interface AccountInfo {
   }
 
   // Sembol fiyatlarını getir (24hr ticker statistics)
-
+  async getSymbolPrices(): Promise<SymbolPrice[]> {
     try {
       const response = await fetch(`${this.baseUrl}/fapi/v1/ticker/24hr`)
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
-
+      }
 
       return await response.json()
     } catch (error) {
       console.error('Sembol fiyatları alınırken hata:', error)
       return []
-
+    }
   }
-
+}
 
 // Singleton instance oluşturma
 export const binanceService = new BinanceService()
