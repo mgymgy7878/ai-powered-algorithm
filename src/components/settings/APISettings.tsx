@@ -157,7 +157,7 @@ export function APISettings() {
       aiService.setSettings(apiSettings)
     }
 
-    if (!aiService?.isConfigured?.()) {
+    if (!aiService || !aiService.isConfigured()) {
       toast.error('Lütfen önce en az bir AI servisini yapılandırın')
       return
     }

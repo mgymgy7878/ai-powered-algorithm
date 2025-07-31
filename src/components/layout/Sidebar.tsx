@@ -2,15 +2,15 @@ import { AppView } from '../../App'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { 
-  ChartBarIcon, 
-  CpuChipIcon, 
-  PlayIcon, 
-  ChartPieIcon,
-  MagnifyingGlassIcon,
-  HomeIcon,
-  CogIcon,
-  RocketLaunchIcon
-} from '@heroicons/react/24/outline'
+  ChartBar, 
+  Cpu, 
+  Play, 
+  ChartPie,
+  MagnifyingGlass,
+  House,
+  Gear,
+  Rocket
+} from '@phosphor-icons/react'
 
 interface SidebarProps {
   currentView: AppView
@@ -22,14 +22,14 @@ interface SidebarProps {
 export function Sidebar({ currentView, onViewChange, strategyCount, runningStrategiesCount = 0 }: SidebarProps) {
   
   const navigation = [
-    { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
-    { id: 'strategies', label: 'Stratejiler', icon: CpuChipIcon, badge: strategyCount },
-    { id: 'running-strategies', label: 'Çalışan Stratejiler', icon: RocketLaunchIcon, badge: runningStrategiesCount },
-    { id: 'backtest', label: 'Backtesting', icon: ChartBarIcon },
-    { id: 'live', label: 'Live Trading', icon: PlayIcon },
-    { id: 'portfolio', label: 'Portfolio', icon: ChartPieIcon },
-    { id: 'analysis', label: 'Market Analysis', icon: MagnifyingGlassIcon },
-    { id: 'settings', label: 'API Settings', icon: CogIcon },
+    { id: 'dashboard', label: 'Dashboard', icon: House },
+    { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
+    { id: 'running-strategies', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
+    { id: 'backtest', label: 'Backtesting', icon: ChartBar },
+    { id: 'live', label: 'Live Trading', icon: Play },
+    { id: 'portfolio', label: 'Portfolio', icon: ChartPie },
+    { id: 'analysis', label: 'Market Analysis', icon: MagnifyingGlass },
+    { id: 'settings', label: 'API Settings', icon: Gear },
   ] as const
 
   return (

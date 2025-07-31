@@ -6,7 +6,7 @@ import { Badge } from '../ui/badge'
 import { Progress } from '../ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { ScrollArea } from '../ui/scroll-area'
-import { PlayIcon, PauseIcon, StopIcon, ChartBarIcon, CogIcon, EyeIcon } from '@heroicons/react/24/outline'
+import { Play, Pause, Stop, ChartBar, Gear, Eye } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface RunningStrategy {
@@ -221,7 +221,7 @@ export function RunningStrategies() {
                               handleStrategyAction(strategy.id, 'pause')
                             }}
                           >
-                            <PauseIcon className="h-3 w-3" />
+                            <Pause className="h-3 w-3" />
                           </Button>
                         ) : (
                           <Button
@@ -232,7 +232,7 @@ export function RunningStrategies() {
                               handleStrategyAction(strategy.id, 'start')
                             }}
                           >
-                            <PlayIcon className="h-3 w-3" />
+                            <Play className="h-3 w-3" />
                           </Button>
                         )}
                         <Button
@@ -243,7 +243,7 @@ export function RunningStrategies() {
                             handleStrategyAction(strategy.id, 'stop')
                           }}
                         >
-                          <StopIcon className="h-3 w-3" />
+                          <Stop className="h-3 w-3" />
                         </Button>
                       </div>
                     </CardContent>
@@ -265,11 +265,11 @@ export function RunningStrategies() {
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm">
-                    <CogIcon className="h-4 w-4 mr-2" />
+                    <Gear className="h-4 w-4 mr-2" />
                     Ayarlar
                   </Button>
                   <Button variant="outline" size="sm">
-                    <ChartBarIcon className="h-4 w-4 mr-2" />
+                    <ChartBar className="h-4 w-4 mr-2" />
                     Grafik
                   </Button>
                 </div>
@@ -470,7 +470,7 @@ export function RunningStrategies() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-center py-8 text-muted-foreground">
-                      <ChartBarIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <ChartBar className="h-12 w-12 mx-auto mb-2 opacity-50" />
                       <p>İşlem geçmişi henüz yüklenmedi</p>
                       <p className="text-sm">Bu özellik yakında eklenecek</p>
                     </div>
@@ -514,7 +514,7 @@ export function RunningStrategies() {
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <EyeIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <Eye className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium mb-2">Strateji Seçin</h3>
                 <p className="text-muted-foreground">
                   Detayları görüntülemek için sol panelden bir strateji seçin
