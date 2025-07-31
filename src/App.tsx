@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
-import { RunningStrategies } from './components/strategy/RunningStrategies'
 import { StrategiesPage } from './components/strategy/StrategiesPage'
 import { BacktestEngine } from './components/backtest/BacktestEngine'
 import { LiveTrading } from './components/live/LiveTrading'
@@ -14,12 +13,12 @@ import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 
-export type AppView = 'dashboard' | 'strategies' | 'running-strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
   const [strategies] = useKV('trading-strategies', [])
-  const [runningStrategies] = useKV('running-strategies', [])
+  const [liveStrategies] = useKV('live-strategies', [])
   const [apiSettings] = useKV<APISettingsType>('api-settings', {
     openai: {
       apiKey: '',
@@ -76,8 +75,6 @@ function App() {
         return <Dashboard />
       case 'strategies':
         return <StrategiesPage />
-      case 'running-strategies':
-        return <RunningStrategies />
       case 'backtest':
         return <BacktestEngine />
       case 'live':
@@ -100,7 +97,7 @@ function App() {
           currentView={currentView} 
           onViewChange={setCurrentView}
           strategyCount={strategies.length}
-          runningStrategiesCount={runningStrategies.length}
+          runningStrategiesCount={liveStrategies.length}
         />
         <main className="flex-1 overflow-hidden">
           {renderView()}

@@ -24,9 +24,8 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
   const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: House },
     { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
-    { id: 'running-strategies', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
+    { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
     { id: 'backtest', label: 'Backtesting', icon: ChartBar },
-    { id: 'live', label: 'Live Trading', icon: Play },
     { id: 'portfolio', label: 'Portfolio', icon: ChartPie },
     { id: 'analysis', label: 'Market Analysis', icon: MagnifyingGlass },
     { id: 'settings', label: 'API Settings', icon: Gear },
