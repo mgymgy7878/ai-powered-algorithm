@@ -175,11 +175,32 @@ export function StrategyGenerator() {
       console.log('Anthropic configured:', anthropicConfigured)
       
       if (!apiSettings.openai?.apiKey?.trim() && !apiSettings.anthropic?.apiKey?.trim()) {
-        toast.error('AI API anahtarı bulunamadı. Lütfen ayarlardan API anahtarınızı girin.')
+        toast.error('Bağlantı yok: AI API anahtarı bulunamadı. Lütfen Ayarlar sekmesinden API anahtarınızı girin ve test edin.', {
+          duration: 5000,
+          action: {
+            label: 'Ayarlara Git',
+            onClick: () => {
+              // Trigger settings view navigation
+              const event = new CustomEvent('navigate-to-settings')
+              window.dispatchEvent(event)
+            }
+          }
+        })
       } else {
-        toast.error('API anahtarları mevcut ancak hiçbiri etkin değil. Lütfen en az birini etkinleştirin.')
+        toast.error('Bağlantı yok: API anahtarları mevcut ancak hiçbiri etkin değil. Lütfen Ayarlar sekmesinden en az birini etkinleştirin.', {
+          duration: 5000,
+          action: {
+            label: 'Ayarlara Git',
+            onClick: () => {
+              // Trigger settings view navigation
+              const event = new CustomEvent('navigate-to-settings')
+              window.dispatchEvent(event)
+            }
+          }
+        })
       }
       
+      // Still show AI config dialog as backup
       setShowAIConfig(true)
       return
     }

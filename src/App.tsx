@@ -49,6 +49,17 @@ function App() {
         apiSettings.binance.testnet
       )
     }
+
+    // Listen for navigation events from components
+    const handleNavigateToSettings = () => {
+      setCurrentView('settings')
+    }
+
+    window.addEventListener('navigate-to-settings', handleNavigateToSettings)
+    
+    return () => {
+      window.removeEventListener('navigate-to-settings', handleNavigateToSettings)
+    }
   }, [apiSettings])
 
   const renderView = () => {

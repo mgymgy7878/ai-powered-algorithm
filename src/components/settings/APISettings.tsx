@@ -529,6 +529,12 @@ export function APISettings() {
               disabled={!apiSettings.binance.enabled}
             >
               Grafik Verilerini Test Et
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Separator />
 
       {/* Test Code Generation */}
       <Card>
