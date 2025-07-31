@@ -92,8 +92,6 @@ Hangi konuda daha detaylı yardım istersiniz?`,
         setMessages(prev => [...prev, assistantMessage])
       }
       
-      setMessages(prev => [...prev, assistantMessage])
-      
     } catch (error) {
       console.error('AI yanıt hatası:', error)
       
