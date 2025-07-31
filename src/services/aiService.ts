@@ -14,6 +14,10 @@ export class AIService {
   }
 
   setSettings(settings: APISettings) {
+    if (!settings) {
+      console.warn('AI Service: Attempted to set null/undefined settings')
+      return
+    }
     this.settings = settings
   }
 
@@ -24,10 +28,15 @@ export class AIService {
   isConfigured(): boolean {
     if (!this.settings) return false
     
-    const openaiReady = this.settings.openai?.enabled && this.settings.openai?.apiKey?.trim()
-    const anthropicReady = this.settings.anthropic?.enabled && this.settings.anthropic?.apiKey?.trim()
-    
-    return !!(openaiReady || anthropicReady)
+    try {
+      const openaiReady = this.settings.openai?.enabled && this.settings.openai?.apiKey?.trim()
+      const anthropicReady = this.settings.anthropic?.enabled && this.settings.anthropic?.apiKey?.trim()
+      
+      return !!(openaiReady || anthropicReady)
+    } catch (error) {
+      console.error('AI Service configuration check error:', error)
+      return false
+    }
   }
 
   async generateCode(prompt: string, provider?: 'openai' | 'anthropic'): Promise<string> {

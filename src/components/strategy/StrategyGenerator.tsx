@@ -43,7 +43,13 @@ export function StrategyGenerator() {
 
   // Keep AI service synchronized with settings
   useEffect(() => {
-    aiService.setSettings(apiSettings)
+    if (apiSettings) {
+      try {
+        aiService.setSettings(apiSettings)
+      } catch (error) {
+        console.error('AI service settings update error:', error)
+      }
+    }
   }, [apiSettings])
 
   const availableIndicators: Indicator[] = [
@@ -164,7 +170,15 @@ export function StrategyGenerator() {
     }
 
     // Ensure AI service has latest settings BEFORE checking configuration
-    aiService.setSettings(apiSettings)
+    try {
+      if (apiSettings) {
+        aiService.setSettings(apiSettings)
+      }
+    } catch (error) {
+      console.error('Error setting AI service settings:', error)
+      toast.error('AI ayarları yüklenemedi. Lütfen sayfayı yenileyin.')
+      return
+    }
 
     // Check AI configuration with more robust checking
     const openaiConfigured = apiSettings?.openai?.enabled && apiSettings?.openai?.apiKey?.trim()
