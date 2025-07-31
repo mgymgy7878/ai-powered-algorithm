@@ -64,12 +64,7 @@ export function Dashboard() {
         <TradingAssistant />
       </div>
 
-      <div className={`${contentPadding}`}>
-        <div>
-          <h2 className="text-3xl font-bold">Anasayfa</h2>
-          <p className="text-muted-foreground">AI destekli trading yönetimi ve portföy genel görünümü</p>
-        </div>
-      </div>
+
 
       {/* Portfolio Metrics - Küçük yatay kutular */}
       <div className={`${contentPadding}`}>
