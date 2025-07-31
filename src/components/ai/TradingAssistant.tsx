@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Send, User, Brain, TrendingUp, TrendingDown, Activity } from '@phosphor-icons/react'
+import { Loader2, Send, User, Brain } from '@phosphor-icons/react'
 
 interface ChatMessage {
   id: string
@@ -89,6 +89,14 @@ export function TradingAssistant() {
     }
   }
 
+  // Enter tuşu ile mesaj gönderme
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
       {/* Sabit başlık */}
@@ -130,19 +138,51 @@ export function TradingAssistant() {
               {message.role === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
                   <User className="w-4 h-4" />
+                </div>
               )}
+            </div>
+          ))}
+          
+          {/* Loading mesajı */}
+          {isLoading && (
+            <div className="flex gap-3 justify-start">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Brain className="w-4 h-4 text-primary" />
+              </div>
+              <div className="bg-muted text-foreground p-3 rounded-lg text-sm flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Düşünüyor...</span>
+              </div>
+            </div>
+          )}
+          
+          {/* Scroll referansı */}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Mesaj input alanı - her zaman altta sabit */}
+      <div className="border-t p-3 flex gap-2 items-center bg-background">
         <Input
           value={inputMessage}
-      </div>
-      {/* Mesaj input alanı - her zaman e
-        <Input
           onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="AI'a mesaj yaz..."
+          className="flex-1"
+          disabled={isLoading}
         />
-        <Button onClick={sendMessage} disabled={!inputMessage.trim() || isLoading} size="icon">
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        <Button 
+          onClick={sendMessage} 
+          disabled={!inputMessage.trim() || isLoading} 
+          size="icon"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
         </Button>
       </div>
-
     </Card>
   )
-
+}
