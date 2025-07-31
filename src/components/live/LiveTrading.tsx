@@ -632,7 +632,7 @@ export function LiveTrading() {
                       <p className="text-sm text-muted-foreground">
                         Sermaye: {formatCurrency(strategy.allocatedCapital)}
                         {strategy.positionSize !== 0 && (
-                          <> • Pozisyon: {strategy.positionSize?.toFixed(4)} {strategy.symbol.replace('USDT', '')}</>
+                          <> • Pozisyon: {strategy.positionSize?.toFixed(4)} {(strategy.symbol || '').replace('USDT', '')}</>
                         )}
                       </p>
                     </div>

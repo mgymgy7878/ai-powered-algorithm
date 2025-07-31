@@ -45,7 +45,8 @@ function ChartContainer({
   >["children"]
 }) {
   const uniqueId = useId()
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
+  // uniqueId'nin undefined olmaması için güvenli erişim
+  const chartId = `chart-${id || (uniqueId || '').replace(/:/g, "")}`
 
   return (
     <ChartContext.Provider value={{ config }}>

@@ -262,11 +262,15 @@ Lütfen profesyonel bir C# trading stratejisi oluştur. Kod şu özellikleri iç
         // Already contains valid C# code
       } else {
         // Fallback to a simple template if no proper code is extracted
+        // strategyName ve strategyPrompt için güvenli erişim sağla
+        const safeName = strategyName || 'NewStrategy'
+        const safePrompt = strategyPrompt || 'AI ile oluşturulan strateji'
+        
         strategyCode = `
-// ${strategyName} - AI tarafından oluşturuldu
-// ${strategyPrompt}
+// ${safeName} - AI tarafından oluşturuldu
+// ${safePrompt}
 
-public class ${strategyName.replace(/\s+/g, '')}Strategy : Strategy
+public class ${safeName.replace(/\s+/g, '')}Strategy : Strategy
 {
     private RSI rsi;
     private SMA sma;

@@ -187,9 +187,12 @@ public class NewTradingStrategy : Strategy
   }
 
   const handleSave = () => {
+    // fileName'in undefined olmaması için güvenli erişim sağla
+    const safeName = fileName || 'NewTradingStrategy.cs'
+    
     const updatedStrategy: TradingStrategy = {
       id: strategy?.id || Date.now().toString(),
-      name: fileName.replace('.cs', '').replace('.js', '').replace('.py', ''),
+      name: safeName.replace('.cs', '').replace('.js', '').replace('.py', ''),
       description: strategy?.description || 'AI ile oluşturulan trading stratejisi',
       code,
       indicators: strategy?.indicators || [],

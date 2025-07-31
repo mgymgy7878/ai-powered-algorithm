@@ -113,6 +113,11 @@ class BacktestEngine {
     candlestickData: CandlestickData[],
     strategyCode: string
   ): Promise<BacktestResult> {
+    // strategyCode parametresinin güvenli kontrolü
+    if (!strategyCode) {
+      throw new Error('Backtest için strateji kodu gereklidir')
+    }
+    
     const backtestId = Date.now().toString()
     const controller = new AbortController()
     this.runningBacktests.set(backtestId, controller)
@@ -186,6 +191,11 @@ class BacktestEngine {
     strategyCode: string,
     onProgress?: (progress: { completed: number; total: number; bestResult?: BacktestResult }) => void
   ): Promise<OptimizationResult> {
+    // strategyCode parametresinin güvenli kontrolü
+    if (!strategyCode) {
+      throw new Error('Optimizasyon için strateji kodu gereklidir')
+    }
+    
     const optimizationId = Date.now().toString()
     const controller = new AbortController()
     this.runningOptimizations.set(optimizationId, controller)
@@ -548,6 +558,12 @@ class BacktestEngine {
   }
 
   private applyParametersToStrategy(strategyCode: string, parameters: Record<string, any>): string {
+    // strategyCode'un undefined olmaması için güvenli kontrol
+    if (!strategyCode) {
+      console.warn('Backtest Engine: strategyCode undefined, boş string döndürülüyor')
+      return ''
+    }
+    
     let modifiedCode = strategyCode
     
     // Parametreleri kod içerisine uygula (basit string replacement)
