@@ -39,15 +39,17 @@ function App() {
 
   // Initialize AI service with stored settings
   useEffect(() => {
-    aiService.setSettings(apiSettings)
-    
-    // Initialize Binance service if configured
-    if (apiSettings.binance.enabled && apiSettings.binance.apiKey && apiSettings.binance.secretKey) {
-      binanceService.setCredentials(
-        apiSettings.binance.apiKey,
-        apiSettings.binance.secretKey,
-        apiSettings.binance.testnet
-      )
+    if (apiSettings) {
+      aiService.setSettings(apiSettings)
+      
+      // Initialize Binance service if configured
+      if (apiSettings.binance?.enabled && apiSettings.binance?.apiKey && apiSettings.binance?.secretKey) {
+        binanceService.setCredentials(
+          apiSettings.binance.apiKey,
+          apiSettings.binance.secretKey,
+          apiSettings.binance.testnet ?? true
+        )
+      }
     }
 
     // Listen for navigation events from components

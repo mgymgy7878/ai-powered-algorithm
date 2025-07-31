@@ -29,7 +29,8 @@ export function StrategyGenerator() {
   const [strategies, setStrategies] = useKV<TradingStrategy[]>('trading-strategies', [])
   const [apiSettings] = useKV<any>('api-settings', {
     openai: { apiKey: '', model: 'gpt-4', enabled: true },
-    anthropic: { apiKey: '', model: 'claude-3-sonnet', enabled: false }
+    anthropic: { apiKey: '', model: 'claude-3-sonnet', enabled: false },
+    binance: { apiKey: '', secretKey: '', testnet: true, enabled: false }
   })
   const [isGenerating, setIsGenerating] = useState(false)
   const [strategyPrompt, setStrategyPrompt] = useState('')
@@ -166,15 +167,15 @@ export function StrategyGenerator() {
     aiService.setSettings(apiSettings)
 
     // Check AI configuration with more robust checking
-    const openaiConfigured = apiSettings.openai?.enabled && apiSettings.openai?.apiKey?.trim()
-    const anthropicConfigured = apiSettings.anthropic?.enabled && apiSettings.anthropic?.apiKey?.trim()
+    const openaiConfigured = apiSettings?.openai?.enabled && apiSettings?.openai?.apiKey?.trim()
+    const anthropicConfigured = apiSettings?.anthropic?.enabled && apiSettings?.anthropic?.apiKey?.trim()
     
     if (!openaiConfigured && !anthropicConfigured) {
       console.log('API Settings:', apiSettings)
       console.log('OpenAI configured:', openaiConfigured)
       console.log('Anthropic configured:', anthropicConfigured)
       
-      if (!apiSettings.openai?.apiKey?.trim() && !apiSettings.anthropic?.apiKey?.trim()) {
+      if (!apiSettings?.openai?.apiKey?.trim() && !apiSettings?.anthropic?.apiKey?.trim()) {
         toast.error('Bağlantı yok: AI API anahtarı bulunamadı. Lütfen Ayarlar sekmesinden API anahtarınızı girin ve test edin.', {
           duration: 5000,
           action: {

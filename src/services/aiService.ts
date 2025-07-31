@@ -24,8 +24,8 @@ export class AIService {
   isConfigured(): boolean {
     if (!this.settings) return false
     
-    const openaiReady = this.settings.openai.enabled && this.settings.openai.apiKey?.trim()
-    const anthropicReady = this.settings.anthropic.enabled && this.settings.anthropic.apiKey?.trim()
+    const openaiReady = this.settings.openai?.enabled && this.settings.openai?.apiKey?.trim()
+    const anthropicReady = this.settings.anthropic?.enabled && this.settings.anthropic?.apiKey?.trim()
     
     return !!(openaiReady || anthropicReady)
   }
@@ -37,9 +37,9 @@ export class AIService {
 
     // Auto-select provider if not specified
     if (!provider) {
-      if (this.settings.openai.enabled && this.settings.openai.apiKey) {
+      if (this.settings.openai?.enabled && this.settings.openai?.apiKey) {
         provider = 'openai'
-      } else if (this.settings.anthropic.enabled && this.settings.anthropic.apiKey) {
+      } else if (this.settings.anthropic?.enabled && this.settings.anthropic?.apiKey) {
         provider = 'anthropic'
       } else {
         throw new Error('Hiçbir AI servisi etkin değil. Lütfen en az birini etkinleştirin.')
@@ -48,7 +48,7 @@ export class AIService {
 
     const config = provider === 'openai' ? this.settings.openai : this.settings.anthropic
 
-    if (!config.enabled || !config.apiKey) {
+    if (!config?.enabled || !config?.apiKey) {
       throw new Error(`${provider} servisi etkin değil veya API anahtarı eksik.`)
     }
 
