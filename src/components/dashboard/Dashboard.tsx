@@ -123,7 +123,7 @@ export function Dashboard() {
     }
   }
 
-  // Tüm gösterge kutularını tek satırda göstermek için birleştir
+  // Tüm gösterge kutularını tek satırda göstermek için birleştir - yazım hataları düzeltildi
   const allMetrics = [
     { label: "Portföy Değeri", value: formatCurrency(safePortfolioMetrics.totalValue), color: 'text-blue-700' },
     { label: "Günlük K/Z", value: formatCurrency(safePortfolioMetrics.dailyPnL), color: safePortfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600' },
@@ -131,19 +131,23 @@ export function Dashboard() {
     { label: "Başarı Oranı", value: formatPercentage(safePortfolioMetrics.winRate), color: 'text-blue-700' },
     { label: "Aktif Stratejiler", value: (safePortfolioMetrics.activeStrategies ?? 0).toString(), color: 'text-green-600' },
     { label: "Aktif İşlemler", value: (safePortfolioMetrics.activeTrades ?? 0).toString(), color: 'text-blue-700' },
-    { label: "Toplam İşlem", value: (safePortfolioMetrics.totalTrades ?? 0).toLocaleString(), color: 'text-blue-700' },
+    { label: "Toplam İşlemler", value: (safePortfolioMetrics.totalTrades ?? 0).toLocaleString(), color: 'text-blue-700' },
     { label: "Ortalama Getiri", value: `+${(safePortfolioMetrics.avgReturn ?? 0).toFixed(1)}%`, color: 'text-green-600' },
     { label: "Max Drawdown", value: `${(safePortfolioMetrics.maxDrawdown ?? 0).toFixed(1)}%`, color: 'text-red-600' }
   ]
 
   return (
     <div className="relative p-2 space-y-2">
-      {/* Tüm Portföy Metrikleri - Tek satırda, %50 küçültülmüş, menü ile bildirim arasında */}
-      <div className="absolute top-3 left-[55px] right-[160px] z-40 flex items-center flex-nowrap gap-1 overflow-hidden">
+      {/* Tüm Portföy Metrikleri - Tek satırda, %20 daha küçültülmüş */}
+      <div className="absolute top-3 left-[55px] right-[160px] z-40 flex items-center justify-start gap-1 overflow-hidden">
         {allMetrics.map((metric, index) => (
-          <div key={index} className="rounded-md bg-muted text-muted-foreground px-2 py-1 text-center shadow-sm w-[110px] h-[32px] flex-shrink-0 flex flex-col items-center justify-center">
-            <p className="text-xs text-muted-foreground truncate leading-none">{metric.label}</p>
-            <p className={`text-xs font-semibold ${metric.color} leading-none mt-0.5`}>
+          <div 
+            key={index} 
+            className="rounded-md bg-muted text-muted-foreground px-1 py-0.5 text-center shadow-sm w-[100px] h-auto flex-shrink-0 flex flex-col items-center justify-center"
+            title={`${metric.label}: ${metric.value}`} // Tooltip için tam değer
+          >
+            <p className="text-[10px] text-muted-foreground truncate leading-tight w-full">{metric.label}</p>
+            <p className={`text-sm font-semibold ${metric.color} leading-tight truncate w-full`}>
               {metric.value}
             </p>
           </div>
