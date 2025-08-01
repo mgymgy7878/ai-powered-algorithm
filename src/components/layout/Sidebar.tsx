@@ -24,7 +24,7 @@ interface SidebarProps {
   runningStrategiesCount?: number
 }
 
-export function Sidebar({ currentView, onViewChange, strategyCount, runningStrategiesCount = 0 }: SidebarProps) {
+export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningStrategiesCount = 0 }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   
   // Sidebar durumunu window'a yayınla ki Dashboard bunu kullanabilsin
@@ -34,8 +34,8 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
   
   const navigation = [
     { id: 'dashboard', label: 'Anasayfa', icon: Home },
-    { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount },
-    { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount },
+    { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount || 0 },
+    { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount || 0 },
     { id: 'backtest', label: 'Backtesting', icon: BarChart },
     { id: 'portfolio', label: 'Portföy', icon: PieChart },
     { id: 'analysis', label: 'Piyasa Analizi', icon: Search },

@@ -221,18 +221,18 @@ class BinanceService {
       
       // Raw kline data'yı KlineData formatına çevir
       return rawData.map((kline: any[]) => ({
-        openTime: kline[0],
-        open: kline[1],
-        high: kline[2],
-        low: kline[3],
-        close: kline[4],
-        volume: kline[5],
-        closeTime: kline[6],
-        quoteAssetVolume: kline[7],
-        numberOfTrades: kline[8],
-        takerBuyBaseAssetVolume: kline[9],
-        takerBuyQuoteAssetVolume: kline[10],
-        ignore: kline[11]
+        openTime: kline[0] || 0,
+        open: kline[1] || '0',
+        high: kline[2] || '0',
+        low: kline[3] || '0',
+        close: kline[4] || '0',
+        volume: kline[5] || '0',
+        closeTime: kline[6] || 0,
+        quoteAssetVolume: kline[7] || '0',
+        numberOfTrades: kline[8] || 0,
+        takerBuyBaseAssetVolume: kline[9] || '0',
+        takerBuyQuoteAssetVolume: kline[10] || '0',
+        ignore: kline[11] || '0'
       }))
     } catch (error) {
       console.error('Kline verisi alınırken hata:', error)

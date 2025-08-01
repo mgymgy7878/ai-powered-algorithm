@@ -136,7 +136,7 @@ export function TradingAssistant() {
       setMessages(prev => [...prev, assistantMessage])
       
       // Aktivite log'a ekle - güvenli substring kullanımı
-      const safeText = text || 'Bilinmeyen sorgu'
+      const safeText = text && typeof text === 'string' ? text : 'Bilinmeyen sorgu'
       addActivity(`AI analiz tamamlandı: ${safeText.substring(0, 50)}...`, 'success')
 
       // Bildirim gönder
@@ -183,12 +183,17 @@ export function TradingAssistant() {
 
   // Hangi modelin aktif olduğunu belirle
   const getActiveModel = () => {
-    if (apiSettings.openai?.enabled && apiSettings.openai?.apiKey) {
-      return `GPT-${apiSettings.openai.model}`
-    } else if (apiSettings.anthropic?.enabled && apiSettings.anthropic?.apiKey) {
-      return `Claude ${apiSettings.anthropic.model}`
+    try {
+      if (apiSettings?.openai?.enabled === true && apiSettings.openai?.apiKey?.trim()) {
+        return `GPT-${apiSettings.openai.model}`
+      } else if (apiSettings?.anthropic?.enabled === true && apiSettings.anthropic?.apiKey?.trim()) {
+        return `Claude ${apiSettings.anthropic.model}`
+      }
+      return 'Model Seçiniz'
+    } catch (error) {
+      console.warn('Model selection error:', error)
+      return 'Model Seçiniz'
     }
-    return 'Model Seçiniz'
   }
 
   return (

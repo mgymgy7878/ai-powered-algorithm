@@ -48,7 +48,9 @@ function App() {
         aiService.setSettings(apiSettings)
         
         // Initialize Binance service if configured
-        if (apiSettings.binance?.enabled && apiSettings.binance?.apiKey && apiSettings.binance?.secretKey) {
+        if (apiSettings.binance?.enabled === true && 
+            apiSettings.binance?.apiKey?.trim() && 
+            apiSettings.binance?.secretKey?.trim()) {
           binanceService.setCredentials(
             apiSettings.binance.apiKey,
             apiSettings.binance.secretKey,
