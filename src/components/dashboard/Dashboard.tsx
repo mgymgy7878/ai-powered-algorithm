@@ -291,5 +291,6 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
+    </div>
   )
 }
