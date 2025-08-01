@@ -86,8 +86,8 @@ export function Dashboard() {
 
   return (
     <div className="relative p-2 space-y-2">
-      {/* Portfolio Metrics - Sağa hizalı kompakt yatay dizilim */}
-      <div className="flex items-center justify-end gap-2 ml-[64px] mr-[300px] mt-2 px-2 overflow-x-auto">
+      {/* Portfolio Metrics - Ekranın en üstünde, menü ile bildirim arasında */}
+      <div className="absolute top-3 left-[60px] right-[280px] z-40 px-2 flex items-center gap-2 overflow-x-auto">
         <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
           <p className="text-muted-foreground truncate">Portföy Değeri</p>
           <p className="font-semibold text-xs text-primary">{formatCurrency(portfolioMetrics.totalValue)}</p>
@@ -136,31 +136,8 @@ export function Dashboard() {
       <div className="absolute top-14 right-4 w-[280px] z-20">
         <TradingAssistant />
       </div>
-      {/* Ana İçerik Alanı */}
-      <div className="pl-2 pr-[300px]">
-        {/* Hızlı İstatistikler - Sağa hizalı kompakt yatay dizilim */}
-        <div className="flex items-center justify-end gap-2 ml-[64px] mr-0 mt-2 px-2 overflow-x-auto">
-          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-            <p className="text-muted-foreground truncate">Aktif İşlemler</p>
-            <p className="font-semibold text-xs text-foreground">12</p>
-          </div>
-
-          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-            <p className="text-muted-foreground truncate">Toplam İşlem</p>
-            <p className="font-semibold text-xs text-foreground">1,247</p>
-          </div>
-
-          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-            <p className="text-muted-foreground truncate">Ortalama Getiri</p>
-            <p className="font-semibold text-xs text-green-600">+2.4%</p>
-          </div>
-
-          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-            <p className="text-muted-foreground truncate">Max Drawdown</p>
-            <p className="font-semibold text-xs text-red-600">-5.2%</p>
-          </div>
-        </div>
-
+      {/* Ana İçerik Alanı - Üstteki metrikler için boşluk bırak */}
+      <div className="pl-2 pr-[300px] pt-12">
         {/* Ana Grafik ve Analiz Alanı */}
         <div className="grid grid-cols-1 gap-2 mt-3">
           {/* Portföy Performans Grafiği */}
