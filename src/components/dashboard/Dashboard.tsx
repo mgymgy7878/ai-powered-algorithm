@@ -123,42 +123,31 @@ export function Dashboard() {
     }
   }
 
-  // Dashboard gösterge kutuları - üst kısım
-  const topMetrics = [
-    { label: "Portföy Değeri", value: formatCurrency(safePortfolioMetrics.totalValue), color: 'text-primary' },
-    { label: "Günlük K/Z", value: formatCurrency(safePortfolioMetrics.dailyPnL), color: safePortfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600', icon: safePortfolioMetrics.dailyPnL >= 0 ? TrendingUp : TrendingDown },
+  // Tüm gösterge kutularını tek satırda göstermek için birleştir
+  const allMetrics = [
+    { label: "Portföy Değeri", value: formatCurrency(safePortfolioMetrics.totalValue), color: 'text-blue-700' },
+    { label: "Günlük K/Z", value: formatCurrency(safePortfolioMetrics.dailyPnL), color: safePortfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600' },
     { label: "Toplam K/Z", value: formatCurrency(safePortfolioMetrics.totalPnL), color: safePortfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600' },
-    { label: "Başarı Oranı", value: formatPercentage(safePortfolioMetrics.winRate), color: 'text-blue-600' },
-    { label: "Aktif Stratejiler", value: (safePortfolioMetrics.activeStrategies ?? 0).toString(), color: 'text-green-500', pulse: true }
-  ]
-
-  // Alt metrikler (görünmeyenler)
-  const bottomMetrics = [
-    { label: "Aktif İşlemler", value: (safePortfolioMetrics.activeTrades ?? 0).toString(), color: 'text-orange-600' },
-    { label: "Toplam İşlem", value: (safePortfolioMetrics.totalTrades ?? 0).toLocaleString(), color: 'text-blue-500' },
+    { label: "Başarı Oranı", value: formatPercentage(safePortfolioMetrics.winRate), color: 'text-blue-700' },
+    { label: "Aktif Stratejiler", value: (safePortfolioMetrics.activeStrategies ?? 0).toString(), color: 'text-green-600' },
+    { label: "Aktif İşlemler", value: (safePortfolioMetrics.activeTrades ?? 0).toString(), color: 'text-blue-700' },
+    { label: "Toplam İşlem", value: (safePortfolioMetrics.totalTrades ?? 0).toLocaleString(), color: 'text-blue-700' },
     { label: "Ortalama Getiri", value: `+${(safePortfolioMetrics.avgReturn ?? 0).toFixed(1)}%`, color: 'text-green-600' },
     { label: "Max Drawdown", value: `${(safePortfolioMetrics.maxDrawdown ?? 0).toFixed(1)}%`, color: 'text-red-600' }
   ]
 
   return (
     <div className="relative p-2 space-y-2">
-      {/* Portfolio Metrics - Ekranın en üstünde, menü ile bildirim arasında */}
-      <div className="absolute top-3 left-[60px] right-[280px] z-40 px-2 flex items-center gap-2 overflow-x-auto">
-        {topMetrics.map((metric, index) => {
-          const IconComponent = metric.icon
-          return (
-            <div key={index} className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-              <p className="text-muted-foreground truncate">{metric.label}</p>
-              <div className="flex items-center justify-center gap-1">
-                <p className={`font-semibold text-xs ${metric.color}`}>
-                  {metric.value}
-                </p>
-                {IconComponent && <IconComponent className="h-2 w-2" />}
-                {metric.pulse && <div className="h-1 w-1 bg-green-500 rounded-full animate-pulse"></div>}
-              </div>
-            </div>
-          )
-        })}
+      {/* Tüm Portföy Metrikleri - Tek satırda, menü ile bildirim arasında */}
+      <div className="absolute top-3 left-[60px] right-[140px] z-40 px-2 flex items-center gap-2 justify-start max-w-[calc(100vw-220px)] overflow-hidden">
+        {allMetrics.map((metric, index) => (
+          <div key={index} className="bg-muted rounded-md px-3 py-2 text-center shadow-sm min-w-[120px] flex-shrink-0">
+            <p className="text-[11px] text-muted-foreground truncate leading-tight">{metric.label}</p>
+            <p className={`text-sm font-semibold ${metric.color} leading-tight`}>
+              {metric.value}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
@@ -253,24 +242,7 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Bottom Metrics - Additional metrics at the bottom */}
-        <Card className="mt-2">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-sm">Detaylı İstatistikler</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {bottomMetrics.map((metric, index) => (
-                <div key={index} className="bg-muted/50 rounded-lg px-3 py-2 text-center">
-                  <p className="text-[10px] text-muted-foreground truncate">{metric.label}</p>
-                  <p className={`font-semibold text-sm ${metric.color}`}>
-                    {metric.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Bottom Metrics bölümünü kaldır - artık üstte tek satırda gösteriliyor */}
       </div>
     </div>
   );
