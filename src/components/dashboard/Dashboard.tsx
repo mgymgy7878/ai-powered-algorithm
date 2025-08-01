@@ -62,43 +62,43 @@ export function Dashboard() {
 
       {/* Portfolio Metrics - Küçük yatay kutular */}
       <div className={`${contentPadding}`}>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
-            <span className="text-muted-foreground">Portföy Değeri</span>
+        <div className="flex flex-wrap items-center gap-1">
+          <div className="flex flex-col px-2 py-1 bg-muted rounded-md shadow-sm text-xs min-w-[120px]">
+            <span className="text-[10px] text-muted-foreground">Portföy Değeri</span>
             <span className="font-bold text-sm text-primary">{formatCurrency(portfolioMetrics.totalValue)}</span>
           </div>
           
-          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
-            <span className="text-muted-foreground">Günlük K/Z</span>
+          <div className="flex flex-col px-2 py-1 bg-muted rounded-md shadow-sm text-xs min-w-[120px]">
+            <span className="text-[10px] text-muted-foreground">Günlük K/Z</span>
             <div className="flex items-center gap-1">
               <span className={`font-bold text-sm ${portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(portfolioMetrics.dailyPnL)}
               </span>
               {portfolioMetrics.dailyPnL >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-green-600" />
+                <TrendingUp className="h-2 w-2 text-green-600" />
               ) : (
-                <TrendingDown className="h-3 w-3 text-red-600" />
+                <TrendingDown className="h-2 w-2 text-red-600" />
               )}
             </div>
           </div>
           
-          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
-            <span className="text-muted-foreground">Toplam K/Z</span>
+          <div className="flex flex-col px-2 py-1 bg-muted rounded-md shadow-sm text-xs min-w-[120px]">
+            <span className="text-[10px] text-muted-foreground">Toplam K/Z</span>
             <span className={`font-bold text-sm ${portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {formatCurrency(portfolioMetrics.totalPnL)}
             </span>
           </div>
           
-          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
-            <span className="text-muted-foreground">Başarı Oranı</span>
+          <div className="flex flex-col px-2 py-1 bg-muted rounded-md shadow-sm text-xs min-w-[120px]">
+            <span className="text-[10px] text-muted-foreground">Başarı Oranı</span>
             <span className="font-bold text-sm text-blue-600">{formatPercentage(portfolioMetrics.winRate)}</span>
           </div>
           
-          <div className="flex flex-col px-3 py-2 bg-muted rounded-md shadow-sm text-xs min-w-[140px]">
-            <span className="text-muted-foreground">Aktif Stratejiler</span>
+          <div className="flex flex-col px-2 py-1 bg-muted rounded-md shadow-sm text-xs min-w-[120px]">
+            <span className="text-[10px] text-muted-foreground">Aktif Stratejiler</span>
             <div className="flex items-center gap-1">
               <span className="font-bold text-sm text-green-500">{portfolioMetrics.activeStrategies}</span>
-              <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="h-1 w-1 bg-green-500 rounded-full animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -108,62 +108,26 @@ export function Dashboard() {
       <div className={`${contentPadding}`}>
         
         {/* Hızlı İstatistikler - %50 küçültülmüş boyutlar */}
-        <div className="grid grid-cols-4 gap-1 mb-3">
-          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
-            <CardContent className="!p-1.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="!text-[10px] !text-muted-foreground">Aktif İşlemler</p>
-                  <p className="!text-sm !font-semibold">12</p>
-                </div>
-                <div className="h-3 w-3 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-2 w-2 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex flex-wrap items-center gap-1 mb-3">
+          <div className="flex flex-col items-start justify-center px-2 py-1 min-w-[120px] bg-muted rounded-md text-xs leading-tight">
+            <span className="text-[10px] text-muted-foreground">Aktif İşlemler</span>
+            <span className="text-sm font-bold text-foreground">12</span>
+          </div>
 
-          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
-            <CardContent className="!p-1.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="!text-[10px] !text-muted-foreground">Toplam İşlem</p>
-                  <p className="!text-sm !font-semibold">1,247</p>
-                </div>
-                <div className="h-3 w-3 bg-blue-100 rounded-full flex items-center justify-center">
-                  <BarChart className="h-2 w-2 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-start justify-center px-2 py-1 min-w-[120px] bg-muted rounded-md text-xs leading-tight">
+            <span className="text-[10px] text-muted-foreground">Toplam İşlem</span>
+            <span className="text-sm font-bold text-foreground">1,247</span>
+          </div>
 
-          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
-            <CardContent className="!p-1.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="!text-[10px] !text-muted-foreground">Ortalama Getiri</p>
-                  <p className="!text-sm !font-semibold text-green-600">+2.4%</p>
-                </div>
-                <div className="h-3 w-3 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-2 w-2 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-start justify-center px-2 py-1 min-w-[120px] bg-muted rounded-md text-xs leading-tight">
+            <span className="text-[10px] text-muted-foreground">Ortalama Getiri</span>
+            <span className="text-sm font-bold text-green-600">+2.4%</span>
+          </div>
 
-          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
-            <CardContent className="!p-1.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="!text-[10px] !text-muted-foreground">Max Drawdown</p>
-                  <p className="!text-sm !font-semibold text-red-600">-5.2%</p>
-                </div>
-                <div className="h-3 w-3 bg-red-100 rounded-full flex items-center justify-center">
-                  <TrendingDown className="h-2 w-2 text-red-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-start justify-center px-2 py-1 min-w-[120px] bg-muted rounded-md text-xs leading-tight">
+            <span className="text-[10px] text-muted-foreground">Max Drawdown</span>
+            <span className="text-sm font-bold text-red-600">-5.2%</span>
+          </div>
         </div>
 
         {/* Ana Grafik ve Analiz Alanı */}
