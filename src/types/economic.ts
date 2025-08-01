@@ -1,50 +1,41 @@
-// Ekonomik Takvim Tipleri
 export interface EconomicEvent {
-  time: stri
-  impact: 'low
-  actual?: str
-  previous?: strin
-  // Türkçe alanlar
-  ulke: string
-  actual?: string
-  forecast?: string
+  id: string
+  date: string
+  time: string
+  ulke: string // country -> ulke (Türkçe arayüz için)
+  olay: string // event -> olay  
+  etki: 'low' | 'medium' | 'high' // importance -> etki
   previous?: string
-  country: string
-  // Türkçe alanlar
-  olay: string
-  ulke: string
-  etki: 'düşük' | 'orta' | 'yüksek'
-  aciklama?: string
+  forecast?: string
+  actual?: string
+  impact: 'low' | 'medium' | 'high'
+  currency: string
 }
 
 export interface EconomicCalendarConfig {
-  currencies: string[] // USD, EUR, GBP, TRY
+  currencies: string[]
   impacts: ('low' | 'medium' | 'high')[]
-  alertType: '
+  dateRange: {
     from: Date
-  message: s
+    to: Date
   }
   autoRefresh: boolean
-  refreshInterval: number // dakika
+  refreshInterval: number
 }
 
-  success: boolean
+export interface EconomicAlert {
   id: string
-  error?: string
-  alertType: 'before' | 'after' | 'changed'
-  minutesBefore?: number
+  eventId: string
+  alertType: 'before' | 'after'
+  minutesBefore: number
   enabled: boolean
   message: string
-  actions?: {
-
-    sendNotification?: boolean
-
+  actions: {
+    pauseStrategies: boolean
+    sendNotification: boolean
   }
+}
 
-
-export interface EconomicCalendarResponse {
-  success: boolean
-  events: EconomicEvent[]
-  lastUpdate: string
-  error?: string
+export interface EconomicCalendarProps {
+  className?: string
 }

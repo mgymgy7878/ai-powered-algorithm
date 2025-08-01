@@ -45,19 +45,9 @@ export function Dashboard() {
       
       // NotificationCenter'a da bildirim gönder
       addNotification({
-        title: getNotificationTitle(type, message),
         message: message,
         type: type
       })
-    }
-
-    // Bildirim başlığını belirle
-    const getNotificationTitle = (type: string, message: string) => {
-      if (message.includes('sinyali')) return 'Trade Sinyali'
-      if (message.includes('strateji')) return 'Strateji Güncellemesi' 
-      if (message.includes('AI') || message.includes('öneri')) return 'AI Önerisi'
-      if (message.includes('risk') || message.includes('uyarı')) return 'Risk Uyarısı'
-      return 'Sistem Bildirimi'
     }
 
     activityMonitor.addListener(handleActivityNotification)
@@ -66,7 +56,6 @@ export function Dashboard() {
     // Demo bildirimler gönder
     setTimeout(() => {
       addNotification({
-        title: 'Hoş Geldiniz',
         message: 'AI Trading Platformu başarıyla başlatıldı. Tüm sistemler aktif.',
         type: 'success'
       })
@@ -121,14 +110,12 @@ export function Dashboard() {
           onClick={() => {
             // Test bildirimleri gönder
             addNotification({
-              title: 'Trade Sinyali',
               message: 'BTCUSDT için güçlü alım sinyali tespit edildi. RSI: 28, MACD pozitif kesişim.',
               type: 'success'
             })
             
             setTimeout(() => {
               addNotification({
-                title: 'Strateji Güncellemesi',
                 message: 'Grid Bot ETHUSDT stratejisi 145$ kar elde etti ve pozisyonları yeniden ayarlandı.',
                 type: 'info'
               })
@@ -136,7 +123,6 @@ export function Dashboard() {
             
             setTimeout(() => {
               addNotification({
-                title: 'Risk Uyarısı',
                 message: 'Volatilite artıyor, pozisyon boyutlarını azaltmayı düşünün.',
                 type: 'warning'
               })

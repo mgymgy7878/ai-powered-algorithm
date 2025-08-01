@@ -1,237 +1,202 @@
-import React, { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Bell, X, TrendingUp, TrendingDown, Bot, AlertTriangle } from '@phosphor-icons/react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Bell, Trash2, X } from 'lucide-react'
 import { useKV } from '@github/spark/hooks'
+import { Notification } from '@/types/notification'
+import { toast } from 'sonner'
 
-export interface Notification {
-  id: string
-  title: string
-  message: string
-  type: 'success' | 'warning' | 'error' | 'info'
-  timestamp: Date | string // KV storage'dan gelen değer string olabilir
-  read: boolean
+// Global notification handler
+let globalNotificationHandler: ((notification: Omit<Notification, 'id'>) => void) | null = null
+
+export function addNotification(notification: Omit<Notification, 'id'>) {
+  if (globalNotificationHandler) {
+    globalNotificationHandler(notification)
+  }
 }
 
-interface NotificationCenterProps {
-  className?: string
-}
+export function NotificationCenter() {
+  const [notifications, setNotifications] = useKV<Notification[]>('app-notifications', [])
+  const [lastNotification, setLastNotification] = useState<Notification | null>(
+    notifications.length > 0 ? notifications[0] : null
+  )
+  const [showLastNotificationBox, setShowLastNotificationBox] = useState(true)
 
-export function NotificationCenter({ className = '' }: NotificationCenterProps) {
-  const [notifications, setNotifications] = useKV<Notification[]>('notifications', [])
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-
-  // Son okunmamış bildirimi al
-  const lastNotification = notifications.find(n => !n.read)
-  const unreadCount = notifications.filter(n => !n.read).length
-
-  // Bildirim ikonunu belirle
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'success': return <TrendingUp className="w-4 h-4 text-green-500" />
-      case 'warning': return <AlertTriangle className="w-4 h-4 text-yellow-500" />
-      case 'error': return <TrendingDown className="w-4 h-4 text-red-500" />
-      default: return <Bot className="w-4 h-4 text-blue-500" />
-    }
-  }
-
-  // Zaman formatla
-  const formatTime = (date: Date | string) => {
-    const now = new Date()
-    // KV storage'dan gelen tarihi Date objesine çevir
-    const dateObj = typeof date === 'string' ? new Date(date) : date
-    
-    // Geçerli bir tarih olup olmadığını kontrol et
-    if (!dateObj || isNaN(dateObj.getTime())) {
-      return 'Bilinmeyen zaman'
-    }
-    
-    const diff = now.getTime() - dateObj.getTime()
-    
-    if (diff < 60000) return 'Az önce'
-    if (diff < 3600000) return `${Math.floor(diff / 60000)} dk önce`
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)} sa önce`
-    return `${Math.floor(diff / 86400000)} gün önce`
-  }
-
-  // Bildirimi okundu olarak işaretle
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    )
-  }
-
-  // Tüm bildirimleri okundu olarak işaretle
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(n => ({ ...n, read: true }))
-    )
-  }
-
-  // Bildirimi sil
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id))
-  }
-
-  // Son bildirimi kapat
-  const dismissLastNotification = () => {
-    if (lastNotification) {
-      markAsRead(lastNotification.id)
-    }
-  }
-
-  // Yeni bildirim ekle (dışarıdan çağrılabilir)
-  const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-    const newNotification: Notification = {
-      ...notification,
-      id: Date.now().toString(),
-      timestamp: new Date(),
-      read: false
-    }
-    setNotifications(prev => [newNotification, ...prev])
-  }
-
-  // Global event listener için
+  // Global handler'ı kaydet
   useEffect(() => {
-    const handleNewNotification = (event: CustomEvent) => {
-      addNotification(event.detail)
-    }
-
-    window.addEventListener('new-notification', handleNewNotification as EventListener)
-    
+    globalNotificationHandler = handleAddNotification
     return () => {
-      window.removeEventListener('new-notification', handleNewNotification as EventListener)
+      globalNotificationHandler = null
     }
   }, [])
 
-  // Son bildirimi göster (varsa)
-  if (lastNotification) {
-    return (
-      <div className={`${className}`}>
-        <Card className="p-3 bg-background border shadow-md max-w-[360px]">
-          <div className="flex items-start gap-3">
-            {getNotificationIcon(lastNotification.type)}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">
-                {lastNotification.title}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                {lastNotification.message}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {formatTime(lastNotification.timestamp)}
-              </p>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6 shrink-0"
-              onClick={dismissLastNotification}
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </Card>
-      </div>
-    )
+  // Yeni bildirim ekle
+  const handleAddNotification = (notification: Omit<Notification, 'id'>) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: Date.now().toString(),
+      time: new Date().toLocaleTimeString('tr-TR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      })
+    }
+    
+    setNotifications(prev => [newNotification, ...prev])
+    setLastNotification(newNotification)
+    setShowLastNotificationBox(true)
+    
+    // Toast bildirimi göster
+    toast(notification.message, {
+      description: newNotification.time,
+      icon: <Bell className="w-4 h-4" />
+    })
   }
 
-  // Bildirim butonu ve dropdown menü
+  // Bildirimi sil
+  const removeNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id))
+  }
+
+  // Tüm bildirimleri temizle
+  const clearAllNotifications = () => {
+    setNotifications([])
+    setLastNotification(null)
+    setShowLastNotificationBox(false)
+  }
+
+  // Son bildirimi gizle
+  const hideLastNotification = () => {
+    setShowLastNotificationBox(false)
+  }
+
+  // Otomatik test bildirimleri (demo amaçlı - kapatıldı)
+  useEffect(() => {
+    // Test bildirimlerini görmek isterseniz yorumu kaldırın
+    /*
+    const interval = setInterval(() => {
+      const demoNotifications = [
+        { message: 'Grid Bot stratejisi başlatıldı', type: 'success' as const },
+        { message: 'BTCUSDT alım sinyali', type: 'info' as const },
+        { message: 'Stop loss tetiklendi', type: 'warning' as const },
+        { message: 'API bağlantı hatası', type: 'error' as const }
+      ]
+      
+      const randomNotification = demoNotifications[Math.floor(Math.random() * demoNotifications.length)]
+      handleAddNotification(randomNotification)
+    }, 30000) // 30 saniyede bir test bildirimi
+
+    return () => clearInterval(interval)
+    */
+  }, [])
+
+  const getNotificationIcon = (type?: string) => {
+    switch (type) {
+      case 'success': return '✅'
+      case 'warning': return '⚠️'
+      case 'error': return '❌'
+      default: return '📢'
+    }
+  }
+
+  const getNotificationColor = (type?: string) => {
+    switch (type) {
+      case 'success': return 'bg-green-100 border-green-200'
+      case 'warning': return 'bg-yellow-100 border-yellow-200'
+      case 'error': return 'bg-red-100 border-red-200'
+      default: return 'bg-blue-100 border-blue-200'
+    }
+  }
+
   return (
-    <div className={className}>
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+    <div className="relative">
+      {/* Son Bildirim Kutusu */}
+      {lastNotification && showLastNotificationBox && (
+        <Card className={`w-[320px] mb-2 ${getNotificationColor(lastNotification.type)} border shadow-sm`}>
+          <CardContent className="p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start gap-2 flex-1">
+                <span className="text-lg">{getNotificationIcon(lastNotification.type)}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">{lastNotification.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{lastNotification.time || 'Şimdi'}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={hideLastNotification}
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Bildirim Dropdown Menüsü */}
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon" className="relative">
             <Bell className="w-4 h-4" />
-            {unreadCount > 0 && (
-              <Badge 
-                className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-                variant="destructive"
-              >
-                {unreadCount > 9 ? '9+' : unreadCount}
+            {notifications.length > 0 && (
+              <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                {notifications.length}
               </Badge>
             )}
           </Button>
         </DropdownMenuTrigger>
         
         <DropdownMenuContent className="w-80" align="end">
-          <div className="flex items-center justify-between p-2">
-            <DropdownMenuLabel>Bildirimler</DropdownMenuLabel>
-            {unreadCount > 0 && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs"
-                onClick={markAllAsRead}
+          <div className="flex items-center justify-between px-3 py-2">
+            <DropdownMenuLabel className="p-0">Bildirimler</DropdownMenuLabel>
+            {notifications.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs h-6"
+                onClick={clearAllNotifications}
               >
-                Tümünü okundu işaretle
+                <Trash2 className="w-3 h-3 mr-1" />
+                Tümünü Sil
               </Button>
             )}
           </div>
+          
           <DropdownMenuSeparator />
           
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                Henüz bildirim yok
-              </div>
-            ) : (
-              notifications.slice(0, 10).map((notification) => (
-                <DropdownMenuItem 
-                  key={notification.id} 
-                  className="flex items-start gap-3 p-3 cursor-pointer"
-                  onClick={() => markAsRead(notification.id)}
+          {notifications.length === 0 ? (
+            <div className="px-3 py-4 text-center text-muted-foreground text-sm">
+              Henüz bildirim yok
+            </div>
+          ) : (
+            <div className="max-h-80 overflow-y-auto">
+              {notifications.slice(0, 10).map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className="flex items-start gap-2 p-3 cursor-pointer"
+                  onClick={() => removeNotification(notification.id)}
                 >
-                  {getNotificationIcon(notification.type)}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className={`text-sm font-medium ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        {notification.title}
-                      </p>
-                      {!notification.read && (
-                        <div className="w-2 h-2 bg-primary rounded-full" />
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {formatTime(notification.timestamp)}
-                    </p>
+                  <span className="text-base">{getNotificationIcon(notification.type)}</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{notification.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{notification.time || 'Şimdi'}</p>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      deleteNotification(notification.id)
-                    }}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
                 </DropdownMenuItem>
-              ))
-            )}
-          </div>
-          
-          {notifications.length > 10 && (
-            <div className="p-2 text-center">
-              <Button variant="ghost" size="sm" className="text-xs">
-                Tüm bildirimleri görüntüle
-              </Button>
+              ))}
             </div>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   )
-}
-
-// Bildirim ekleme utility fonksiyonu
-export const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-  const event = new CustomEvent('new-notification', { detail: notification })
-  window.dispatchEvent(event)
 }
