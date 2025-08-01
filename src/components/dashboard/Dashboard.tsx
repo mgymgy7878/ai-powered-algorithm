@@ -84,11 +84,50 @@ export function Dashboard() {
     return `${(value ?? 0).toFixed(2)}%`
   }
 
-  // Sidebar durumuna göre dinamik padding hesapla
-  const contentPadding = 'pl-2 pr-[300px]'
-
   return (
     <div className="relative p-2 space-y-2">
+      {/* Portfolio Metrics - Sağa hizalı kompakt yatay dizilim */}
+      <div className="flex items-center justify-end gap-2 ml-[64px] mr-[300px] mt-2 px-2 overflow-x-auto">
+        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+          <p className="text-muted-foreground truncate">Portföy Değeri</p>
+          <p className="font-semibold text-xs text-primary">{formatCurrency(portfolioMetrics.totalValue)}</p>
+        </div>
+        
+        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+          <p className="text-muted-foreground truncate">Günlük K/Z</p>
+          <div className="flex items-center justify-center gap-1">
+            <p className={`font-semibold text-xs ${portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {formatCurrency(portfolioMetrics.dailyPnL)}
+            </p>
+            {portfolioMetrics.dailyPnL >= 0 ? (
+              <TrendingUp className="h-2 w-2 text-green-600" />
+            ) : (
+              <TrendingDown className="h-2 w-2 text-red-600" />
+            )}
+          </div>
+        </div>
+        
+        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+          <p className="text-muted-foreground truncate">Toplam K/Z</p>
+          <p className={`font-semibold text-xs ${portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {formatCurrency(portfolioMetrics.totalPnL)}
+          </p>
+        </div>
+        
+        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+          <p className="text-muted-foreground truncate">Başarı Oranı</p>
+          <p className="font-semibold text-xs text-blue-600">{formatPercentage(portfolioMetrics.winRate)}</p>
+        </div>
+        
+        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+          <p className="text-muted-foreground truncate">Aktif Stratejiler</p>
+          <div className="flex items-center justify-center gap-1">
+            <p className="font-semibold text-xs text-green-500">{portfolioMetrics.activeStrategies}</p>
+            <div className="h-1 w-1 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
       <div className="absolute top-1 right-4 w-[280px] z-50">
         <NotificationCenter />
@@ -97,71 +136,28 @@ export function Dashboard() {
       <div className="absolute top-14 right-4 w-[280px] z-20">
         <TradingAssistant />
       </div>
-      {/* Portfolio Metrics - Kompakt yatay dizilim */}
-      <div className={`${contentPadding} pt-0`}>
-        <div className="flex flex-wrap items-center justify-start gap-2 w-full px-2 py-1">
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Portföy Değeri</p>
-            <p className="font-semibold text-sm text-primary">{formatCurrency(portfolioMetrics.totalValue)}</p>
-          </div>
-          
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Günlük K/Z</p>
-            <div className="flex items-center gap-1">
-              <p className={`font-semibold text-sm ${portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(portfolioMetrics.dailyPnL)}
-              </p>
-              {portfolioMetrics.dailyPnL >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-green-600" />
-              ) : (
-                <TrendingDown className="h-3 w-3 text-red-600" />
-              )}
-            </div>
-          </div>
-          
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Toplam K/Z</p>
-            <p className={`font-semibold text-sm ${portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(portfolioMetrics.totalPnL)}
-            </p>
-          </div>
-          
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Başarı Oranı</p>
-            <p className="font-semibold text-sm text-blue-600">{formatPercentage(portfolioMetrics.winRate)}</p>
-          </div>
-          
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Aktif Stratejiler</p>
-            <div className="flex items-center gap-1">
-              <p className="font-semibold text-sm text-green-500">{portfolioMetrics.activeStrategies}</p>
-              <div className="h-1 w-1 bg-green-500 rounded-full animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
       {/* Ana İçerik Alanı */}
-      <div className={`${contentPadding}`}>
-        {/* Hızlı İstatistikler - Kompakt yatay dizilim */}
-        <div className="flex flex-wrap items-center justify-start gap-2 w-full mt-2 px-2 py-1">
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Aktif İşlemler</p>
-            <p className="font-semibold text-sm text-foreground">12</p>
+      <div className="pl-2 pr-[300px]">
+        {/* Hızlı İstatistikler - Sağa hizalı kompakt yatay dizilim */}
+        <div className="flex items-center justify-end gap-2 ml-[64px] mr-0 mt-2 px-2 overflow-x-auto">
+          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+            <p className="text-muted-foreground truncate">Aktif İşlemler</p>
+            <p className="font-semibold text-xs text-foreground">12</p>
           </div>
 
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Toplam İşlem</p>
-            <p className="font-semibold text-sm text-foreground">1,247</p>
+          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+            <p className="text-muted-foreground truncate">Toplam İşlem</p>
+            <p className="font-semibold text-xs text-foreground">1,247</p>
           </div>
 
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Ortalama Getiri</p>
-            <p className="font-semibold text-sm text-green-600">+2.4%</p>
+          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+            <p className="text-muted-foreground truncate">Ortalama Getiri</p>
+            <p className="font-semibold text-xs text-green-600">+2.4%</p>
           </div>
 
-          <div className="bg-muted rounded-md px-3 py-1 text-[11px] min-w-[110px]">
-            <p className="text-muted-foreground">Max Drawdown</p>
-            <p className="font-semibold text-sm text-red-600">-5.2%</p>
+          <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+            <p className="text-muted-foreground truncate">Max Drawdown</p>
+            <p className="font-semibold text-xs text-red-600">-5.2%</p>
           </div>
         </div>
 
