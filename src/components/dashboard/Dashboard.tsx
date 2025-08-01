@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { TrendingUp, TrendingDown, BarChart } from 'lucide-react'
+import { Button } from '../ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
+import { TrendingUp, TrendingDown, BarChart, Bell } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
 
 interface PortfolioMetrics {
@@ -11,6 +13,14 @@ interface PortfolioMetrics {
   totalPnL: number
   winRate: number
   activeStrategies: number
+}
+
+interface Activity {
+  id: string
+  title: string
+  timeAgo: string
+  color: string
+  type: 'success' | 'info' | 'warning' | 'error'
 }
 
 export function Dashboard() {
@@ -37,6 +47,52 @@ export function Dashboard() {
     activeStrategies: 3
   })
 
+  // Son aktiviteler verisi
+  const [activities] = useKV<Activity[]>('recent-activities', [
+    {
+      id: '1',
+      title: 'Grid Bot stratejisi başlatıldı',
+      timeAgo: '2 dakika önce',
+      color: 'bg-green-500',
+      type: 'success'
+    },
+    {
+      id: '2',
+      title: 'BTCUSDT alım sinyali',
+      timeAgo: '5 dakika önce',
+      color: 'bg-blue-500',
+      type: 'info'
+    },
+    {
+      id: '3',
+      title: 'Backtest tamamlandı',
+      timeAgo: '12 dakika önce',
+      color: 'bg-yellow-500',
+      type: 'warning'
+    },
+    {
+      id: '4',
+      title: 'Stop-loss tetiklendi',
+      timeAgo: '18 dakika önce',
+      color: 'bg-red-500',
+      type: 'error'
+    },
+    {
+      id: '5',
+      title: 'ETHUSDT satış işlemi tamamlandı',
+      timeAgo: '25 dakika önce',
+      color: 'bg-green-500',
+      type: 'success'
+    },
+    {
+      id: '6',
+      title: 'AI strateji önerisi oluşturuldu',
+      timeAgo: '32 dakika önce',
+      color: 'bg-blue-500',
+      type: 'info'
+    }
+  ])
+
   const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -56,6 +112,40 @@ export function Dashboard() {
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
       <div className="absolute top-16 right-4 w-[360px] z-50">
         <TradingAssistant />
+      </div>
+
+      {/* Son Aktiviteler Dropdown - Sağ üst köşede aktivite ikonu */}
+      <div className="absolute top-4 right-[380px] z-40">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="rounded-full relative">
+              <Bell className="w-4 h-4" />
+              {activities.length > 0 && (
+                <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-80" align="end">
+            <DropdownMenuLabel>Son Aktiviteler</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <div className="max-h-[400px] overflow-y-auto">
+              {activities.slice(0, 10).map((activity) => (
+                <DropdownMenuItem key={activity.id} className="flex gap-2 items-start text-xs p-3 cursor-default">
+                  <span className={`w-2 h-2 mt-1 rounded-full ${activity.color} flex-shrink-0`} />
+                  <div className="flex flex-col gap-1 flex-1">
+                    <span className="font-medium text-sm leading-tight">{activity.title}</span>
+                    <span className="text-muted-foreground text-xs">{activity.timeAgo}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </div>
+            {activities.length === 0 && (
+              <div className="text-center py-6 text-muted-foreground text-sm">
+                Henüz aktivite bulunmuyor
+              </div>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
 
@@ -131,10 +221,10 @@ export function Dashboard() {
         </div>
 
         {/* Ana Grafik ve Analiz Alanı */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           
           {/* Portföy Performans Grafiği */}
-          <Card className="lg:col-span-2">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart className="h-5 w-5" />
@@ -144,48 +234,6 @@ export function Dashboard() {
             <CardContent>
               <div className="h-[300px] flex items-center justify-center bg-muted/50 rounded-lg">
                 <p className="text-muted-foreground">Grafik yükleniyor...</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Son Aktiviteler */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Son Aktiviteler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Grid Bot stratejisi başlatıldı</p>
-                    <p className="text-xs text-muted-foreground">2 dakika önce</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">BTCUSDT alım sinyali</p>
-                    <p className="text-xs text-muted-foreground">5 dakika önce</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Backtest tamamlandı</p>
-                    <p className="text-xs text-muted-foreground">12 dakika önce</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Stop-loss tetiklendi</p>
-                    <p className="text-xs text-muted-foreground">18 dakika önce</p>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
