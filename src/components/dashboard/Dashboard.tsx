@@ -1,41 +1,13 @@
-import { useState, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
-import { TrendingUp, TrendingDown, BarChart } from 'lucide-react'
+import { TrendingUp, BarChart } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
 import { NotificationCenter } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 
-interface PortfolioMetrics {
-  totalValue: number
-  dailyPnL: number
-  totalPnL: number
-  winRate: number
-  activeStrategies: number
-  activeTrades: number
-  totalTrades: number
-  avgReturn: number
-  maxDrawdown: number
-}
-
 export function Dashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const { activities, addActivity } = useActivity()
-  
-  // Sidebar durumu değişikliklerini dinle
-  useEffect(() => {
-    const handleSidebarToggle = (event: CustomEvent) => {
-      setIsSidebarOpen(event.detail.isOpen)
-    }
-    
-    window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener)
-    
-    return () => {
-      window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener)
-    }
-  }, [])
   
   // Otomatik demo bildirimler sistemi
   useEffect(() => {
@@ -68,104 +40,23 @@ export function Dashboard() {
       clearInterval(interval)
     }
   }, [])
-  
-  const [portfolioMetrics] = useKV<PortfolioMetrics>('portfolio-metrics', {
-    totalValue: 50000,
-    dailyPnL: 1250.50,
-    totalPnL: 8750.25,
-    winRate: 68.5,
-    activeStrategies: 3,
-    activeTrades: 12,
-    totalTrades: 1247,
-    avgReturn: 2.4,
-    maxDrawdown: -5.2
-  })
-
-  // Portfolio metrics için güvenli erişim - extra safety layer
-  const safePortfolioMetrics = portfolioMetrics || {
-    totalValue: 0,
-    dailyPnL: 0,
-    totalPnL: 0,
-    winRate: 0,
-    activeStrategies: 0,
-    activeTrades: 0,
-    totalTrades: 0,
-    avgReturn: 0,
-    maxDrawdown: 0
-  }
-
-  const formatCurrency = (value?: number | null) => {
-    if (value === undefined || value === null || isNaN(Number(value))) {
-      return '$0.00'
-    }
-    try {
-      const numValue = Number(value)
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(numValue)
-    } catch (error) {
-      console.warn('Currency formatting error:', error)
-      return `$${Number(value || 0).toFixed(2)}`
-    }
-  }
-
-  const formatPercentage = (value?: number | null) => {
-    if (value === undefined || value === null || isNaN(Number(value))) {
-      return '0.00%'
-    }
-    try {
-      const numValue = Number(value)
-      return `${numValue.toFixed(2)}%`
-    } catch (error) {
-      console.warn('Percentage formatting error:', error)
-      return '0.00%'
-    }
-  }
-
-  // Tüm gösterge kutularını tek satırda göstermek için birleştir - yazım hataları düzeltildi
-  const allMetrics = [
-    { label: "Portföy Değeri", value: formatCurrency(safePortfolioMetrics.totalValue), color: 'text-blue-700' },
-    { label: "Günlük K/Z", value: formatCurrency(safePortfolioMetrics.dailyPnL), color: safePortfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600' },
-    { label: "Toplam K/Z", value: formatCurrency(safePortfolioMetrics.totalPnL), color: safePortfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600' },
-    { label: "Başarı Oranı", value: formatPercentage(safePortfolioMetrics.winRate), color: 'text-blue-700' },
-    { label: "Aktif Stratejiler", value: (safePortfolioMetrics.activeStrategies ?? 0).toString(), color: 'text-green-600' },
-    { label: "Aktif İşlemler", value: (safePortfolioMetrics.activeTrades ?? 0).toString(), color: 'text-blue-700' },
-    { label: "Toplam İşlemler", value: (safePortfolioMetrics.totalTrades ?? 0).toLocaleString(), color: 'text-blue-700' },
-    { label: "Ortalama Getiri", value: `+${(safePortfolioMetrics.avgReturn ?? 0).toFixed(1)}%`, color: 'text-green-600' },
-    { label: "Max Drawdown", value: `${(safePortfolioMetrics.maxDrawdown ?? 0).toFixed(1)}%`, color: 'text-red-600' }
-  ]
 
   return (
-    <div className="relative p-2 space-y-2">
-      {/* Tüm Portföy Metrikleri - Tek satırda, %20 daha küçültülmüş */}
-      <div className="absolute top-3 left-[55px] right-[160px] z-40 flex items-center justify-start gap-1 overflow-hidden">
-        {allMetrics.map((metric, index) => (
-          <div 
-            key={index} 
-            className="rounded-md bg-muted text-muted-foreground px-1 py-0.5 text-center shadow-sm w-[100px] h-auto flex-shrink-0 flex flex-col items-center justify-center"
-            title={`${metric.label}: ${metric.value}`} // Tooltip için tam değer
-          >
-            <p className="text-[10px] text-muted-foreground truncate leading-tight w-full">{metric.label}</p>
-            <p className={`text-sm font-semibold ${metric.color} leading-tight truncate w-full`}>
-              {metric.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Bildirim Merkezi - AI panelinin üst kısmında */}
-      <div className="absolute top-1 right-4 w-[280px] z-50">
+    <div className="relative min-h-screen bg-background">
+      {/* Sadece Bildirim Merkezi - Sağ üst köşede sabitlenmiş */}
+      <div className="absolute top-2 right-4 w-[280px] z-50">
         <NotificationCenter />
       </div>
-      {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
-      <div className="absolute top-14 right-4 w-[280px] z-20">
+      
+      {/* Yapay Zeka Trading Yöneticisi - Bildirim kutusunun altında */}
+      <div className="absolute top-14 right-4 w-[280px] z-40">
         <TradingAssistant />
       </div>
-      {/* Ana İçerik Alanı - Üstteki metrikler için boşluk bırak */}
-      <div className="pl-2 pr-[300px] pt-12">
+      
+      {/* Ana İçerik Alanı - Sol kenara hizalı, sağda AI için boşluk */}
+      <div className="pl-4 pr-[300px] pt-4">
         {/* Ana Grafik ve Analiz Alanı */}
-        <div className="grid grid-cols-1 gap-2 mt-3">
+        <div className="grid grid-cols-1 gap-4 mt-2">
           {/* Portföy Performans Grafiği */}
           <Card>
             <CardHeader className="pb-1">
@@ -183,7 +74,7 @@ export function Dashboard() {
         </div>
 
         {/* Top Performing Strategies */}
-        <Card className="mt-2">
+        <Card className="mt-4">
           <CardHeader className="pb-1">
             <CardTitle className="text-sm">En İyi Performans Gösteren Stratejiler</CardTitle>
           </CardHeader>
