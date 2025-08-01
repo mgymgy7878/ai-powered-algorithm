@@ -196,7 +196,7 @@ export function TradingAssistant() {
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
       {/* Header - Sabit üst bar (sticky) */}
-      <div className="sticky top-0 z-30 bg-background border-b p-2 flex flex-col gap-1">
+      <div className="sticky top-0 z-30 bg-background border-b p-2 flex flex-col gap-1 font-thin text-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-semibold">
             <Brain className="w-4 h-4 text-primary" />
@@ -329,10 +329,9 @@ export function TradingAssistant() {
           )}
         </Button>
       </div>
-
       {/* AI Önerileri - Gizlenebilir panel */}
       {showSuggestions && (
-        <div className="px-3 py-2 bg-muted/30 border-b">
+        <div className="px-3 py-2 bg-muted/30 border-b font-thin">
           <div className="grid grid-cols-2 gap-1">
             {suggestions.map((item, index) => (
               <Button
@@ -349,7 +348,6 @@ export function TradingAssistant() {
           </div>
         </div>
       )}
-
       {/* Chat Messages - Kaydırılabilir alan */}
       <ScrollArea className="flex-1 px-3 py-2">
         <div className="space-y-3">
@@ -400,7 +398,6 @@ export function TradingAssistant() {
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
-
       {/* Input Area - Sabit alt bar */}
       <div className="border-t p-3 bg-background">
         <div className="flex gap-2 items-center">
@@ -427,5 +424,5 @@ export function TradingAssistant() {
         </div>
       </div>
     </Card>
-  )
+  );
 }
