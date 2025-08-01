@@ -1,207 +1,146 @@
-import { EconomicEvent, EconomicCalendarConfig } from '@/types/economic'
+// Ekonomik takvim servisi - AI Trading Yöneticisi için
+export interface EconomicEvent {
+  id: string
+  date: string
+  time: string
+  currency: string
+  olay: string // Event name in Turkish
+  etki: 'Düşük' | 'Orta' | 'Yüksek' // Impact level
+  beklenen?: string // Expected value
+  onceki?: string // Previous value
+  gercek?: string // Actual value
+}
 
-interface EconomicApiResponse {
-  success: boolean
-  events: EconomicEvent[]
-  lastUpdate: string
-  error?: string
+// API compatible interface
+export interface EconomicEventAPI {
+  id: string
+  date: string
+  time: string
+  currency: string
+  event: string
+  impact: 'low' | 'medium' | 'high'
+  forecast?: string
+  previous?: string
+  actual?: string
+  country?: string
+  category?: string
 }
 
 class EconomicCalendarService {
-  private config: EconomicCalendarConfig = {
-    currencies: ['USD', 'EUR', 'TRY'],
-    impacts: ['medium', 'high'],
-    dateRange: {
-      from: new Date(),
-      to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  private mockEvents: EconomicEvent[] = [
+    {
+      id: '1',
+      date: new Date().toLocaleDateString('tr-TR'),
+      time: '14:30',
+      currency: 'USD',
+      olay: 'Fed Faiz Kararı',
+      etki: 'Yüksek',
+      beklenen: '5.50%',
+      onceki: '5.25%'
     },
-    autoRefresh: true,
-    refreshInterval: 30
-  }
+    {
+      id: '2',
+      date: new Date().toLocaleDateString('tr-TR'),
+      time: '16:00',
+      currency: 'USD', 
+      olay: 'İşsizlik Başvuruları',
+      etki: 'Orta',
+      beklenen: '220K',
+      onceki: '215K'
+    },
+    {
+      id: '3',
+      date: new Date(Date.now() + 24*60*60*1000).toLocaleDateString('tr-TR'),
+      time: '10:00',
+      currency: 'EUR',
+      olay: 'ECB Toplantısı',
+      etki: 'Yüksek',
+      beklenen: '4.25%',
+      onceki: '4.00%'
+    },
+    {
+      id: '4',
+      date: new Date(Date.now() + 12*60*60*1000).toLocaleDateString('tr-TR'),
+      time: '22:30',
+      currency: 'USD',
+      olay: 'Tüketici Fiyat Endeksi (CPI)',
+      etki: 'Yüksek',
+      beklenen: '3.2%',
+      onceki: '3.0%'
+    }
+  ]
 
-  setConfig(config: EconomicCalendarConfig) {
+  private config: any = {}
+
+  setConfig(config: any) {
     this.config = config
   }
 
-  // Demo veriler - gerçek API entegrasyonu için burası değiştirilmeli
-  async getEconomicEvents(): Promise<EconomicApiResponse> {
-    try {
-      // Simüle edilmiş yüklenme süresi
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      const today = new Date()
-      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000)
-      const dayAfter = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000)
-
-      const mockEvents: EconomicEvent[] = [
-        {
-          id: '1',
-          date: today.toISOString().split('T')[0],
-          time: '16:30',
-          ulke: 'ABD',
-          olay: 'İşsizlik Başvuruları',
-          etki: 'medium',
-          previous: '220K',
-          forecast: '215K',
-          actual: '210K',
-          impact: 'medium',
-          currency: 'USD'
-        },
-        {
-          id: '2',
-          date: today.toISOString().split('T')[0],
-          time: '22:00',
-          ulke: 'ABD',
-          olay: 'Fed Faiz Kararı',
-          etki: 'high',
-          previous: '5.25%',
-          forecast: '5.50%',
-          actual: '',
-          impact: 'high',
-          currency: 'USD'
-        },
-        {
-          id: '3',
-          date: tomorrow.toISOString().split('T')[0],
-          time: '11:00',
-          ulke: 'Avrupa',
-          olay: 'ECB Toplantısı',
-          etki: 'high',
-          previous: '4.00%',
-          forecast: '4.25%',
-          actual: '',
-          impact: 'high',
-          currency: 'EUR'
-        },
-        {
-          id: '4',
-          date: tomorrow.toISOString().split('T')[0],
-          time: '14:00',
-          ulke: 'Türkiye',
-          olay: 'TCMB Faiz Kararı',
-          etki: 'high',
-          previous: '45.00%',
-          forecast: '40.00%',
-          actual: '',
-          impact: 'high',
-          currency: 'TRY'
-        },
-        {
-          id: '5',
-          date: dayAfter.toISOString().split('T')[0],
-          time: '16:30',
-          ulke: 'ABD',
-          olay: 'NFP İstihdam Verisi',
-          etki: 'high',
-          previous: '150K',
-          forecast: '180K',
-          actual: '',
-          impact: 'high',
-          currency: 'USD'
-        },
-        {
-          id: '6',
-          date: today.toISOString().split('T')[0],
-          time: '14:30',
-          ulke: 'ABD',
-          olay: 'Tüketici Fiyat Endeksi (CPI)',
-          etki: 'high',
-          previous: '3.2%',
-          forecast: '3.1%',
-          actual: '3.4%',
-          impact: 'high',
-          currency: 'USD'
-        },
-        {
-          id: '7',
-          date: tomorrow.toISOString().split('T')[0],
-          time: '10:00',
-          ulke: 'Avrupa',
-          olay: 'Almanya GDP',
-          etki: 'medium',
-          previous: '0.2%',
-          forecast: '0.3%',
-          actual: '',
-          impact: 'medium',
-          currency: 'EUR'
-        }
-      ]
-
-      // Konfigürasyona göre filtrele
-      const filteredEvents = mockEvents.filter(event => {
-        const currencyMatch = this.config.currencies.includes(event.currency)
-        const impactMatch = this.config.impacts.includes(event.etki)
-        const dateMatch = new Date(event.date) >= this.config.dateRange.from &&
-                          new Date(event.date) <= this.config.dateRange.to
-        
-        return currencyMatch && impactMatch && dateMatch
-      })
-
-      return {
-        success: true,
-        events: filteredEvents,
-        lastUpdate: new Date().toISOString(),
-        error: undefined
-      }
-    } catch (error) {
-      return {
-        success: false,
-        events: [],
-        lastUpdate: '',
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
-      }
-    }
-  }
-
-  // Bugün yüksek etkili olayları getir
+  /**
+   * Bugünkü yüksek etkili ekonomik olayları getir
+   */
   async getTodayHighImpactEvents(): Promise<EconomicEvent[]> {
-    try {
-      const response = await this.getEconomicEvents()
-      if (!response.success) return []
-      
-      const today = new Date().toISOString().split('T')[0]
-      return response.events.filter(event => 
-        event.date === today && event.etki === 'high'
-      )
-    } catch (error) {
-      console.error('Bugünkü yüksek etkili olaylar alınırken hata:', error)
-      return []
-    }
+    const today = new Date().toLocaleDateString('tr-TR')
+    return this.mockEvents.filter(event => 
+      event.date === today && event.etki === 'Yüksek'
+    )
   }
 
-  // Gelecek 24 saat yüksek etkili olayları getir
+  /**
+   * Gelecek 24 saatteki yüksek etkili olayları getir
+   */
   async getUpcomingHighImpactEvents(): Promise<EconomicEvent[]> {
-    try {
-      const response = await this.getEconomicEvents()
-      if (!response.success) return []
-      
-      const now = new Date()
-      const next24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-      
-      return response.events.filter(event => {
-        const eventDate = new Date(event.date)
-        return eventDate >= now && eventDate <= next24Hours && event.etki === 'high'
-      })
-    } catch (error) {
-      console.error('Gelecek 24 saatteki yüksek etkili olaylar alınırken hata:', error)
-      return []
-    }
+    const now = new Date()
+    const tomorrow = new Date(now.getTime() + 24*60*60*1000)
+    
+    return this.mockEvents.filter(event => {
+      const eventDate = new Date(event.date.split('.').reverse().join('-'))
+      return eventDate >= now && eventDate <= tomorrow && event.etki === 'Yüksek'
+    })
   }
 
-  // Gerçek API entegrasyonu için bu fonksiyonlar kullanılabilir
-  async fetchFromInvestingDotCom(): Promise<EconomicEvent[]> {
-    // Investing.com API entegrasyonu
-    return []
+  /**
+   * Tüm ekonomik olayları getir (haftalık)
+   */
+  async getWeeklyEvents(): Promise<EconomicEvent[]> {
+    // Gerçek implementasyonda bu bir API çağrısı olacak
+    return this.mockEvents
   }
 
-  async fetchFromForexFactory(): Promise<EconomicEvent[]> {
-    // ForexFactory API entegrasyonu
-    return []
+  /**
+   * Belirli bir para biriminin olaylarını getir
+   */
+  async getEventsByCurrency(currency: string): Promise<EconomicEvent[]> {
+    return this.mockEvents.filter(event => 
+      event.currency.toUpperCase() === currency.toUpperCase()
+    )
   }
 
-  async fetchFromFinancialModelingPrep(): Promise<EconomicEvent[]> {
-    // Financial Modeling Prep API entegrasyonu
-    return []
+  /**
+   * Olay etkisine göre filtrele
+   */
+  async getEventsByImpact(impact: 'Düşük' | 'Orta' | 'Yüksek'): Promise<EconomicEvent[]> {
+    return this.mockEvents.filter(event => event.etki === impact)
+  }
+
+  /**
+   * API compatible event fetcher - for EconomicCalendar component
+   */
+  async fetchEvents(): Promise<EconomicEventAPI[]> {
+    // Convert Turkish events to API format
+    return this.mockEvents.map(event => ({
+      id: event.id,
+      date: event.date,
+      time: event.time,
+      currency: event.currency,
+      event: event.olay,
+      impact: event.etki === 'Yüksek' ? 'high' : event.etki === 'Orta' ? 'medium' : 'low',
+      forecast: event.beklenen,
+      previous: event.onceki,
+      actual: event.gercek,
+      country: event.currency === 'USD' ? 'US' : event.currency === 'EUR' ? 'EU' : 'TR',
+      category: 'monetary-policy'
+    }))
   }
 }
 

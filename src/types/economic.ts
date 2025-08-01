@@ -1,15 +1,17 @@
+// Economic Calendar types for the AI Trading Platform
+
 export interface EconomicEvent {
   id: string
   date: string
   time: string
-  ulke: string // country -> ulke (Türkçe arayüz için)
-  olay: string // event -> olay  
-  etki: 'low' | 'medium' | 'high' // importance -> etki
-  previous?: string
-  forecast?: string
-  actual?: string
-  impact: 'low' | 'medium' | 'high'
   currency: string
+  event: string
+  impact: 'low' | 'medium' | 'high'
+  forecast?: string
+  previous?: string
+  actual?: string
+  country?: string
+  category?: string
 }
 
 export interface EconomicCalendarConfig {
@@ -20,22 +22,25 @@ export interface EconomicCalendarConfig {
     to: Date
   }
   autoRefresh: boolean
-  refreshInterval: number
+  refreshInterval: number // minutes
+  showNotifications: boolean
 }
 
 export interface EconomicAlert {
   id: string
   eventId: string
-  alertType: 'before' | 'after'
-  minutesBefore: number
+  type: 'before' | 'after' | 'deviation'
+  minutes?: number // for 'before' type
+  threshold?: number // for 'deviation' type (percentage)
   enabled: boolean
-  message: string
-  actions: {
-    pauseStrategies: boolean
-    sendNotification: boolean
-  }
+  created: Date
 }
 
-export interface EconomicCalendarProps {
-  className?: string
+export interface EconomicNotification {
+  id: string
+  eventId: string
+  message: string
+  type: 'info' | 'warning' | 'critical'
+  timestamp: Date
+  read: boolean
 }

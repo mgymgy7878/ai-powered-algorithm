@@ -509,19 +509,31 @@ Kullanıcı mesajı: ${userMessage.content}`
   return (
     <Card className="w-full h-[520px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
       {/* Başlık ve Ayarlar */}
-      <div className="p-3 border-b bg-muted/50 flex items-center justify-between">
+      <div className="p-2 border-b bg-muted/50 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5" />
+          <Brain className="w-4 h-4" />
           <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
         </div>
         
-        {/* API Ayarları Dialog */}
-        <Dialog open={showSettings} onOpenChange={setShowSettings}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </DialogTrigger>
+        {/* Model Seçici */}
+        <div className="flex items-center gap-2">
+          <Select value={model} onValueChange={setModel}>
+            <SelectTrigger className="w-32 text-xs h-7">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+              <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {/* API Ayarları Dialog */}
+          <Dialog open={showSettings} onOpenChange={setShowSettings}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>AI API Ayarları</DialogTitle>
@@ -646,29 +658,16 @@ Kullanıcı mesajı: ${userMessage.content}`
             </div>
           </DialogContent>
         </Dialog>
+        
+        <Badge variant="secondary" className="text-xs">
+          {apiSettings?.openai?.enabled ? 'OpenAI' : apiSettings?.anthropic?.enabled ? 'Claude' : 'Spark LLM'}
+        </Badge>
       </div>
-
-      {/* Model Seçimi */}
-      <div className="p-2 bg-muted/30 border-b">
-        <div className="flex items-center gap-2">
-          <Select value={model} onValueChange={setModel}>
-            <SelectTrigger className="flex-1 text-xs h-7">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-              <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
-            </SelectContent>
-          </Select>
-          <Badge variant="secondary" className="text-xs">
-            {apiSettings?.openai?.enabled ? 'OpenAI' : apiSettings?.anthropic?.enabled ? 'Claude' : 'Spark LLM'}
-          </Badge>
-        </div>
-      </div>
+    </div>
 
       {/* Mesaj Listesi */}
-      <ScrollArea className="flex-1 p-3">
-        <div className="space-y-3">
+      <ScrollArea className="flex-1 p-2">
+        <div className="space-y-2">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -677,15 +676,15 @@ Kullanıcı mesajı: ${userMessage.content}`
               }`}
             >
               {message.role === 'assistant' && (
-                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center mt-1">
+                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center mt-1">
                   <Brain className="w-3 h-3 text-primary-foreground" />
                 </div>
               )}
               
               <div
-                className={`rounded-md text-sm px-2 py-1 max-w-[85%] whitespace-pre-wrap ${
+                className={`rounded-md text-xs px-2 py-1 max-w-[85%] whitespace-pre-wrap ${
                   message.role === 'user'
-                    ? 'bg-primary text-primary-foreground ml-8'
+                    ? 'bg-primary text-primary-foreground ml-6'
                     : 'bg-muted text-foreground'
                 }`}
               >
@@ -693,7 +692,7 @@ Kullanıcı mesajı: ${userMessage.content}`
               </div>
 
               {message.role === 'user' && (
-                <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center mt-1">
+                <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center mt-1">
                   <User className="w-3 h-3 text-muted-foreground" />
                 </div>
               )}
@@ -702,11 +701,11 @@ Kullanıcı mesajı: ${userMessage.content}`
           
           {isLoading && (
             <div className="flex items-start gap-2">
-              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center mt-1">
+              <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center mt-1">
                 <Brain className="w-3 h-3 text-primary-foreground" />
               </div>
-              <div className="bg-muted text-foreground rounded-md px-2 py-1 text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" />
+              <div className="bg-muted text-foreground rounded-md px-2 py-1 text-xs">
+                <Loader2 className="w-3 h-3 animate-spin" />
               </div>
             </div>
           )}
@@ -717,27 +716,27 @@ Kullanıcı mesajı: ${userMessage.content}`
       {/* AI Önerileri Paneli */}
       {showSuggestions && (
         <div className="border-t bg-muted/30 p-2">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-1">
             <h4 className="text-xs font-medium text-muted-foreground">AI Önerileri</h4>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSuggestions(false)}
-              className="h-5 w-5 p-0"
+              className="h-4 w-4 p-0"
             >
               <ChevronUp className="w-3 h-3" />
             </Button>
           </div>
-          <div className="space-y-2 bg-muted rounded-md p-3 text-sm max-h-32 overflow-y-auto">
+          <div className="space-y-1 bg-muted rounded-md p-2 text-xs max-h-24 overflow-y-auto">
             {suggestions.map((item, index) => (
               <div key={index} className="flex items-center justify-between gap-2">
-                <span className="text-xs text-foreground">{item.label}</span>
+                <span className="text-xs text-foreground flex-1 truncate">{item.label}</span>
                 <Button 
                   size="sm" 
                   variant="outline" 
                   onClick={() => handleSuggestionApply(item.command)}
                   disabled={isLoading}
-                  className="text-xs h-6 px-2"
+                  className="text-xs h-5 px-1"
                 >
                   Uygula
                 </Button>
@@ -749,39 +748,39 @@ Kullanıcı mesajı: ${userMessage.content}`
 
       {/* Öneriler Göster/Gizle Butonu - Kapalıyken */}
       {!showSuggestions && (
-        <div className="border-t p-2 flex justify-center">
+        <div className="border-t p-1 flex justify-center">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowSuggestions(true)}
-            className="text-xs h-6"
+            className="text-xs h-5"
           >
             <ChevronDown className="w-3 h-3 mr-1" />
-            AI Önerilerini Göster
+            AI Önerileri
           </Button>
         </div>
       )}
 
       {/* Mesaj Gönderme Alanı */}
-      <div className="border-t p-3 flex gap-2 items-center bg-background">
+      <div className="border-t p-2 flex gap-2 items-center bg-background">
         <Input
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder="AI'a mesaj yaz..."
-          className="flex-1 text-sm"
+          className="flex-1 text-xs h-8"
           disabled={isLoading}
         />
         <Button 
           onClick={sendMessage} 
           disabled={!inputMessage.trim() || isLoading} 
           size="icon"
-          className="h-9 w-9"
+          className="h-8 w-8"
         >
           {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-3 h-3 animate-spin" />
           ) : (
-            <Send className="w-4 h-4" />
+            <Send className="w-3 h-3" />
           )}
         </Button>
       </div>
