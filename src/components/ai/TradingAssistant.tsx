@@ -329,7 +329,6 @@ export function TradingAssistant() {
             )}
           </Button>
         </div>
-      </div>
       {/* AI Önerileri - Gizlenebilir panel - taşma sorunu düzeltildi */}
       {showSuggestions && (
         <div className="px-2 py-1 bg-muted/30 border-b font-thin">
