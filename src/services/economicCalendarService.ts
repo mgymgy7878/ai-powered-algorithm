@@ -153,6 +153,41 @@ class EconomicCalendarService {
     }
   }
 
+  // Bugün yüksek etkili olayları getir
+  async getTodayHighImpactEvents(): Promise<EconomicEvent[]> {
+    try {
+      const response = await this.getEconomicEvents()
+      if (!response.success) return []
+      
+      const today = new Date().toISOString().split('T')[0]
+      return response.events.filter(event => 
+        event.date === today && event.etki === 'high'
+      )
+    } catch (error) {
+      console.error('Bugünkü yüksek etkili olaylar alınırken hata:', error)
+      return []
+    }
+  }
+
+  // Gelecek 24 saat yüksek etkili olayları getir
+  async getUpcomingHighImpactEvents(): Promise<EconomicEvent[]> {
+    try {
+      const response = await this.getEconomicEvents()
+      if (!response.success) return []
+      
+      const now = new Date()
+      const next24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+      
+      return response.events.filter(event => {
+        const eventDate = new Date(event.date)
+        return eventDate >= now && eventDate <= next24Hours && event.etki === 'high'
+      })
+    } catch (error) {
+      console.error('Gelecek 24 saatteki yüksek etkili olaylar alınırken hata:', error)
+      return []
+    }
+  }
+
   // Gerçek API entegrasyonu için bu fonksiyonlar kullanılabilir
   async fetchFromInvestingDotCom(): Promise<EconomicEvent[]> {
     // Investing.com API entegrasyonu

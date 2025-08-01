@@ -5,9 +5,14 @@ import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { useKV } from '@github/spark/hooks'
 import { useActivity } from '@/contexts/ActivityContext'
-import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp } from '@phosphor-icons/react'
+import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp, Eye, EyeOff } from '@phosphor-icons/react'
+import { APISettings } from '../../types/api'
+import { aiService } from '../../services/aiService'
 
 interface ChatMessage {
   id: string
@@ -32,8 +37,37 @@ export function TradingAssistant({}: TradingAssistantProps = {}) {
   const [isLoading, setIsLoading] = useState(false)
   const [model, setModel] = useKV<string>('ai-model', 'gpt-4o')
   const [showSuggestions, setShowSuggestions] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showApiKeys, setShowApiKeys] = useState({ openai: false, anthropic: false })
+  
+  // API Settings state
+  const [apiSettings, setApiSettings] = useKV<APISettings>('api-settings', {
+    openai: {
+      apiKey: '',
+      model: 'gpt-4',
+      enabled: true
+    },
+    anthropic: {
+      apiKey: '',
+      model: 'claude-3-sonnet',
+      enabled: false
+    },
+    binance: {
+      apiKey: '',
+      secretKey: '',
+      testnet: true,
+      enabled: false
+    }
+  })
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Initialize AI service with settings
+  useEffect(() => {
+    if (apiSettings && aiService) {
+      aiService.setSettings(apiSettings)
+    }
+  }, [apiSettings])
 
   // AI önerileri listesi - ekonomik takvim entegrasyonu eklendi
   const suggestions = [
@@ -115,8 +149,19 @@ Kullanıcı mesajı: ${userMessage.content}`
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
   const sendMessage = async () => {
-
     if (!inputMessage.trim() || isLoading) return
+
+    // Check if AI is configured
+    if (!aiService?.isConfigured()) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '⚠️ AI servisleri yapılandırılmamış. Lütfen sağ üstteki ayarlar ikonuna tıklayarak API anahtarlarınızı girin.',
+        timestamp: new Date()
+      }])
+      return
+    }
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -174,7 +219,7 @@ Kullanıcı mesajı: ${userMessage.content}`
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen API ayarlarınızı kontrol edin veya daha sonra tekrar deneyin.',
         timestamp: new Date()
       }
 
@@ -231,7 +276,9 @@ Kullanıcı mesajı: ${userMessage.content}`
         }])
       } catch (error) {
         addActivity('Grid Bot stratejisi başlatılamadı', 'error')
-        onNotification?.('Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.', 'error')
+        if ((window as any).pushNotification) {
+          ;(window as any).pushNotification('Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.', 'error')
+        }
       }
     }
 
@@ -421,20 +468,191 @@ Kullanıcı mesajı: ${userMessage.content}`
     }
   }
 
+  const updateAPISettings = (provider: 'openai' | 'anthropic', updates: any) => {
+    setApiSettings(prev => ({
+      ...prev,
+      [provider]: {
+        ...prev?.[provider],
+        ...updates
+      }
+    }))
+  }
+
+  const testAPIConnection = async (provider: 'openai' | 'anthropic', apiKey: string) => {
+    try {
+      const isValid = await aiService?.testConnection(provider, apiKey)
+      if (isValid) {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `✅ ${provider === 'openai' ? 'OpenAI' : 'Anthropic'} bağlantısı başarılı! Artık bu sağlayıcıyı kullanabilirsiniz.`,
+          timestamp: new Date()
+        }])
+      } else {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `❌ ${provider === 'openai' ? 'OpenAI' : 'Anthropic'} bağlantısı başarısız. API anahtarınızı kontrol edin.`,
+          timestamp: new Date()
+        }])
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `❌ Bağlantı testi sırasında hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`,
+        timestamp: new Date()
+      }])
+    }
+  }
+
   return (
     <Card className="w-full h-[520px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Başlık */}
-      <div className="p-3 border-b bg-muted/50 flex items-center gap-2">
-        <Brain className="w-5 h-5" />
-        <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
+      {/* Başlık ve Ayarlar */}
+      <div className="p-3 border-b bg-muted/50 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Brain className="w-5 h-5" />
+          <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
+        </div>
+        
+        {/* API Ayarları Dialog */}
+        <Dialog open={showSettings} onOpenChange={setShowSettings}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>AI API Ayarları</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* OpenAI Settings */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">OpenAI</Label>
+                  <Switch
+                    checked={apiSettings?.openai?.enabled ?? false}
+                    onCheckedChange={(enabled) => updateAPISettings('openai', { enabled })}
+                  />
+                </div>
+                
+                {apiSettings?.openai?.enabled && (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Input
+                        type={showApiKeys.openai ? "text" : "password"}
+                        placeholder="OpenAI API Key (sk-...)"
+                        value={apiSettings?.openai?.apiKey ?? ''}
+                        onChange={(e) => updateAPISettings('openai', { apiKey: e.target.value })}
+                        className="text-xs pr-8"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-2"
+                        onClick={() => setShowApiKeys(prev => ({ ...prev, openai: !prev.openai }))}
+                      >
+                        {showApiKeys.openai ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      </Button>
+                    </div>
+                    
+                    <Select
+                      value={apiSettings?.openai?.model ?? 'gpt-4'}
+                      onValueChange={(value) => updateAPISettings('openai', { model: value })}
+                    >
+                      <SelectTrigger className="text-xs h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gpt-4">GPT-4</SelectItem>
+                        <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => testAPIConnection('openai', apiSettings?.openai?.apiKey ?? '')}
+                      className="w-full h-7 text-xs"
+                      disabled={!apiSettings?.openai?.apiKey?.trim()}
+                    >
+                      Bağlantıyı Test Et
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Anthropic Settings */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Anthropic Claude</Label>
+                  <Switch
+                    checked={apiSettings?.anthropic?.enabled ?? false}
+                    onCheckedChange={(enabled) => updateAPISettings('anthropic', { enabled })}
+                  />
+                </div>
+                
+                {apiSettings?.anthropic?.enabled && (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Input
+                        type={showApiKeys.anthropic ? "text" : "password"}
+                        placeholder="Anthropic API Key (sk-ant-...)"
+                        value={apiSettings?.anthropic?.apiKey ?? ''}
+                        onChange={(e) => updateAPISettings('anthropic', { apiKey: e.target.value })}
+                        className="text-xs pr-8"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-2"
+                        onClick={() => setShowApiKeys(prev => ({ ...prev, anthropic: !prev.anthropic }))}
+                      >
+                        {showApiKeys.anthropic ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      </Button>
+                    </div>
+                    
+                    <Select
+                      value={apiSettings?.anthropic?.model ?? 'claude-3-sonnet'}
+                      onValueChange={(value) => updateAPISettings('anthropic', { model: value })}
+                    >
+                      <SelectTrigger className="text-xs h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                        <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                        <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => testAPIConnection('anthropic', apiSettings?.anthropic?.apiKey ?? '')}
+                      className="w-full h-7 text-xs"
+                      disabled={!apiSettings?.anthropic?.apiKey?.trim()}
+                    >
+                      Bağlantıyı Test Et
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Model Seçimi */}
       <div className="p-2 bg-muted/30 border-b">
         <div className="flex items-center gap-2">
-          <Settings className="w-4 h-4 text-muted-foreground" />
           <Select value={model} onValueChange={setModel}>
-            <SelectTrigger className="w-48 text-xs h-8">
+            <SelectTrigger className="flex-1 text-xs h-7">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -443,7 +661,7 @@ Kullanıcı mesajı: ${userMessage.content}`
             </SelectContent>
           </Select>
           <Badge variant="secondary" className="text-xs">
-            Spark LLM
+            {apiSettings?.openai?.enabled ? 'OpenAI' : apiSettings?.anthropic?.enabled ? 'Claude' : 'Spark LLM'}
           </Badge>
         </div>
       </div>
@@ -510,7 +728,7 @@ Kullanıcı mesajı: ${userMessage.content}`
               <ChevronUp className="w-3 h-3" />
             </Button>
           </div>
-          <div className="space-y-2 bg-muted rounded-md p-3 text-sm">
+          <div className="space-y-2 bg-muted rounded-md p-3 text-sm max-h-32 overflow-y-auto">
             {suggestions.map((item, index) => (
               <div key={index} className="flex items-center justify-between gap-2">
                 <span className="text-xs text-foreground">{item.label}</span>

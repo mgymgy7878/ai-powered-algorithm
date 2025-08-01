@@ -585,7 +585,7 @@ export function APISettings() {
           </Button>
           
           {/* AI servisi yapılandırma durumunu güvenli kontrol */}
-          {!aiService.isConfigured() && (
+          {!aiService?.isConfigured() && (
             <p className="text-sm text-muted-foreground mt-2 text-center">
               Test etmek için en az bir AI servisinin API anahtarını girin ve etkinleştirin
             </p>

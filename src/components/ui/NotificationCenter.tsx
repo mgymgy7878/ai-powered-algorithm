@@ -72,7 +72,7 @@ export function NotificationCenter() {
 
       {/* Dropdown Menü */}
       {isDropdownOpen && notifications.length > 1 && (
-        <div className="absolute top-full mt-1 left-0 right-0 border rounded-md bg-background shadow-lg text-xs max-h-64 overflow-auto z-50">
+        <div className="absolute top-full mt-1 left-0 right-0 border rounded-md bg-background shadow-lg text-xs max-h-64 overflow-hidden z-[60]">
           <div className="flex justify-between items-center px-3 py-2 border-b bg-muted">
             <span className="font-medium">Geçmiş Bildirimler</span>
             <Button
@@ -92,7 +92,7 @@ export function NotificationCenter() {
                 className={`px-3 py-2 border-b last:border-none hover:bg-muted/50 ${getTypeColor(notification.type)}`}
               >
                 <div className="flex justify-between items-start gap-2">
-                  <p className="flex-1 min-w-0">{notification.message}</p>
+                  <p className="flex-1 min-w-0 text-xs">{notification.message}</p>
                   <span className="text-muted-foreground flex-shrink-0 text-[10px]">
                     {notification.time}
                   </span>
