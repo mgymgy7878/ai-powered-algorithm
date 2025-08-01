@@ -5,12 +5,11 @@ import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { useKV } from '@github/spark/hooks'
 import { useActivity } from '@/contexts/ActivityContext'
-import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp, Eye, EyeOff } from '@phosphor-icons/react'
+import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react'
 import { APISettings } from '../../types/api'
 import { aiService } from '../../services/aiService'
 
@@ -21,9 +20,7 @@ interface ChatMessage {
   timestamp: Date
 }
 
-interface TradingAssistantProps {}
-
-export function TradingAssistant({}: TradingAssistantProps = {}) {
+export function TradingAssistant() {
   const { addActivity } = useActivity()
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -35,12 +32,11 @@ export function TradingAssistant({}: TradingAssistantProps = {}) {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [model, setModel] = useKV<string>('ai-model', 'gpt-4o')
   const [showSuggestions, setShowSuggestions] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [showApiKeys, setShowApiKeys] = useState({ openai: false, anthropic: false })
   
-  // API Settings state
+  // API Settings state - App.tsx'ten gelen global ayarları kullan
   const [apiSettings, setApiSettings] = useKV<APISettings>('api-settings', {
     openai: {
       apiKey: '',
@@ -69,92 +65,40 @@ export function TradingAssistant({}: TradingAssistantProps = {}) {
     }
   }, [apiSettings])
 
-  // AI önerileri listesi - ekonomik takvim entegrasyonu eklendi
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  // AI önerileri listesi
   const suggestions = [
     { label: "Portföyü değerlendir", command: "portföyü değerlendir" },
     { label: "Bugünkü önemli ekonomik olayları göster", command: "bugünkü yüksek etkili ekonomik olayları listele" },
     { label: "Sonraki 24 saatteki kritik olaylar", command: "gelecek 24 saatte hangi önemli ekonomik olaylar var" },
-    { label: "Ekonomik takvime göre strateji öner", command: "ekonomik takvim analizi yaparak strateji önerisi ver" },
     { label: "Grid bot stratejisini başlat", command: "grid bot stratejisini başlat" },
     { label: "AI'dan piyasa özeti al", command: "bugünkü piyasa özetini sun" },
-    { label: "Kazanç/zarar analizi", command: "kazanç zarar analizi yap" }
+    { label: "Risk analizi yap", command: "portföy risk analizi yap" }
   ]
 
-  // Öneri uygulama fonksiyonu - kullanıcı tarafından tanımlanan komutları kullanır
+  // Öneri uygulama fonksiyonu
   const handleSuggestionApply = async (command: string) => {
-    if (isLoading) return // Zaten işlem devam ediyorsa yeni işlem başlatma
+    if (isLoading) return
     
-    // Input alanına komutu yaz (kullanıcının görmesi için)
     setInputMessage(command)
-    
-    // Kısa bir gecikme sonrası otomatik gönder
-    setTimeout(async () => {
-      // Kullanıcı mesajını otomatik gönder
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: command,
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, userMessage])
-      setInputMessage('') // Input alanını temizle
-      setIsLoading(true)
-
-      try {
-        const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
-- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
-- Ekonomik takvimi ve haber akışını takip edip yorumlamak (Fed faiz kararları, istihdam verileri, enflasyon, GSYİH gibi)
-- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
-- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
-- Ekonomik olayların piyasa etkilerini öngörmek ve strateji önerileri sunmak
-- Türkçe yanıtlar üretmek
-
-Önemli: Ekonomik takvim sorularında güncel ekonomik olayları (Fed kararları, ECB toplantıları, istihdam verileri vb.) dikkate al ve bunların piyasa volatilitesine etkilerini değerlendir.
-
-Kullanıcı mesajı: ${userMessage.content}`
-
-        // Spark LLM API doğru kullanımı: spark.llm(prompt, modelName?, jsonMode?)
-        const response = await spark.llm(prompt, model)
-
-        const assistantMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: response,
-          timestamp: new Date()
-        }
-
-        setMessages(prev => [...prev, assistantMessage])
-        await handleAgentActions(userMessage.content)
-
-      } catch (error) {
-        console.error('AI yanıt hatası:', error)
-        
-        const errorMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
-          timestamp: new Date()
-        }
-
-        setMessages(prev => [...prev, errorMessage])
-      } finally {
-        setIsLoading(false)
-      }
-    }, 300) // 300ms gecikme ile kullanıcı mesajı görür
+    setTimeout(() => {
+      sendMessage(command)
+    }, 100)
   }
 
-  // Otomatik kaydırma - yeni mesaj geldiğinde en alta git
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return
+  // Ana mesaj gönderme fonksiyonu
+  const sendMessage = async (messageText?: string) => {
+    const text = messageText || inputMessage.trim()
+    if (!text || isLoading) return
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputMessage.trim(),
+      content: text,
       timestamp: new Date()
     }
 
@@ -163,32 +107,22 @@ Kullanıcı mesajı: ${userMessage.content}`
     setIsLoading(true)
 
     try {
-      // AI yanıtı için prompt oluştur - Türkçe sistem talimatları
-      const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
-- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek (1D, 4H, 1H, 15M, 1M)
-- Ekonomik takvimi ve haber akışını takip edip yorumlamak (Fed faiz kararları, istihdam verileri, enflasyon, GSYİH gibi)
-- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak 
-- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
-- Ekonomik olayların piyasa etkilerini öngörmek ve strateji önerileri sunmak
-- Türkçe yanıtlar üretmek ve trading terminolojisini doğru kullanmak
+      // AI yanıtını al
+      const prompt = spark.llmPrompt`
+        Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
+        - Farklı zaman dilimlerinde piyasa enstrümanlarını analiz etmek
+        - Ekonomik takvimi ve haber akışını takip edip yorumlamak  
+        - Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+        - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+        - Türkçe yanıtlar üretmek
+        
+        Kullanıcı sorusu: ${text}
+        
+        Kısa, net ve uygulanabilir öneriler ver. Mümkün olduğunca spesifik ol.
+      `
 
-Önemli: Ekonomik takvim sorularında güncel ekonomik olayları (Fed kararları, ECB toplantıları, istihdam verileri vb.) dikkate al ve bunların piyasa volatilitesine etkilerini değerlendir.
+      const response = await spark.llm(prompt)
 
-Kullanıcı mesajı: ${userMessage.content}`
-
-      // Spark LLM API ile model seçimi - kullanıcının tercih ettiği modeli kullan
-      let response: string
-      
-      if (model === 'gpt-4o') {
-        response = await spark.llm(prompt, 'gpt-4o')
-      } else if (model === 'gpt-4o-mini') {
-        response = await spark.llm(prompt, 'gpt-4o-mini')
-      } else {
-        // Varsayılan olarak gpt-4o kullan
-        response = await spark.llm(prompt, 'gpt-4o')
-      }
-
-      // AI yanıtını mesaj listesine ekle
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -197,267 +131,40 @@ Kullanıcı mesajı: ${userMessage.content}`
       }
 
       setMessages(prev => [...prev, assistantMessage])
-
-      // AI yanıtından sonra ajan aksiyonlarını kontrol et (strateji başlat/durdur vb.)
-      await handleAgentActions(userMessage.content)
       
-      // AI etkileşimi için aktivite günlüğüne ekle
-      addActivity(`AI ile etkileşim: ${userMessage.content.slice(0, 50)}...`, 'info')
+      // Aktivite log'a ekle
+      addActivity({
+        id: Date.now().toString(),
+        type: 'ai',
+        message: `AI analiz tamamlandı: ${text.substring(0, 50)}...`,
+        timestamp: new Date(),
+        details: { query: text, response: response.substring(0, 100) + '...' }
+      })
 
-      // Global bildirim merkezi üzerinden bildirim gönder
+      // Bildirim gönder
       if ((window as any).pushNotification) {
-        ;(window as any).pushNotification(`AI yanıtı: ${response.slice(0, 80)}...`, 'info')
+        ;(window as any).pushNotification('🤖 AI analiz tamamlandı', 'success')
       }
 
     } catch (error) {
       console.error('AI yanıt hatası:', error)
-      
-      // Hata durumunda kullanıcıya açıklayıcı mesaj göster
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '❌ Üzgünüm, şu anda AI servisiyle iletişim kuramıyorum. Lütfen daha sonra tekrar deneyin veya API ayarlarınızı kontrol edin.',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. API ayarlarınızı kontrol edin veya daha sonra tekrar deneyin.',
         timestamp: new Date()
       }
-
       setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Mock fonksiyonlar - gerçek API entegrasyonları için
-  const startStrategy = async (strategyName: string) => {
-    console.log(`${strategyName} stratejisi başlatılıyor...`)
-    // Gerçek implementasyon: strateji başlatma API çağrısı
-    return { success: true, strategy: strategyName }
-  }
-
-  const stopStrategy = async (strategyName: string) => {
-    console.log(`${strategyName} stratejisi durduruluyor...`)
-    // Gerçek implementasyon: strateji durdurma API çağrısı
-    return { success: true, strategy: strategyName }
-  }
-
-  const fetchPortfolioData = async () => {
-    // Mock portföy verisi
-    return {
-      total: 50000,
-      dailyPnl: 1250.50,
-      totalPnl: 8750.25,
-      activeStrategies: 3,
-      successRate: 68.5
-    }
-  }
-
-  // AI ajan aksiyonlarını işleme fonksiyonu - ekonomik takvim entegrasyonu eklendi
-  const handleAgentActions = async (message: string) => {
-    const content = message.toLowerCase()
-
-    // Strateji başlatma komutları
-    if (content.includes("strateji başlat") || content.includes("grid bot")) {
-      try {
-        await startStrategy("grid-bot")
-        addActivity('Grid Bot stratejisi AI tarafından başlatıldı', 'success')
-        
-        // Global bildirim merkezi bildirimi gönder
-        if ((window as any).pushNotification) {
-          ;(window as any).pushNotification('Grid Bot stratejisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.', 'success')
-        }
-        
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: '✅ Grid Bot stratejisi başarıyla başlatıldı ve çalışmaya başladı.',
-          timestamp: new Date()
-        }])
-      } catch (error) {
-        addActivity('Grid Bot stratejisi başlatılamadı', 'error')
-        if ((window as any).pushNotification) {
-          ;(window as any).pushNotification('Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.', 'error')
-        }
-      }
-    }
-
-    // Strateji durdurma komutları
-    if (content.includes("strateji durdur") || content.includes("stratejileri durdur")) {
-      try {
-        await stopStrategy("scalper")
-        addActivity('Scalper stratejisi AI tarafından durduruldu', 'warning')
-        
-        // Global bildirim merkezi bildirimi gönder
-        if ((window as any).pushNotification) {
-          ;(window as any).pushNotification('Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.', 'warning')
-        }
-        
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: '⏸️ Aktif stratejiler durduruldu.',
-          timestamp: new Date()
-        }])
-      } catch (error) {
-        addActivity('Strateji durdurulamadı', 'error')
-        if ((window as any).pushNotification) {
-          ;(window as any).pushNotification('Strateji durdurma işlemi başarısız oldu.', 'error')
-        }
-      }
-    }
-
-    // Ekonomik takvim sorguları
-    if (content.includes("ekonomik olay") || content.includes("yüksek etkili")) {
-      try {
-        const { economicCalendarService } = await import('@/services/economicCalendarService')
-        const todayEvents = await economicCalendarService.getTodayHighImpactEvents()
-        
-        if (todayEvents.length > 0) {
-          const eventsList = todayEvents.map(event => 
-            `🔔 ${event.time} - ${event.olay} (${event.currency}) - Etki: ${event.etki}`
-          ).join('\n')
-          
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: `📅 **Bugünkü Yüksek Etkili Ekonomik Olaylar:**\n\n${eventsList}\n\n⚠️ Bu olaylar piyasada volatiliteye neden olabilir. Strateji ayarlamalarınızı buna göre planlayın.`,
-            timestamp: new Date()
-          }])
-        } else {
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: '📅 Bugün yüksek etkili ekonomik olay bulunmuyor. Piyasalar sakin seyredebilir.',
-            timestamp: new Date()
-          }])
-        }
-      } catch (error) {
-        console.error('Ekonomik takvim hatası:', error)
-      }
-    }
-
-    // Gelecek 24 saatteki olaylar
-    if (content.includes("24 saat") || content.includes("gelecek") && content.includes("ekonomik")) {
-      try {
-        const { economicCalendarService } = await import('@/services/economicCalendarService')
-        const upcomingEvents = await economicCalendarService.getUpcomingHighImpactEvents()
-        
-        if (upcomingEvents.length > 0) {
-          const eventsList = upcomingEvents.map(event => 
-            `📅 ${event.date} ${event.time} - ${event.olay} (${event.currency})`
-          ).join('\n')
-          
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: `⏰ **Gelecek 24 Saatteki Kritik Olaylar:**\n\n${eventsList}\n\n🚨 Bu olaylar öncesinde pozisyonlarınızı gözden geçirmenizi öneririm.`,
-            timestamp: new Date()
-          }])
-        } else {
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: '⏰ Gelecek 24 saatte yüksek etkili ekonomik olay bulunmuyor.',
-            timestamp: new Date()
-          }])
-        }
-      } catch (error) {
-        console.error('Ekonomik takvim hatası:', error)
-      }
-    }
-
-    // Ekonomik takvim bazlı strateji önerisi
-    if (content.includes("ekonomik takvim") && content.includes("strateji")) {
-      try {
-        const { economicCalendarService } = await import('@/services/economicCalendarService')
-        const todayEvents = await economicCalendarService.getTodayHighImpactEvents()
-        const upcomingEvents = await economicCalendarService.getUpcomingHighImpactEvents()
-        
-        let recommendation = '📊 **Ekonomik Takvim Bazlı Strateji Önerisi:**\n\n'
-        
-        if (todayEvents.length > 0 || upcomingEvents.length > 0) {
-          recommendation += '⚠️ **Yüksek Volatilite Beklentisi:**\n'
-          recommendation += '• Grid bot stratejilerini durdurun\n'
-          recommendation += '• Scalping stratejilerini aktifleştirin\n'
-          recommendation += '• Stop-loss seviyelerini daraltın\n'
-          recommendation += '• Pozisyon boyutlarını azaltın\n\n'
-          recommendation += '🎯 **Önerilen Aksiyonlar:**\n'
-          recommendation += '• Haber öncesi 30 dakika pozisyon almayın\n'
-          recommendation += '• Haber sonrası ilk 15 dakika momentum takibi yapın\n'
-          recommendation += '• ATR bazlı stop-loss kullanın'
-        } else {
-          recommendation += '😌 **Düşük Volatilite Ortamı:**\n'
-          recommendation += '• Grid bot stratejileri ideal\n'
-          recommendation += '• Range trading stratejileri çalıştırabilirsiniz\n'
-          recommendation += '• Carry trade pozisyonları değerlendirin\n'
-          recommendation += '• Uzun vadeli trend takibi yapabilirsiniz'
-        }
-        
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: recommendation,
-          timestamp: new Date()
-        }])
-      } catch (error) {
-        console.error('Ekonomik takvim analizi hatası:', error)
-      }
-    }
-
-    // Portföy analizi
-    if (content.includes("portföy") && (content.includes("değerlendir") || content.includes("analiz"))) {
-      const p = await fetchPortfolioData()
-      addActivity('AI portföy analizi tamamlandı', 'info')
       
-      // Global bildirim merkezi bildirimi gönder
       if ((window as any).pushNotification) {
-        ;(window as any).pushNotification(`Portföy değerlendirmesi tamamlandı. Toplam değer: $${p.total.toLocaleString()}, Günlük K/Z: $${p.dailyPnl}`, 'info')
+        ;(window as any).pushNotification('❌ AI yanıt hatası - API ayarlarını kontrol edin', 'error')
       }
-      
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `📊 **Portföy Değerlendirmesi:**\n\n💰 Toplam Bakiye: $${p.total.toLocaleString()}\n📈 Günlük K/Z: $${p.dailyPnl}\n💹 Toplam K/Z: $${p.totalPnl}\n🎯 Başarı Oranı: %${p.successRate}\n🤖 Aktif Stratejiler: ${p.activeStrategies}`,
-        timestamp: new Date()
-      }])
     }
-
-    // Piyasa özeti
-    if (content.includes("piyasa özeti") || content.includes("piyasa özetini sun")) {
-      // Mock piyasa verisi
-      const marketData = {
-        btc: { price: 42500, change: 2.5 },
-        eth: { price: 2850, change: -1.2 },
-        general: "Kripto piyasalar pozitif seyirde"
-      }
-      
-      addActivity('AI piyasa özeti oluşturuldu', 'info')
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `📈 **Günlük Piyasa Özeti:**\n\n₿ BTC: $${marketData.btc.price.toLocaleString()} (${marketData.btc.change > 0 ? '+' : ''}${marketData.btc.change}%)\nⒺ ETH: $${marketData.eth.price.toLocaleString()} (${marketData.eth.change > 0 ? '+' : ''}${marketData.eth.change}%)\n\n📊 Genel Durum: ${marketData.general}`,
-        timestamp: new Date()
-      }])
-    }
-
-    // Kazanç/zarar analizi
-    if (content.includes("kazanç zarar analizi") || content.includes("k/z analizi")) {
-      const analysisData = {
-        weeklyPnl: 3250.75,
-        monthlyPnl: 12450.30,
-        winRate: 72.5,
-        avgWin: 185.50,
-        avgLoss: -95.25
-      }
-      
-      addActivity('AI K/Z analizi tamamlandı', 'info')
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `💹 **Kazanç/Zarar Analizi:**\n\n📊 Haftalık K/Z: $${analysisData.weeklyPnl}\n📈 Aylık K/Z: $${analysisData.monthlyPnl}\n🎯 Kazanma Oranı: %${analysisData.winRate}\n💚 Ortalama Kazanç: $${analysisData.avgWin}\n🔴 Ortalama Kayıp: $${analysisData.avgLoss}`,
-        timestamp: new Date()
-      }])
-    }
+    
+    setIsLoading(false)
   }
 
+  // Enter tuşu ile mesaj gönderme
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -465,321 +172,263 @@ Kullanıcı mesajı: ${userMessage.content}`
     }
   }
 
-  const updateAPISettings = (provider: 'openai' | 'anthropic', updates: any) => {
-    setApiSettings(prev => ({
-      ...prev,
-      [provider]: {
-        ...prev?.[provider],
-        ...updates
-      }
-    }))
+  // API ayarlarını kaydetme
+  const saveApiSettings = () => {
+    setApiSettings({ ...apiSettings })
+    aiService.setSettings(apiSettings)
+    setShowSettings(false)
+    
+    if ((window as any).pushNotification) {
+      ;(window as any).pushNotification('✅ API ayarları kaydedildi', 'success')
+    }
   }
 
-  const testAPIConnection = async (provider: 'openai' | 'anthropic', apiKey: string) => {
-    try {
-      const isValid = await aiService?.testConnection(provider, apiKey)
-      if (isValid) {
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: `✅ ${provider === 'openai' ? 'OpenAI' : 'Anthropic'} bağlantısı başarılı! Artık bu sağlayıcıyı kullanabilirsiniz.`,
-          timestamp: new Date()
-        }])
-      } else {
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: `❌ ${provider === 'openai' ? 'OpenAI' : 'Anthropic'} bağlantısı başarısız. API anahtarınızı kontrol edin.`,
-          timestamp: new Date()
-        }])
-      }
-    } catch (error) {
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `❌ Bağlantı testi sırasında hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`,
-        timestamp: new Date()
-      }])
+  // Hangi modelin aktif olduğunu belirle
+  const getActiveModel = () => {
+    if (apiSettings.openai?.enabled && apiSettings.openai?.apiKey) {
+      return `GPT-${apiSettings.openai.model}`
+    } else if (apiSettings.anthropic?.enabled && apiSettings.anthropic?.apiKey) {
+      return `Claude ${apiSettings.anthropic.model}`
     }
+    return 'Model Seçiniz'
   }
 
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Başlık ve Ayarlar */}
-      <div className="p-2 border-b bg-muted/50 flex items-center justify-between">
+      {/* Header - Sabit üst bar */}
+      <div className="flex items-center justify-between p-3 border-b bg-muted/50">
         <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4" />
+          <Brain className="w-5 h-5 text-primary" />
           <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
         </div>
         
-        {/* Model Seçici */}
-        <div className="flex items-center gap-2">
-          <Select value={model} onValueChange={setModel}>
-            <SelectTrigger className="w-32 text-xs h-7">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-              <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          {/* API Ayarları Dialog */}
-          <Dialog open={showSettings} onOpenChange={setShowSettings}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Settings className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>AI API Ayarları</DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              {/* OpenAI Settings */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium">OpenAI</Label>
-                  <Switch
-                    checked={apiSettings?.openai?.enabled ?? false}
-                    onCheckedChange={(enabled) => updateAPISettings('openai', { enabled })}
-                  />
-                </div>
-                
-                {apiSettings?.openai?.enabled && (
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <Input
-                        type={showApiKeys.openai ? "text" : "password"}
-                        placeholder="OpenAI API Key (sk-...)"
-                        value={apiSettings?.openai?.apiKey ?? ''}
-                        onChange={(e) => updateAPISettings('openai', { apiKey: e.target.value })}
-                        className="text-xs pr-8"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-2"
-                        onClick={() => setShowApiKeys(prev => ({ ...prev, openai: !prev.openai }))}
-                      >
-                        {showApiKeys.openai ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      </Button>
-                    </div>
-                    
-                    <Select
-                      value={apiSettings?.openai?.model ?? 'gpt-4'}
-                      onValueChange={(value) => updateAPISettings('openai', { model: value })}
-                    >
-                      <SelectTrigger className="text-xs h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="gpt-4">GPT-4</SelectItem>
-                        <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                        <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => testAPIConnection('openai', apiSettings?.openai?.apiKey ?? '')}
-                      className="w-full h-7 text-xs"
-                      disabled={!apiSettings?.openai?.apiKey?.trim()}
-                    >
-                      Bağlantıyı Test Et
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {/* Anthropic Settings */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium">Anthropic Claude</Label>
-                  <Switch
-                    checked={apiSettings?.anthropic?.enabled ?? false}
-                    onCheckedChange={(enabled) => updateAPISettings('anthropic', { enabled })}
-                  />
-                </div>
-                
-                {apiSettings?.anthropic?.enabled && (
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <Input
-                        type={showApiKeys.anthropic ? "text" : "password"}
-                        placeholder="Anthropic API Key (sk-ant-...)"
-                        value={apiSettings?.anthropic?.apiKey ?? ''}
-                        onChange={(e) => updateAPISettings('anthropic', { apiKey: e.target.value })}
-                        className="text-xs pr-8"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-2"
-                        onClick={() => setShowApiKeys(prev => ({ ...prev, anthropic: !prev.anthropic }))}
-                      >
-                        {showApiKeys.anthropic ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      </Button>
-                    </div>
-                    
-                    <Select
-                      value={apiSettings?.anthropic?.model ?? 'claude-3-sonnet'}
-                      onValueChange={(value) => updateAPISettings('anthropic', { model: value })}
-                    >
-                      <SelectTrigger className="text-xs h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
-                        <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
-                        <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => testAPIConnection('anthropic', apiSettings?.anthropic?.apiKey ?? '')}
-                      className="w-full h-7 text-xs"
-                      disabled={!apiSettings?.anthropic?.apiKey?.trim()}
-                    >
-                      Bağlantıyı Test Et
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </DialogContent>
-          </Dialog>
-          
-          <Badge variant="secondary" className="text-xs">
-            {apiSettings?.openai?.enabled ? 'OpenAI' : apiSettings?.anthropic?.enabled ? 'Claude' : 'Spark LLM'}
+        <div className="flex items-center gap-1">
+          <Badge variant="outline" className="text-xs px-2 py-1">
+            {getActiveModel()}
           </Badge>
+          
+          <Dialog open={showSettings} onOpenChange={setShowSettings}>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowSettings(true)}
+              className="h-7 w-7 p-0"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+            
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>API Ayarları</DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                {/* OpenAI Settings */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">OpenAI</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowApiKeys(prev => ({ ...prev, openai: !prev.openai }))}
+                    >
+                      {showApiKeys.openai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  <Input
+                    type={showApiKeys.openai ? "text" : "password"}
+                    placeholder="OpenAI API Key"
+                    value={apiSettings.openai?.apiKey || ''}
+                    onChange={(e) => setApiSettings(prev => ({
+                      ...prev,
+                      openai: { ...prev.openai!, apiKey: e.target.value }
+                    }))}
+                  />
+                  <Select
+                    value={apiSettings.openai?.model || 'gpt-4'}
+                    onValueChange={(value) => setApiSettings(prev => ({
+                      ...prev,
+                      openai: { ...prev.openai!, model: value }
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gpt-4">GPT-4</SelectItem>
+                      <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Anthropic Settings */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Anthropic Claude</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowApiKeys(prev => ({ ...prev, anthropic: !prev.anthropic }))}
+                    >
+                      {showApiKeys.anthropic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  <Input
+                    type={showApiKeys.anthropic ? "text" : "password"}
+                    placeholder="Anthropic API Key"
+                    value={apiSettings.anthropic?.apiKey || ''}
+                    onChange={(e) => setApiSettings(prev => ({
+                      ...prev,
+                      anthropic: { ...prev.anthropic!, apiKey: e.target.value }
+                    }))}
+                  />
+                  <Select
+                    value={apiSettings.anthropic?.model || 'claude-3-sonnet'}
+                    onValueChange={(value) => setApiSettings(prev => ({
+                      ...prev,
+                      anthropic: { ...prev.anthropic!, model: value }
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                      <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                      <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button onClick={saveApiSettings} className="w-full">
+                  Ayarları Kaydet
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Mesaj Listesi */}
-      <ScrollArea className="flex-1 p-2">
-        <div className="space-y-2">
+      {/* AI Önerileri - Gizlenebilir panel */}
+      {showSuggestions && (
+        <div className="px-3 py-2 bg-muted/30 border-b">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowSuggestions(false)}
+            className="text-xs text-muted-foreground mb-2 h-6 px-2"
+          >
+            <ChevronUp className="w-3 h-3 mr-1" />
+            Önerileri Gizle
+          </Button>
+          
+          <div className="grid grid-cols-2 gap-1">
+            {suggestions.map((item, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                onClick={() => handleSuggestionApply(item.command)}
+                disabled={isLoading}
+                className="text-xs h-7 px-2 justify-start"
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!showSuggestions && (
+        <div className="px-3 py-1 bg-muted/30 border-b">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowSuggestions(true)}
+            className="text-xs text-muted-foreground h-6 px-2"
+          >
+            <ChevronDown className="w-3 h-3 mr-1" />
+            Önerileri Göster
+          </Button>
+        </div>
+      )}
+
+      {/* Chat Messages - Kaydırılabilir alan */}
+      <ScrollArea className="flex-1 px-3 py-2">
+        <div className="space-y-3">
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex items-start gap-2 ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
+            <div key={message.id} className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {message.role === 'assistant' && (
-                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center mt-1">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Brain className="w-3 h-3 text-primary-foreground" />
                 </div>
               )}
               
-              <div
-                className={`rounded-md text-xs px-2 py-1 max-w-[85%] whitespace-pre-wrap ${
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground ml-6'
-                    : 'bg-muted text-foreground'
-                }`}
-              >
-                {message.content}
+              <div className={`rounded-lg px-3 py-2 max-w-[85%] text-sm ${
+                message.role === 'user'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted'
+              }`}>
+                <p className="whitespace-pre-wrap">{message.content}</p>
+                <p className={`text-xs mt-1 opacity-70 ${
+                  message.role === 'user' ? 'text-primary-foreground' : 'text-muted-foreground'
+                }`}>
+                  {message.timestamp.toLocaleTimeString('tr-TR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </p>
               </div>
-
+              
               {message.role === 'user' && (
-                <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center mt-1">
-                  <User className="w-3 h-3 text-muted-foreground" />
+                <div className="w-6 h-6 bg-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <User className="w-3 h-3 text-secondary-foreground" />
                 </div>
               )}
             </div>
           ))}
           
           {isLoading && (
-            <div className="flex items-start gap-2">
-              <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center mt-1">
+            <div className="flex gap-2 justify-start">
+              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                 <Brain className="w-3 h-3 text-primary-foreground" />
               </div>
-              <div className="bg-muted text-foreground rounded-md px-2 py-1 text-xs">
-                <Loader2 className="w-3 h-3 animate-spin" />
+              <div className="bg-muted rounded-lg px-3 py-2 flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Düşünüyor...</span>
               </div>
             </div>
           )}
+          
+          <div ref={messagesEndRef} />
         </div>
-        <div ref={messagesEndRef} />
       </ScrollArea>
 
-      {/* AI Önerileri Paneli */}
-      {showSuggestions && (
-        <div className="border-t bg-muted/30 p-2">
-          <div className="flex items-center justify-between mb-1">
-            <h4 className="text-xs font-medium text-muted-foreground">AI Önerileri</h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowSuggestions(false)}
-              className="h-4 w-4 p-0"
-            >
-              <ChevronUp className="w-3 h-3" />
-            </Button>
-          </div>
-          <div className="space-y-1 bg-muted rounded-md p-2 text-xs max-h-24 overflow-y-auto">
-            {suggestions.map((item, index) => (
-              <div key={index} className="flex items-center justify-between gap-2">
-                <span className="text-xs text-foreground flex-1 truncate">{item.label}</span>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => handleSuggestionApply(item.command)}
-                  disabled={isLoading}
-                  className="text-xs h-5 px-1"
-                >
-                  Uygula
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Öneriler Göster/Gizle Butonu - Kapalıyken */}
-      {!showSuggestions && (
-        <div className="border-t p-1 flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowSuggestions(true)}
-            className="text-xs h-5"
+      {/* Input Area - Sabit alt bar */}
+      <div className="border-t p-3 bg-background">
+        <div className="flex gap-2 items-center">
+          <Input
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="AI'a mesaj yaz..."
+            className="flex-1 text-sm"
+            onKeyDown={handleKeyPress}
+            disabled={isLoading}
+          />
+          <Button 
+            onClick={() => sendMessage()} 
+            disabled={!inputMessage.trim() || isLoading} 
+            size="icon"
+            className="flex-shrink-0"
           >
-            <ChevronDown className="w-3 h-3 mr-1" />
-            AI Önerileri
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
-      )}
-
-      {/* Mesaj Gönderme Alanı */}
-      <div className="border-t p-2 flex gap-2 items-center bg-background">
-        <Input
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="AI'a mesaj yaz..."
-          className="flex-1 text-xs h-8"
-          disabled={isLoading}
-        />
-        <Button 
-          onClick={sendMessage} 
-          disabled={!inputMessage.trim() || isLoading} 
-          size="icon"
-          className="h-8 w-8"
-        >
-          {isLoading ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            <Send className="w-3 h-3" />
-          )}
-        </Button>
       </div>
     </Card>
   )

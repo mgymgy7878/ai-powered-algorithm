@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { Bell, X, CheckCircle, AlertTriangle, Info, XCircle } from '@phosphor-icons/react'
-import { Button } from './button'
-import { Card } from './card'
-import { Badge } from './badge'
+import { useState, useEffect } from 'react'
+import { Bell, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Badge } from '@/components/ui/badge'
 
 export interface Notification {
   id: string
   message: string
-  type: 'success' | 'error' | 'warning' | 'info'
   time: string
-  isRead?: boolean
+  type: 'success' | 'info' | 'warning' | 'error'
 }
 
 interface NotificationCenterProps {
@@ -18,196 +18,144 @@ interface NotificationCenterProps {
 
 export function NotificationCenter({ className = '' }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
+  const [isOpen, setIsOpen] = useState(false)
 
-  // Global notification pusher fonksiyonunu window'a kaydet
+  // Global notification function'ı pencereye ekle
   useEffect(() => {
-    const pushNotification = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    const pushNotification = (message: string, type: Notification['type'] = 'info') => {
       const newNotification: Notification = {
         id: Date.now().toString(),
         message,
-        type,
         time: new Date().toLocaleTimeString('tr-TR', { 
           hour: '2-digit', 
           minute: '2-digit' 
         }),
-        isRead: false
+        type
       }
-
-      setNotifications(prev => [newNotification, ...prev.slice(0, 9)]) // Max 10 bildirim saklayalım
-      setUnreadCount(prev => prev + 1)
+      
+      setNotifications(prev => [newNotification, ...prev.slice(0, 9)]) // Max 10 bildirim
     }
 
-    // Global fonksiyonu window'a ekle
+    // Global erişim için window'a ekle
     ;(window as any).pushNotification = pushNotification
 
-    // Component unmount olduğunda temizle
     return () => {
       delete (window as any).pushNotification
     }
   }, [])
 
-  // Son bildirimi al (en üstteki)
+  const getTypeColor = (type: Notification['type']) => {
+    switch (type) {
+      case 'success': return 'bg-green-500'
+      case 'warning': return 'bg-yellow-500'
+      case 'error': return 'bg-red-500'
+      default: return 'bg-blue-500'
+    }
+  }
+
+  const getTypeIcon = (type: Notification['type']) => {
+    switch (type) {
+      case 'success': return '✅'
+      case 'warning': return '⚠️'
+      case 'error': return '❌'
+      default: return 'ℹ️'
+    }
+  }
+
+  const clearNotifications = () => {
+    setNotifications([])
+    setIsOpen(false)
+  }
+
   const latestNotification = notifications[0]
 
-  // Dropdown'u aç/kapat
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-    
-    // Açıldığında tüm bildirimleri okundu olarak işaretle
-    if (!isDropdownOpen) {
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
-      setUnreadCount(0)
-    }
-  }
-
-  // Bildirim ikonunu type'a göre döndür
-  const getNotificationIcon = (type: Notification['type']) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="w-3 h-3 text-green-500" />
-      case 'error':
-        return <XCircle className="w-3 h-3 text-red-500" />
-      case 'warning':
-        return <AlertTriangle className="w-3 h-3 text-yellow-500" />
-      case 'info':
-      default:
-        return <Info className="w-3 h-3 text-blue-500" />
-    }
-  }
-
-  // Bildirim temizleme
-  const clearAllNotifications = () => {
-    setNotifications([])
-    setUnreadCount(0)
-    setIsDropdownOpen(false)
-  }
-
-  // Tekil bildirim silme
-  const removeNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id))
-  }
-
-  // Dışarı tıklanınca dropdown'u kapat
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (!target.closest('.notification-center')) {
-        setIsDropdownOpen(false)
-      }
-    }
-
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isDropdownOpen])
-
   return (
-    <div className={`relative notification-center ${className}`}>
-      {/* Son Bildirim Kutusu (her zaman görünür) */}
-      {latestNotification ? (
-        <Card
-          className="p-2 cursor-pointer hover:bg-muted/50 transition-colors shadow-sm border-l-2 border-l-primary"
-          onClick={toggleDropdown}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {getNotificationIcon(latestNotification.type)}
-              <span className="text-xs truncate flex-1">{latestNotification.message}</span>
-            </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <span className="text-xs text-muted-foreground">{latestNotification.time}</span>
-              {unreadCount > 0 && (
-                <Badge variant="destructive" className="text-xs h-4 w-4 p-0 flex items-center justify-center">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </Badge>
+    <div className={`relative ${className}`}>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div className="w-full">
+            {/* Son bildirim gösterici kutu */}
+            <div className="flex items-center justify-between px-3 py-2 bg-muted rounded-md text-xs shadow-sm cursor-pointer hover:bg-muted/80 transition-colors">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <Bell className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                {latestNotification ? (
+                  <>
+                    <span className="text-xs">{getTypeIcon(latestNotification.type)}</span>
+                    <span className="truncate flex-1">
+                      {latestNotification.message}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">Henüz bildirim yok</span>
+                )}
+              </div>
+              
+              {latestNotification && (
+                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                  <span className="text-muted-foreground">{latestNotification.time}</span>
+                  {notifications.length > 1 && (
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                      +{notifications.length - 1}
+                    </Badge>
+                  )}
+                </div>
               )}
-              <Bell className="w-3 h-3 text-muted-foreground" />
             </div>
           </div>
-        </Card>
-      ) : (
-        <Card
-          className="p-2 cursor-pointer hover:bg-muted/50 transition-colors"
-          onClick={toggleDropdown}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">Henüz bildirim yok</span>
-            <Bell className="w-3 h-3 text-muted-foreground" />
-          </div>
-        </Card>
-      )}
+        </PopoverTrigger>
 
-      {/* Geçmiş Bildirimler Dropdown */}
-      {isDropdownOpen && (
-        <Card className="absolute top-full left-0 mt-1 w-[320px] max-h-[300px] shadow-lg border z-[9999] bg-background">
-          {/* Başlık */}
-          <div className="p-2 border-b flex items-center justify-between bg-muted/50">
-            <span className="text-xs font-semibold">Bildirimler</span>
-            <div className="flex items-center gap-1">
+        <PopoverContent className="w-[360px] p-0" align="start" side="bottom">
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <h3 className="text-sm font-semibold">Son Bildirimler</h3>
+            <div className="flex items-center gap-2">
               {notifications.length > 0 && (
-                <Button
-                  variant="ghost"
+                <Button 
+                  variant="ghost" 
                   size="sm"
-                  onClick={clearAllNotifications}
-                  className="text-xs h-5 px-1"
+                  onClick={clearNotifications}
+                  className="text-xs h-7 px-2"
                 >
                   Temizle
                 </Button>
               )}
               <Button
                 variant="ghost"
-                size="sm"
-                onClick={() => setIsDropdownOpen(false)}
-                className="h-5 w-5 p-0"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="h-7 w-7"
               >
-                <X className="w-3 h-3" />
+                <X className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
-          {/* Bildirim Listesi */}
-          <div className="max-h-48 overflow-y-auto">
-            {notifications.length > 0 ? (
-              notifications.slice(0, 10).map((notification, index) => (
-                <div
-                  key={notification.id}
-                  className={`p-2 border-b last:border-none hover:bg-muted/30 transition-colors ${
-                    !notification.isRead ? 'bg-primary/5' : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-2">
-                    {getNotificationIcon(notification.type)}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-foreground leading-4">{notification.message}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeNotification(notification.id)}
-                      className="h-4 w-4 p-0 opacity-50 hover:opacity-100"
-                    >
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="p-4 text-center text-xs text-muted-foreground">
+          <ScrollArea className="max-h-[300px]">
+            {notifications.length === 0 ? (
+              <div className="p-4 text-center text-muted-foreground text-sm">
                 Henüz bildirim bulunmuyor
               </div>
+            ) : (
+              <div className="divide-y">
+                {notifications.map((notification, index) => (
+                  <div key={notification.id} className="px-4 py-3 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-2 h-2 rounded-full mt-2 ${getTypeColor(notification.type)} flex-shrink-0`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm leading-relaxed">
+                          {notification.message}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {notification.time}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
-          </div>
-        </Card>
-      )}
+          </ScrollArea>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
-
-export default NotificationCenter
