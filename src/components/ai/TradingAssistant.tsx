@@ -80,6 +80,9 @@ Kullanıcı mesajı: ${userMessage.content}`
 
       setMessages(prev => [...prev, assistantMessage])
 
+      // AI yanıtından sonra ajan aksiyonlarını kontrol et
+      await handleAgentActions(userMessage.content)
+
     } catch (error) {
       console.error('AI yanıt hatası:', error)
       
@@ -94,6 +97,65 @@ Kullanıcı mesajı: ${userMessage.content}`
       setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // Mock fonksiyonlar - gerçek API entegrasyonları için
+  const startStrategy = async (strategyName: string) => {
+    console.log(`${strategyName} stratejisi başlatılıyor...`)
+    // Gerçek implementasyon: strateji başlatma API çağrısı
+    return { success: true, strategy: strategyName }
+  }
+
+  const stopStrategy = async (strategyName: string) => {
+    console.log(`${strategyName} stratejisi durduruluyor...`)
+    // Gerçek implementasyon: strateji durdurma API çağrısı
+    return { success: true, strategy: strategyName }
+  }
+
+  const fetchPortfolioData = async () => {
+    // Mock portföy verisi
+    return {
+      total: 50000,
+      dailyPnl: 1250.50,
+      totalPnl: 8750.25,
+      activeStrategies: 3,
+      successRate: 68.5
+    }
+  }
+
+  // AI ajan aksiyonlarını işleme fonksiyonu
+  const handleAgentActions = async (message: string) => {
+    const content = message.toLowerCase()
+
+    if (content.includes("başlat")) {
+      await startStrategy("grid-bot")
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '✅ Grid-bot stratejisi başarıyla başlatıldı.',
+        timestamp: new Date()
+      }])
+    }
+
+    if (content.includes("durdur")) {
+      await stopStrategy("scalper")
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '⏹️ Scalper stratejisi durduruldu.',
+        timestamp: new Date()
+      }])
+    }
+
+    if (content.includes("portföyü değerlendir") || content.includes("portföy analizi")) {
+      const p = await fetchPortfolioData()
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `📊 **Portföy Değerlendirmesi:**\n\n💰 Toplam Bakiye: $${p.total.toLocaleString()}\n📈 Günlük K/Z: $${p.dailyPnl}\n💹 Toplam K/Z: $${p.totalPnl}\n🎯 Başarı Oranı: %${p.successRate}\n🤖 Aktif Stratejiler: ${p.activeStrategies}`,
+        timestamp: new Date()
+      }])
     }
   }
 
