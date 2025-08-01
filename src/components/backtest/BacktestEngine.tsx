@@ -562,7 +562,7 @@ export function BacktestEngine() {
                             </DialogHeader>
                             {selectedResult && (
                               <div className="space-y-4">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="flex flex-wrap gap-2 items-center">
                                   <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="text-lg font-semibold text-primary">
                                       {selectedResult?.metrics?.totalTrades ?? 0}

@@ -318,7 +318,7 @@ export function LiveTrading() {
       </div>
 
       {/* Özet Kartları */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="flex flex-wrap gap-2 items-center">
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
@@ -457,7 +457,7 @@ export function LiveTrading() {
             <CardTitle>Piyasa Verileri</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="flex flex-wrap gap-2 items-center">
               {/* Piyasa verilerini güvenli şekilde göster */}
               {(marketData || []).slice(0, 6).map((market) => market && market.symbol ? (
                 <div key={market.symbol} className="text-center p-3 bg-muted rounded-lg">
@@ -703,7 +703,7 @@ export function LiveTrading() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex flex-wrap gap-2 items-center">
                     <div className="text-center p-3 bg-muted rounded-lg">
                       <div className={`text-lg font-semibold ${strategy.pnl >= 0 ? 'text-accent' : 'text-destructive'}`}>
                         {strategy.pnl >= 0 ? '+' : ''}{formatCurrency(strategy.pnl)}

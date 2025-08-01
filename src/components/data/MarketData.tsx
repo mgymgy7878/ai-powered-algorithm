@@ -175,7 +175,7 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
       )}
 
       {marketData && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="flex flex-wrap gap-2 items-center">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">

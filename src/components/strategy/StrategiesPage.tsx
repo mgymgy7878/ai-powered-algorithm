@@ -151,7 +151,7 @@ export function StrategiesPage() {
       </div>
 
       {/* İstatistik Kartları */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="flex flex-wrap gap-2 items-center">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Toplam Strateji</CardTitle>
