@@ -15,10 +15,12 @@ import { TradingChart, ChartData, TradeSignal } from '../charts/TradingChart'
 import { dataService, HistoricalDataRequest } from '../../services/dataService'
 import { backtestEngine, BacktestResult, BacktestConfiguration, OptimizationConfiguration, OptimizationParameter } from '../../services/backtestEngine'
 import { UTCTimestamp } from 'lightweight-charts'
+import { useActivity } from '../../contexts/ActivityContext'
 
 export function BacktestEngine() {
   const [strategies] = useKV('trading-strategies', [])
   const [backtestResults, setBacktestResults] = useKV<BacktestResult[]>('backtest-results', [])
+  const { addActivity } = useActivity()
   
   const [selectedStrategy, setSelectedStrategy] = useState('')
   const [selectedSymbol, setSelectedSymbol] = useState('BTCUSDT')
@@ -72,6 +74,7 @@ export function BacktestEngine() {
       })
       
       toast.success(`${data.length} adet mum verisi indirildi`)
+      addActivity(`${selectedSymbol} için ${data.length} adet tarihsel veri indirildi`, 'info')
       setShowChart(true)
       
     } catch (error) {
@@ -140,6 +143,7 @@ export function BacktestEngine() {
         } : null)
         
         toast.success('Backtest başarıyla tamamlandı!')
+        addActivity(`${strategy.name} backtest tamamlandı (${selectedSymbol}, ROI: ${((result.finalCapital - result.initialCapital) / result.initialCapital * 100).toFixed(2)}%)`, 'success')
       } else {
         toast.error(`Backtest başarısız: ${result.error || 'Bilinmeyen hata'}`)
       }

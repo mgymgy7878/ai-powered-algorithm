@@ -31,6 +31,7 @@ import {
 import { toast } from 'sonner'
 import { StrategyEditor } from './StrategyEditor'
 import { TradingStrategy } from '../../types/trading'
+import { useActivity } from '../../contexts/ActivityContext'
 
 export function StrategiesPage() {
   const [strategies, setStrategies] = useKV<TradingStrategy[]>('trading-strategies', [])
@@ -38,6 +39,7 @@ export function StrategiesPage() {
   const [showEditor, setShowEditor] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
+  const { addActivity } = useActivity()
 
   // Strateji filtreleme
   const filteredStrategies = strategies.filter(strategy => {
@@ -74,12 +76,15 @@ export function StrategiesPage() {
     }
     setStrategies(prev => [...prev, duplicatedStrategy])
     toast.success('Strateji kopyalandı')
+    addActivity(`${strategy.name} stratejisi kopyalandı`, 'info')
   }
 
   // Strateji sil
   const handleDeleteStrategy = (strategyId: string) => {
+    const strategy = strategies.find(s => s.id === strategyId)
     setStrategies(prev => prev.filter(s => s.id !== strategyId))
     toast.success('Strateji silindi')
+    addActivity(`${strategy?.name || 'Strateji'} silindi`, 'warning')
   }
 
   // Strateji kaydet
@@ -88,10 +93,12 @@ export function StrategiesPage() {
       // Mevcut stratejiyi güncelle
       setStrategies(prev => prev.map(s => s.id === strategy.id ? strategy : s))
       toast.success('Strateji güncellendi')
+      addActivity(`${strategy.name} stratejisi güncellendi`, 'info')
     } else {
       // Yeni strateji ekle
       setStrategies(prev => [...prev, strategy])
       toast.success('Strateji oluşturuldu')
+      addActivity(`${strategy.name} yeni stratejisi oluşturuldu`, 'success')
     }
     setShowEditor(false)
     setSelectedStrategy(null)

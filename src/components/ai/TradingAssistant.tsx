@@ -156,6 +156,9 @@ Kullanıcı mesajı: ${userMessage.content}`
 
       // AI yanıtından sonra ajan aksiyonlarını kontrol et
       await handleAgentActions(userMessage.content)
+      
+      // AI etkileşimi için aktivite ekle
+      addActivity(`AI ile etkileşim: ${userMessage.content.slice(0, 50)}...`, 'info')
 
     } catch (error) {
       console.error('AI yanıt hatası:', error)

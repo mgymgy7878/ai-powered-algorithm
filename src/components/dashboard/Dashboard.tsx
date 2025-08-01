@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { TrendingUp, TrendingDown, BarChart, Bell } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
 import { useActivity } from '../../contexts/ActivityContext'
+import { activityMonitor } from '../../services/activityMonitor'
 
 interface PortfolioMetrics {
   totalValue: number
@@ -20,6 +21,9 @@ export function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const { activities, addActivity } = useActivity()
   
+  // Otomatik bildirimler için sayaç
+  const [notificationTimer, setNotificationTimer] = useState(0)
+  
   // Sidebar durumu değişikliklerini dinle
   useEffect(() => {
     const handleSidebarToggle = (event: CustomEvent) => {
@@ -32,6 +36,22 @@ export function Dashboard() {
       window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener)
     }
   }, [])
+  
+  // Otomatik bildirim sistemi - gerçek piyasa olaylarını simüle eder
+  useEffect(() => {
+    // Activity monitor'ı addActivity ile bağla
+    const handleActivityNotification = (message: string, type: 'success' | 'info' | 'warning' | 'error') => {
+      addActivity(message, type)
+    }
+
+    activityMonitor.addListener(handleActivityNotification)
+    activityMonitor.startMarketSimulation()
+
+    return () => {
+      activityMonitor.removeListener(handleActivityNotification)
+      activityMonitor.stopMarketSimulation()
+    }
+  }, [addActivity])
   
   const [portfolioMetrics] = useKV<PortfolioMetrics>('portfolio-metrics', {
     totalValue: 50000,
@@ -69,10 +89,16 @@ export function Dashboard() {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => addActivity('Test aktivitesi eklendi', 'success')}
+            onClick={() => {
+              // Test trading sinyalleri gönder
+              activityMonitor.notifyTradeSignal('BTCUSDT', 'buy', 42500, 0.025)
+              setTimeout(() => activityMonitor.notifyStrategyEvent('Grid Bot ETHUSDT', 'profit', '+$145'), 2000)
+              setTimeout(() => activityMonitor.notifyAIRecommendation('Volatilite artıyor, pozisyon boyutlarını azaltın', 'high'), 4000)
+              setTimeout(() => activityMonitor.notifyRiskAlert('Stop-loss seviyeleri dar tutuluyor', 'medium'), 6000)
+            }}
             className="text-xs"
           >
-            Test
+            🔔 Test
           </Button>
           
           <DropdownMenu>

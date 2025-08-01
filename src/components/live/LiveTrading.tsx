@@ -14,6 +14,8 @@ import { TradingChart, ChartData } from '../charts/TradingChart'
 import { binanceService } from '../../services/binanceService'
 import { dataService } from '../../services/dataService'
 import { APISettings as APISettingsType } from '../../types/api'
+import { useActivity } from '../../contexts/ActivityContext'
+import { activityMonitor } from '../../services/activityMonitor'
 
 interface LiveStrategy {
   id: string
@@ -47,6 +49,7 @@ export function LiveTrading() {
   const [marketData, setMarketData] = useState<MarketData[]>([])
   const [chartData, setChartData] = useState<ChartData | null>(null)
   const [selectedSymbol, setSelectedSymbol] = useState('BTCUSDT')
+  const { addActivity } = useActivity()
   
   const [autoTrading, setAutoTrading] = useKV('auto-trading-enabled', false)
   const [riskManagement, setRiskManagement] = useKV('risk-management-enabled', true)
@@ -175,7 +178,10 @@ export function LiveTrading() {
         riskLevel: 'medium'
       })
 
+      // Toast bildirim ve aktivite ekle
       toast.success('Canlı strateji eklendi')
+      addActivity(`${strategy.name} canlı stratejiye eklendi (${newStrategyForm.symbol})`, 'success')
+      activityMonitor.notifyStrategyEvent(strategy.name, 'started', `${newStrategyForm.symbol} için aktifleştirildi`)
     } catch (error) {
       console.error('Add live strategy error:', error)
       toast.error(`Strateji eklenirken hata: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`)
@@ -204,7 +210,11 @@ export function LiveTrading() {
           s.id === strategyId ? { ...s, status: 'running' as const } : s
         )
       )
+      
+      const strategy = liveStrategies.find(s => s.id === strategyId)
       toast.success('Strateji başlatıldı')
+      addActivity(`${strategy?.name || 'Strateji'} başlatıldı (${strategy?.symbol || ''})`, 'success')
+      activityMonitor.notifyStrategyEvent(strategy?.name || 'Strateji', 'started', strategy?.symbol)
     } catch (error) {
       toast.error('Strateji başlatılamadı')
       console.error('Start strategy error:', error)
@@ -212,12 +222,15 @@ export function LiveTrading() {
   }
 
   const pauseStrategy = (strategyId: string) => {
+    const strategy = liveStrategies.find(s => s.id === strategyId)
     setLiveStrategies(current =>
       current.map(s =>
         s.id === strategyId ? { ...s, status: 'paused' as const } : s
       )
     )
     toast.success('Strateji duraklatıldı')
+    addActivity(`${strategy?.name || 'Strateji'} duraklatıldı (${strategy?.symbol || ''})`, 'warning')
+    activityMonitor.notifyStrategyEvent(strategy?.name || 'Strateji', 'paused', strategy?.symbol)
   }
 
   const stopStrategy = async (strategyId: string) => {
@@ -230,9 +243,11 @@ export function LiveTrading() {
           try {
             await binanceService.closePosition(strategy.symbol)
             toast.success('Açık pozisyonlar kapatıldı')
+            addActivity(`${strategy.name} pozisyonu kapatıldı (${strategy.symbol})`, 'info')
           } catch (error) {
             console.error('Position closing error:', error)
             toast.warning('Pozisyon kapatılamadı, manuel kontrol edin')
+            addActivity(`${strategy.name} pozisyon kapatma hatası`, 'error')
           }
         }
       }
@@ -243,15 +258,19 @@ export function LiveTrading() {
         )
       )
       toast.success('Strateji durduruldu')
+      addActivity(`${strategy?.name || 'Strateji'} durduruldu (${strategy?.symbol || ''})`, 'warning')
     } catch (error) {
       toast.error('Strateji durdurulamadı')
       console.error('Stop strategy error:', error)
+      addActivity('Strateji durdurma hatası', 'error')
     }
   }
 
   const removeStrategy = (strategyId: string) => {
+    const strategy = liveStrategies.find(s => s.id === strategyId)
     setLiveStrategies(current => current.filter(s => s.id !== strategyId))
     toast.success('Strateji kaldırıldı')
+    addActivity(`${strategy?.name || 'Strateji'} canlı listeden kaldırıldı`, 'info')
   }
 
   const getStatusColor = (status: LiveStrategy['status']) => {
