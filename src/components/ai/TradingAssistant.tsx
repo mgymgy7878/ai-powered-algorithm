@@ -196,132 +196,143 @@ export function TradingAssistant() {
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
       {/* Header - Sabit üst bar (sticky) */}
-      <div className="sticky top-0 z-20 bg-background px-3 py-2 border-b flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Brain className="w-4 h-4 text-primary" />
-          <span>AI Trading Yöneticisi</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Badge variant="outline" className="text-xs px-2 py-1">
-            {getActiveModel()}
-          </Badge>
-          
-          <Dialog open={showSettings} onOpenChange={setShowSettings}>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowSettings(true)}
-              className="h-6 w-6 p-0"
-            >
-              <Settings className="w-3 h-3" />
-            </Button>
+      <div className="sticky top-0 z-30 bg-background border-b p-2 flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-semibold">
+            <Brain className="w-4 h-4 text-primary" />
+            <span>AI Trading Yöneticisi</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Badge variant="outline" className="text-xs px-2 py-1">
+              {getActiveModel()}
+            </Badge>
             
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>API Ayarları</DialogTitle>
-              </DialogHeader>
+            <Dialog open={showSettings} onOpenChange={setShowSettings}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setShowSettings(true)}
+                className="h-6 w-6 p-0"
+              >
+                <Settings className="w-3 h-3" />
+              </Button>
               
-              <div className="space-y-4">
-                {/* OpenAI Settings */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">OpenAI</Label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowApiKeys(prev => ({ ...prev, openai: !prev.openai }))}
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>API Ayarları</DialogTitle>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  {/* OpenAI Settings */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">OpenAI</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowApiKeys(prev => ({ ...prev, openai: !prev.openai }))}
+                      >
+                        {showApiKeys.openai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <Input
+                      type={showApiKeys.openai ? "text" : "password"}
+                      placeholder="OpenAI API Key"
+                      value={apiSettings.openai?.apiKey || ''}
+                      onChange={(e) => setApiSettings(prev => ({
+                        ...prev,
+                        openai: { ...prev.openai!, apiKey: e.target.value }
+                      }))}
+                    />
+                    <Select
+                      value={apiSettings.openai?.model || 'gpt-4'}
+                      onValueChange={(value) => setApiSettings(prev => ({
+                        ...prev,
+                        openai: { ...prev.openai!, model: value }
+                      }))}
                     >
-                      {showApiKeys.openai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gpt-4">GPT-4</SelectItem>
+                        <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Input
-                    type={showApiKeys.openai ? "text" : "password"}
-                    placeholder="OpenAI API Key"
-                    value={apiSettings.openai?.apiKey || ''}
-                    onChange={(e) => setApiSettings(prev => ({
-                      ...prev,
-                      openai: { ...prev.openai!, apiKey: e.target.value }
-                    }))}
-                  />
-                  <Select
-                    value={apiSettings.openai?.model || 'gpt-4'}
-                    onValueChange={(value) => setApiSettings(prev => ({
-                      ...prev,
-                      openai: { ...prev.openai!, model: value }
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gpt-4">GPT-4</SelectItem>
-                      <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                {/* Anthropic Settings */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">Anthropic Claude</Label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowApiKeys(prev => ({ ...prev, anthropic: !prev.anthropic }))}
+                  {/* Anthropic Settings */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Anthropic Claude</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowApiKeys(prev => ({ ...prev, anthropic: !prev.anthropic }))}
+                      >
+                        {showApiKeys.anthropic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <Input
+                      type={showApiKeys.anthropic ? "text" : "password"}
+                      placeholder="Anthropic API Key"
+                      value={apiSettings.anthropic?.apiKey || ''}
+                      onChange={(e) => setApiSettings(prev => ({
+                        ...prev,
+                        anthropic: { ...prev.anthropic!, apiKey: e.target.value }
+                      }))}
+                    />
+                    <Select
+                      value={apiSettings.anthropic?.model || 'claude-3-sonnet'}
+                      onValueChange={(value) => setApiSettings(prev => ({
+                        ...prev,
+                        anthropic: { ...prev.anthropic!, model: value }
+                      }))}
                     >
-                      {showApiKeys.anthropic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                        <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                        <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Input
-                    type={showApiKeys.anthropic ? "text" : "password"}
-                    placeholder="Anthropic API Key"
-                    value={apiSettings.anthropic?.apiKey || ''}
-                    onChange={(e) => setApiSettings(prev => ({
-                      ...prev,
-                      anthropic: { ...prev.anthropic!, apiKey: e.target.value }
-                    }))}
-                  />
-                  <Select
-                    value={apiSettings.anthropic?.model || 'claude-3-sonnet'}
-                    onValueChange={(value) => setApiSettings(prev => ({
-                      ...prev,
-                      anthropic: { ...prev.anthropic!, model: value }
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
-                      <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
-                      <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                <Button onClick={saveApiSettings} className="w-full">
-                  Ayarları Kaydet
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+                  <Button onClick={saveApiSettings} className="w-full">
+                    Ayarları Kaydet
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
+
+        {/* Sabitlenmiş öneri gizle/göster butonu */}
+        <Button
+          onClick={() => setShowSuggestions(!showSuggestions)}
+          variant="ghost"
+          className="text-[10px] self-start px-2 py-1 h-auto"
+        >
+          {showSuggestions ? (
+            <>
+              <ChevronUp className="w-3 h-3 mr-1" />
+              Önerileri Gizle
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-3 h-3 mr-1" />
+              Önerileri Göster
+            </>
+          )}
+        </Button>
       </div>
 
       {/* AI Önerileri - Gizlenebilir panel */}
       {showSuggestions && (
         <div className="px-3 py-2 bg-muted/30 border-b">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowSuggestions(false)}
-            className="text-xs text-muted-foreground mb-2 h-6 px-2"
-          >
-            <ChevronUp className="w-3 h-3 mr-1" />
-            Önerileri Gizle
-          </Button>
-          
           <div className="grid grid-cols-2 gap-1">
             {suggestions.map((item, index) => (
               <Button
@@ -336,20 +347,6 @@ export function TradingAssistant() {
               </Button>
             ))}
           </div>
-        </div>
-      )}
-
-      {!showSuggestions && (
-        <div className="px-3 py-1 bg-muted/30 border-b">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowSuggestions(true)}
-            className="text-xs text-muted-foreground h-6 px-2"
-          >
-            <ChevronDown className="w-3 h-3 mr-1" />
-            Önerileri Göster
-          </Button>
         </div>
       )}
 
