@@ -42,22 +42,27 @@ export function TradingAssistant() {
 
   // Öneri uygulama fonksiyonu - kullanıcı tarafından tanımlanan komutları kullanır
   const handleSuggestionApply = async (command: string) => {
+    if (isLoading) return // Zaten işlem devam ediyorsa yeni işlem başlatma
+    
+    // Input alanına komutu yaz (kullanıcının görmesi için)
     setInputMessage(command)
     
-    // Kullanıcı mesajını otomatik gönder
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: command,
-      timestamp: new Date()
-    }
+    // Kısa bir gecikme sonrası otomatik gönder
+    setTimeout(async () => {
+      // Kullanıcı mesajını otomatik gönder
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: command,
+        timestamp: new Date()
+      }
 
-    setMessages(prev => [...prev, userMessage])
-    setInputMessage('')
-    setIsLoading(true)
+      setMessages(prev => [...prev, userMessage])
+      setInputMessage('') // Input alanını temizle
+      setIsLoading(true)
 
-    try {
-      const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
+      try {
+        const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
 - Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
 - Ekonomik takvimi ve haber akışını takip edip yorumlamak
 - Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
@@ -66,32 +71,33 @@ export function TradingAssistant() {
 
 Kullanıcı mesajı: ${userMessage.content}`
 
-      const response = await spark.llm(prompt, model)
+        const response = await spark.llm(prompt, model)
 
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date()
+        const assistantMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response,
+          timestamp: new Date()
+        }
+
+        setMessages(prev => [...prev, assistantMessage])
+        await handleAgentActions(userMessage.content)
+
+      } catch (error) {
+        console.error('AI yanıt hatası:', error)
+        
+        const errorMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
+          timestamp: new Date()
+        }
+
+        setMessages(prev => [...prev, errorMessage])
+      } finally {
+        setIsLoading(false)
       }
-
-      setMessages(prev => [...prev, assistantMessage])
-      await handleAgentActions(userMessage.content)
-
-    } catch (error) {
-      console.error('AI yanıt hatası:', error)
-      
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
+    }, 300) // 300ms gecikme ile kullanıcı mesajı görür
   }
 
   // Otomatik kaydırma - yeni mesaj geldiğinde en alta git
