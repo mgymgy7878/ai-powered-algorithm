@@ -11,7 +11,7 @@ export interface Notification {
   title: string
   message: string
   type: 'success' | 'warning' | 'error' | 'info'
-  timestamp: Date
+  timestamp: Date | string // KV storage'dan gelen değer string olabilir
   read: boolean
 }
 
@@ -38,9 +38,17 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
   }
 
   // Zaman formatla
-  const formatTime = (date: Date) => {
+  const formatTime = (date: Date | string) => {
     const now = new Date()
-    const diff = now.getTime() - date.getTime()
+    // KV storage'dan gelen tarihi Date objesine çevir
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    // Geçerli bir tarih olup olmadığını kontrol et
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      return 'Bilinmeyen zaman'
+    }
+    
+    const diff = now.getTime() - dateObj.getTime()
     
     if (diff < 60000) return 'Az önce'
     if (diff < 3600000) return `${Math.floor(diff / 60000)} dk önce`

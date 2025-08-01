@@ -1239,7 +1239,9 @@ public class ${safeName.replace(/\s+/g, '')}Strategy : Strategy
                             <div>
                               <span className="text-muted-foreground">Çalışma Süresi</span>
                               <div className="font-semibold">
-                                {Math.ceil((Date.now() - new Date(strategy.liveStats.startDate).getTime()) / (1000 * 60 * 60 * 24))} gün
+                                {strategy.liveStats?.startDate ? 
+                                  Math.ceil((Date.now() - new Date(strategy.liveStats.startDate).getTime()) / (1000 * 60 * 60 * 24)) 
+                                  : 0} gün
                               </div>
                             </div>
                           </div>

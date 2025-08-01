@@ -270,7 +270,7 @@ class BacktestEngine {
         status: 'completed',
         startTime,
         endTime: new Date().toISOString(),
-        duration: Date.now() - new Date(startTime).getTime()
+        duration: startTime ? Date.now() - new Date(startTime).getTime() : 0
       }
 
     } catch (error) {

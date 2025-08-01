@@ -303,7 +303,9 @@ export function RunningStrategies() {
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">Çalışma Süresi:</span>
                           <span className="text-sm">
-                            {Math.floor((Date.now() - new Date(selectedStrategyData.startTime).getTime()) / (1000 * 60 * 60))}h
+                            {selectedStrategyData?.startTime ? 
+                              Math.floor((Date.now() - new Date(selectedStrategyData.startTime).getTime()) / (1000 * 60 * 60)) 
+                              : 0}h
                           </span>
                         </div>
                       </div>
