@@ -195,8 +195,8 @@ export function TradingAssistant() {
 
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Header - Sabit üst bar (sticky) */}
-      <div className="sticky top-0 z-30 bg-background border-b p-2 flex flex-col gap-1 font-thin text-xs">
+      {/* Header - Sabit üst bar (sticky) - gereksiz boşluk kaldırıldı */}
+      <div className="sticky top-0 z-30 bg-background border-b px-2 py-1 flex flex-col gap-1 font-thin text-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-semibold">
             <Brain className="w-4 h-4 text-primary" />
@@ -310,11 +310,11 @@ export function TradingAssistant() {
           </div>
         </div>
 
-        {/* Sabitlenmiş öneri gizle/göster butonu */}
+        {/* Sabitlenmiş öneri gizle/göster butonu - padding azaltıldı */}
         <Button
           onClick={() => setShowSuggestions(!showSuggestions)}
           variant="ghost"
-          className="text-[10px] self-start px-2 py-1 h-auto"
+          className="text-[10px] self-start px-1 py-0.5 h-auto"
         >
           {showSuggestions ? (
             <>
@@ -329,10 +329,10 @@ export function TradingAssistant() {
           )}
         </Button>
       </div>
-      {/* AI Önerileri - Gizlenebilir panel */}
+      {/* AI Önerileri - Gizlenebilir panel - taşma sorunu düzeltildi */}
       {showSuggestions && (
-        <div className="px-3 py-2 bg-muted/30 border-b font-thin">
-          <div className="grid grid-cols-2 gap-1">
+        <div className="px-2 py-1 bg-muted/30 border-b font-thin">
+          <div className="flex flex-wrap gap-1">
             {suggestions.map((item, index) => (
               <Button
                 key={index}
@@ -340,7 +340,7 @@ export function TradingAssistant() {
                 size="sm"
                 onClick={() => handleSuggestionApply(item.command)}
                 disabled={isLoading}
-                className="text-xs h-7 px-2 justify-start"
+                className="text-[9px] h-6 px-2 justify-start flex-shrink-0"
               >
                 {item.label}
               </Button>
@@ -348,9 +348,9 @@ export function TradingAssistant() {
           </div>
         </div>
       )}
-      {/* Chat Messages - Kaydırılabilir alan */}
-      <ScrollArea className="flex-1 px-3 py-2">
-        <div className="space-y-3">
+      {/* Chat Messages - Kaydırılabilir alan - padding azaltıldı */}
+      <ScrollArea className="flex-1 px-2 py-1">
+        <div className="space-y-2">
           {messages.map((message) => (
             <div key={message.id} className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {message.role === 'assistant' && (
@@ -359,13 +359,13 @@ export function TradingAssistant() {
                 </div>
               )}
               
-              <div className={`rounded-lg px-3 py-2 max-w-[85%] text-sm ${
+              <div className={`rounded-lg px-2 py-1 max-w-[85%] text-xs ${
                 message.role === 'user'
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted'
               }`}>
-                <p className="whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-1 opacity-70 ${
+                <p className="whitespace-pre-wrap leading-tight">{message.content}</p>
+                <p className={`text-[10px] mt-0.5 opacity-70 ${
                   message.role === 'user' ? 'text-primary-foreground' : 'text-muted-foreground'
                 }`}>
                   {message.timestamp.toLocaleTimeString('tr-TR', { 
@@ -388,9 +388,9 @@ export function TradingAssistant() {
               <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                 <Brain className="w-3 h-3 text-primary-foreground" />
               </div>
-              <div className="bg-muted rounded-lg px-3 py-2 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Düşünüyor...</span>
+              <div className="bg-muted rounded-lg px-2 py-1 flex items-center gap-2">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span className="text-xs text-muted-foreground">Düşünüyor...</span>
               </div>
             </div>
           )}
@@ -398,27 +398,27 @@ export function TradingAssistant() {
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
-      {/* Input Area - Sabit alt bar */}
-      <div className="border-t p-3 bg-background">
-        <div className="flex gap-2 items-center">
+      {/* Input Area - Sabit alt bar - padding azaltıldı */}
+      <div className="border-t px-2 py-2 bg-background">
+        <div className="flex gap-1 items-center">
           <Input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="AI'a mesaj yaz..."
-            className="flex-1 text-sm"
+            className="flex-1 text-xs h-8"
             onKeyDown={handleKeyPress}
             disabled={isLoading}
           />
           <Button 
             onClick={() => sendMessage()} 
             disabled={!inputMessage.trim() || isLoading} 
-            size="icon"
-            className="flex-shrink-0"
+            size="sm"
+            className="flex-shrink-0 h-8 w-8 p-0"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-3 h-3 animate-spin" />
             ) : (
-              <Send className="w-4 h-4" />
+              <Send className="w-3 h-3" />
             )}
           </Button>
         </div>
