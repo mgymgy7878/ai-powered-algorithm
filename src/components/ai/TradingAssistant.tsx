@@ -1,191 +1,202 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Brain, Send, Loader2, User, Settin
+import { Input } from '@/components/ui/input'
+import { Card } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { useKV } from '@github/spark/hooks'
 import { Brain, Send, Loader2, User, Settings } from '@phosphor-icons/react'
 
-  content: string
 interface ChatMessage {
-
+  id: string
   role: 'user' | 'assistant'
-    {
+  content: string
   timestamp: Date
 }
 
 export function TradingAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([
-  con
+    {
       id: '1',
       role: 'assistant',
       content: 'Merhaba! AI Trading Yöneticinizim. Size piyasa analizi, strateji önerileri ve portföy değerlendirmesi konularında yardımcı olabilirim. Nasıl yardımcı olabilirim?',
-  useEffect(() => {
+      timestamp: new Date()
     }
-
+  ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [apiSettings] = useKV('api-settings', {})
+  const [apiKey, setApiKey] = useKV<string>('openai-api-key', '')
+  
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Mesajlar değiştiğinde en alta kaydır
+  // Otomatik kaydırma - yeni mesaj geldiğinde en alta git
   useEffect(() => {
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const saveApiKey = () => {
+    // API key zaten useKV ile otomatik kaydediliyor
+    console.log('API key kaydedildi')
   }
 
-  // AI ile mesaj gönderme
   const sendMessage = async () => {
-    if (!inputMessage.trim()) return
+    if (!inputMessage.trim() || isLoading) return
 
-    // API ayarları kontrolü
-    if (!apiSettings?.openai?.apiKey && !apiSettings?.anthropic?.apiKey) {
-      // API ayarları sayfasına yönlendir
-      window.dispatchEvent(new CustomEvent('navigate-to-settings'))
-      return
-    }
-
-    if (!inputMessage.
-
-    if (!checkApiSettings()) {
+    // Kullanıcı mesajını ekle
     const userMessage: ChatMessage = {
-    }
+      id: Date.now().toString(),
       role: 'user',
-
+      content: inputMessage.trim(),
       timestamp: new Date()
     }
 
     setMessages(prev => [...prev, userMessage])
     setInputMessage('')
+    setIsLoading(true)
 
     try {
-    } finally {
-    }
+      // AI yanıtı için prompt oluştur
+      const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
+- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
+- Ekonomik takvimi ve haber akışını takip edip yorumlamak
+- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+- Türkçe yanıtlar üretmek
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-      e.preventDefault()
-    }
+Kullanıcı mesajı: ${userMessage.content}`
 
+      // AI'dan yanıt al
+      const response = await spark.llm(prompt)
 
-      <div className="p-3 border-b bg-muted/30
+      // AI yanıtını ekle
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: response,
+        timestamp: new Date()
+      }
 
-          <Badge variant="secondary" className="text-xs ml-auto">
+      setMessages(prev => [...prev, assistantMessage])
 
-            variant="ghost"
+    } catch (error) {
+      console.error('AI yanıt hatası:', error)
       
-          >
-          </Button>
+      // Hata mesajı ekle
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
+        timestamp: new Date()
+      }
+
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
+  return (
+    <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
+      {/* Başlık */}
+      <div className="p-3 border-b bg-muted/50 flex items-center gap-2">
+        <Brain className="w-5 h-5" />
+        <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
       </div>
-      {/* API Setup ekranı *
-        <div className="p-3 b
-       
 
-                value={tempApiKey}
-                class
-              />
-                Kaydet
-            </div>
-              API anahtarı
+      {/* API Key Ayarı */}
+      {!apiKey && (
+        <div className="p-2 bg-yellow-50 border-b">
+          <div className="flex gap-2 items-center">
+            <Input
+              placeholder="OpenAI API Key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="text-xs"
+              type="password"
+            />
+            <Button onClick={saveApiKey} size="sm">Kaydet</Button>
           </div>
-      )}
-      {
-        <div className="flex-1 flex items-center j
-            <Se
-              AI ile konu
-     
-   
-
-            </Button>
         </div>
-
-      {checkApiSettings(
-          <div clas
-     
-   
-
-          
-                  message.role === 'user' 
-                    : 'bg-
-                  <p className="whitespace-pre-w
-                    {message.timestamp.toLocaleTi
-                      minute: '2-digit' 
-                  </p>
-
-                 
-                  
-              
-            
-
-                  <Brain className="w-4 h-4 t
-                <div className="bg-muted px-2 py-1 rounded-md text-sm 
-                  <span>Düşünüyor...
-              </div>
-            <div ref={messagesEndRef} />
-
-          <div className="border-t p-3 flex gap-2 items-ce
-              placeh
-              
-            
-            <Button
-              disabled={!inputMessage.
-              className="h-8 w-8"
-              {isLoading ? (
-              ) 
-              )}
-          </div>
       )}
+
+      {/* Mesaj Listesi */}
+      <ScrollArea className="flex-1 p-3">
+        <div className="space-y-3">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex items-start gap-2 ${
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              }`}
+            >
+              {message.role === 'assistant' && (
+                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center mt-1">
+                  <Brain className="w-3 h-3 text-primary-foreground" />
+                </div>
+              )}
+              
+              <div
+                className={`rounded-md text-sm px-2 py-1 max-w-[85%] whitespace-pre-wrap ${
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground ml-8'
+                    : 'bg-muted text-foreground'
+                }`}
+              >
+                {message.content}
+              </div>
+
+              {message.role === 'user' && (
+                <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center mt-1">
+                  <User className="w-3 h-3 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+          ))}
+          
+          {isLoading && (
+            <div className="flex items-start gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center mt-1">
+                <Brain className="w-3 h-3 text-primary-foreground" />
+              </div>
+              <div className="bg-muted text-foreground rounded-md px-2 py-1 text-sm">
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </div>
+            </div>
+          )}
+        </div>
+        <div ref={messagesEndRef} />
+      </ScrollArea>
+
+      {/* Mesaj Gönderme Alanı */}
+      <div className="border-t p-3 flex gap-2 items-center bg-background">
+        <Input
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="AI'a mesaj yaz..."
+          className="flex-1 text-sm"
+          disabled={isLoading}
+        />
+        <Button 
+          onClick={sendMessage} 
+          disabled={!inputMessage.trim() || isLoading} 
+          size="icon"
+          className="h-9 w-9"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
+        </Button>
+      </div>
+    </Card>
   )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
