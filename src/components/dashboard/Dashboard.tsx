@@ -93,12 +93,10 @@ export function Dashboard() {
       <div className="absolute top-1 right-4 w-[280px] z-50">
         <NotificationCenter />
       </div>
-
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
       <div className="absolute top-14 right-4 w-[280px] z-20">
         <TradingAssistant />
       </div>
-
       {/* Portfolio Metrics - Kompakt yatay dizilim */}
       <div className={`${contentPadding} pt-0`}>
         <div className="flex flex-wrap items-center justify-start gap-1 w-full">
@@ -142,11 +140,10 @@ export function Dashboard() {
           </div>
         </div>
       </div>
-
       {/* Ana İçerik Alanı */}
       <div className={`${contentPadding}`}>
         {/* Hızlı İstatistikler - Kompakt yatay dizilim */}
-        <div className="flex flex-wrap items-center justify-start gap-1 w-full mt-2">
+        <div className="flex flex-wrap items-center justify-start gap-1 w-full mt-2 text-xs">
           <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[110px] flex flex-col">
             <span className="text-muted-foreground">Aktif İşlemler</span>
             <span className="font-semibold text-sm text-foreground">12</span>
@@ -251,5 +248,5 @@ export function Dashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
