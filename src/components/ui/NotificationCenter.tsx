@@ -145,7 +145,7 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
 
       {/* Geçmiş Bildirimler Dropdown */}
       {isDropdownOpen && (
-        <Card className="absolute top-full left-0 mt-1 w-[320px] max-h-[300px] shadow-lg border z-[999] bg-background">
+        <Card className="absolute top-full left-0 mt-1 w-[320px] max-h-[300px] shadow-lg border z-[9999] bg-background">
           {/* Başlık */}
           <div className="p-2 border-b flex items-center justify-between bg-muted/50">
             <span className="text-xs font-semibold">Bildirimler</span>
