@@ -82,28 +82,22 @@ export function Dashboard() {
         <TradingAssistant />
       </div>
 
-      {/* Son Aktiviteler Dropdown - Sağ üst köşede aktivite ikonu */}
+      {/* Geçmiş Bildirimler Dropdown - Sağ üst köşede aktivite ikonu */}
       <div className="absolute top-4 right-[390px] z-40">
-        <div className="flex gap-2 items-center">
-          {/* Test butonu - geliştirme amaçlı */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => {
-              // Test trading sinyalleri gönder
-              activityMonitor.notifyTradeSignal('BTCUSDT', 'buy', 42500, 0.025)
-              setTimeout(() => activityMonitor.notifyStrategyEvent('Grid Bot ETHUSDT', 'profit', '+$145'), 2000)
-              setTimeout(() => activityMonitor.notifyAIRecommendation('Volatilite artıyor, pozisyon boyutlarını azaltın', 'high'), 4000)
-              setTimeout(() => activityMonitor.notifyRiskAlert('Stop-loss seviyeleri dar tutuluyor', 'medium'), 6000)
-            }}
-            className="text-xs"
-          >
-            🔔 Test
-          </Button>
-          
-          <DropdownMenu>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="rounded-full relative">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="rounded-full relative hover:bg-muted transition-colors"
+              onClick={() => {
+                // Test trading sinyalleri gönder (tıklama ile aktivasyon)
+                activityMonitor.notifyTradeSignal('BTCUSDT', 'buy', 42500, 0.025)
+                setTimeout(() => activityMonitor.notifyStrategyEvent('Grid Bot ETHUSDT', 'profit', '+$145'), 2000)
+                setTimeout(() => activityMonitor.notifyAIRecommendation('Volatilite artıyor, pozisyon boyutlarını azaltın', 'high'), 4000)
+                setTimeout(() => activityMonitor.notifyRiskAlert('Stop-loss seviyeleri dar tutuluyor', 'medium'), 6000)
+              }}
+            >
               <Bell className="w-4 h-4" />
               {activities.length > 0 && (
                 <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
@@ -111,7 +105,7 @@ export function Dashboard() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-80" align="end">
-            <DropdownMenuLabel>Son Aktiviteler</DropdownMenuLabel>
+            <DropdownMenuLabel>Geçmiş Bildirimler</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-[400px] overflow-y-auto">
               {activities.slice(0, 10).map((activity) => (
@@ -126,12 +120,11 @@ export function Dashboard() {
             </div>
             {activities.length === 0 && (
               <div className="text-center py-6 text-muted-foreground text-sm">
-                Henüz aktivite bulunmuyor
+                Henüz bildirim bulunmuyor
               </div>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
-        </div>
       </div>
 
 
