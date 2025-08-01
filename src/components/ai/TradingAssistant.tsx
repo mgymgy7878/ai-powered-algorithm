@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useKV } from '@github/spark/hooks'
 import { Brain, Send, Loader2, User, Settings } from '@phosphor-icons/react'
 
@@ -26,6 +27,7 @@ export function TradingAssistant() {
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [apiKey, setApiKey] = useKV<string>('openai-api-key', '')
+  const [model, setModel] = useKV<string>('ai-model', 'gpt-4o')
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -65,8 +67,8 @@ export function TradingAssistant() {
 
 Kullanıcı mesajı: ${userMessage.content}`
 
-      // AI'dan yanıt al
-      const response = await spark.llm(prompt)
+      // AI'dan yanıt al - seçilen modeli kullan
+      const response = await spark.llm(prompt, model)
 
       // AI yanıtını ekle
       const assistantMessage: ChatMessage = {
@@ -104,10 +106,24 @@ Kullanıcı mesajı: ${userMessage.content}`
 
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Başlık */}
-      <div className="p-3 border-b bg-muted/50 flex items-center gap-2">
-        <Brain className="w-5 h-5" />
-        <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
+      {/* Başlık ve Model Seçimi */}
+      <div className="p-3 border-b bg-muted/50 flex items-center gap-2 justify-between">
+        <div className="flex items-center gap-2">
+          <Brain className="w-5 h-5" />
+          <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
+        </div>
+        
+        {/* Model Seçimi */}
+        <Select onValueChange={setModel} value={model}>
+          <SelectTrigger className="w-32 text-xs h-7">
+            <SelectValue placeholder="Model Seç" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+            <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+            <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* API Key Ayarı */}
