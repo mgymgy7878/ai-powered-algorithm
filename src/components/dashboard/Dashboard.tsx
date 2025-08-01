@@ -52,22 +52,25 @@ export function Dashboard() {
 
   return (
     <div className="relative min-h-screen bg-background">
-      {/* Ana Metrikler - Üst satırda tek sıra */}
-      <div className="absolute top-2 left-[60px] right-[300px] z-40 flex items-center gap-2 overflow-hidden">
-        {mainMetrics.map((metric, index) => (
-          <div 
-            key={index}
-            className="bg-muted rounded-md px-2 py-1 text-[10px] min-w-[100px] max-w-[120px] text-center shadow-sm flex-shrink-0"
-          >
-            <p className="text-muted-foreground truncate font-medium">{metric.label}</p>
-            <p className={`font-semibold text-sm ${metric.color} truncate`}>{metric.value}</p>
-          </div>
-        ))}
-      </div>
+      {/* Ana Metrikler ve Bildirim Merkezi - Tek satırda hizalı */}
+      <div className="absolute top-2 left-[60px] right-4 z-40 flex items-center gap-0 overflow-hidden">
+        {/* Metrik kutuları */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {mainMetrics.map((metric, index) => (
+            <div 
+              key={index}
+              className="bg-muted rounded-md px-2 py-1 text-[10px] min-w-[100px] max-w-[120px] text-center shadow-sm flex-shrink-0"
+            >
+              <p className="text-muted-foreground truncate font-medium">{metric.label}</p>
+              <p className={`font-semibold text-sm ${metric.color} truncate`}>{metric.value}</p>
+            </div>
+          ))}
+        </div>
 
-      {/* Bildirim Merkezi - Sağ üst köşede sabitlenmiş */}
-      <div className="absolute top-2 right-4 w-[280px] z-50">
-        <NotificationCenter />
+        {/* Bildirim Merkezi - Metriklerden hemen sonra başlayacak şekilde genişletilmiş */}
+        <div className="flex-1 ml-2 z-50">
+          <NotificationCenter />
+        </div>
       </div>
       
       {/* Yapay Zeka Trading Yöneticisi - Bildirim kutusunun altında */}
