@@ -5,7 +5,7 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { TrendingUp, TrendingDown, BarChart } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
-import { NotificationCenter, addNotification } from '../ui/NotificationCenter'
+import { NotificationCenter, type Notification } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 
 interface PortfolioMetrics {
@@ -20,8 +20,25 @@ export function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const { activities, addActivity } = useActivity()
   
-  // Otomatik bildirimler için sayaç
-  const [notificationTimer, setNotificationTimer] = useState(0)
+  // Bildirimler için state
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: '1',
+      message: 'AI Trading Platformu başarıyla başlatıldı',
+      time: '2 dakika önce',
+      type: 'success'
+    }
+  ])
+  
+  // Bildirim ekleme fonksiyonu
+  const addNotification = (notif: Omit<Notification, 'id' | 'time'>) => {
+    const newNotification: Notification = {
+      ...notif,
+      id: Date.now().toString(),
+      time: 'şimdi'
+    }
+    setNotifications(prev => [newNotification, ...prev.slice(0, 9)]) // Son 10 bildirimi tut
+  }
   
   // Sidebar durumu değişikliklerini dinle
   useEffect(() => {
@@ -94,8 +111,8 @@ export function Dashboard() {
       </div>
 
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
-      <div className="absolute top-4 right-4 z-50">
-        <NotificationCenter />
+      <div className="absolute top-4 right-4 w-[360px] z-50">
+        <NotificationCenter notifications={notifications} />
       </div>
 
       {/* Test Bildirimleri Butonu (geliştirme amaçlı) */}
