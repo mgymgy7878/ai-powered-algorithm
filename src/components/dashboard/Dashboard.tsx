@@ -107,59 +107,59 @@ export function Dashboard() {
       {/* Ana İçerik Alanı */}
       <div className={`${contentPadding}`}>
         
-        {/* Hızlı İstatistikler - Küçültülmüş boyutlar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-          <Card className="h-auto">
-            <CardContent className="p-2">
+        {/* Hızlı İstatistikler - %50 küçültülmüş boyutlar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-3">
+          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
+            <CardContent className="!p-1.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Aktif İşlemler</p>
-                  <p className="text-base font-bold">12</p>
+                  <p className="!text-[10px] !text-muted-foreground">Aktif İşlemler</p>
+                  <p className="!text-sm !font-semibold">12</p>
                 </div>
-                <div className="h-5 w-5 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-3 w-3 text-green-600" />
+                <div className="h-3 w-3 bg-green-100 rounded-full flex items-center justify-center">
+                  <TrendingUp className="h-2 w-2 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="h-auto">
-            <CardContent className="p-2">
+          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
+            <CardContent className="!p-1.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Toplam İşlem</p>
-                  <p className="text-base font-bold">1,247</p>
+                  <p className="!text-[10px] !text-muted-foreground">Toplam İşlem</p>
+                  <p className="!text-sm !font-semibold">1,247</p>
                 </div>
-                <div className="h-5 w-5 bg-blue-100 rounded-full flex items-center justify-center">
-                  <BarChart className="h-3 w-3 text-blue-600" />
+                <div className="h-3 w-3 bg-blue-100 rounded-full flex items-center justify-center">
+                  <BarChart className="h-2 w-2 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="h-auto">
-            <CardContent className="p-2">
+          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
+            <CardContent className="!p-1.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Ortalama Getiri</p>
-                  <p className="text-base font-bold text-green-600">+2.4%</p>
+                  <p className="!text-[10px] !text-muted-foreground">Ortalama Getiri</p>
+                  <p className="!text-sm !font-semibold text-green-600">+2.4%</p>
                 </div>
-                <div className="h-5 w-5 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-3 w-3 text-green-600" />
+                <div className="h-3 w-3 bg-green-100 rounded-full flex items-center justify-center">
+                  <TrendingUp className="h-2 w-2 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="h-auto">
-            <CardContent className="p-2">
+          <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
+            <CardContent className="!p-1.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Max Drawdown</p>
-                  <p className="text-base font-bold text-red-600">-5.2%</p>
+                  <p className="!text-[10px] !text-muted-foreground">Max Drawdown</p>
+                  <p className="!text-sm !font-semibold text-red-600">-5.2%</p>
                 </div>
-                <div className="h-5 w-5 bg-red-100 rounded-full flex items-center justify-center">
-                  <TrendingDown className="h-3 w-3 text-red-600" />
+                <div className="h-3 w-3 bg-red-100 rounded-full flex items-center justify-center">
+                  <TrendingDown className="h-2 w-2 text-red-600" />
                 </div>
               </div>
             </CardContent>
