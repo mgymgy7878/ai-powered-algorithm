@@ -6,6 +6,7 @@ import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { TrendingUp, TrendingDown, BarChart, Bell } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
+import { useActivity } from '../../contexts/ActivityContext'
 
 interface PortfolioMetrics {
   totalValue: number
@@ -15,16 +16,9 @@ interface PortfolioMetrics {
   activeStrategies: number
 }
 
-interface Activity {
-  id: string
-  title: string
-  timeAgo: string
-  color: string
-  type: 'success' | 'info' | 'warning' | 'error'
-}
-
 export function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const { activities, addActivity } = useActivity()
   
   // Sidebar durumu değişikliklerini dinle
   useEffect(() => {
@@ -46,52 +40,6 @@ export function Dashboard() {
     winRate: 68.5,
     activeStrategies: 3
   })
-
-  // Son aktiviteler verisi
-  const [activities] = useKV<Activity[]>('recent-activities', [
-    {
-      id: '1',
-      title: 'Grid Bot stratejisi başlatıldı',
-      timeAgo: '2 dakika önce',
-      color: 'bg-green-500',
-      type: 'success'
-    },
-    {
-      id: '2',
-      title: 'BTCUSDT alım sinyali',
-      timeAgo: '5 dakika önce',
-      color: 'bg-blue-500',
-      type: 'info'
-    },
-    {
-      id: '3',
-      title: 'Backtest tamamlandı',
-      timeAgo: '12 dakika önce',
-      color: 'bg-yellow-500',
-      type: 'warning'
-    },
-    {
-      id: '4',
-      title: 'Stop-loss tetiklendi',
-      timeAgo: '18 dakika önce',
-      color: 'bg-red-500',
-      type: 'error'
-    },
-    {
-      id: '5',
-      title: 'ETHUSDT satış işlemi tamamlandı',
-      timeAgo: '25 dakika önce',
-      color: 'bg-green-500',
-      type: 'success'
-    },
-    {
-      id: '6',
-      title: 'AI strateji önerisi oluşturuldu',
-      timeAgo: '32 dakika önce',
-      color: 'bg-blue-500',
-      type: 'info'
-    }
-  ])
 
   const formatCurrency = (value: number | undefined) => {
     return new Intl.NumberFormat('en-US', {
@@ -116,7 +64,18 @@ export function Dashboard() {
 
       {/* Son Aktiviteler Dropdown - Sağ üst köşede aktivite ikonu */}
       <div className="absolute top-4 right-[390px] z-40">
-        <DropdownMenu>
+        <div className="flex gap-2 items-center">
+          {/* Test butonu - geliştirme amaçlı */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => addActivity('Test aktivitesi eklendi', 'success')}
+            className="text-xs"
+          >
+            Test
+          </Button>
+          
+          <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full relative">
               <Bell className="w-4 h-4" />
@@ -146,6 +105,7 @@ export function Dashboard() {
             )}
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
 
 

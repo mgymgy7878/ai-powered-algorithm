@@ -11,6 +11,7 @@ import { TradingAssistant } from './components/ai/TradingAssistant'
 import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import { APISettings } from './components/settings/APISettings'
 import { Toaster } from './components/ui/sonner'
+import { ActivityProvider } from './contexts/ActivityContext'
 import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
@@ -95,20 +96,22 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="flex">
-        <Sidebar 
-          currentView={currentView} 
-          onViewChange={setCurrentView}
-          strategyCount={strategies?.length ?? 0}
-          runningStrategiesCount={liveStrategies?.length ?? 0}
-        />
-        <main className="flex-1 overflow-hidden">
-          {renderView()}
-        </main>
+    <ActivityProvider>
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="flex">
+          <Sidebar 
+            currentView={currentView} 
+            onViewChange={setCurrentView}
+            strategyCount={strategies?.length ?? 0}
+            runningStrategiesCount={liveStrategies?.length ?? 0}
+          />
+          <main className="flex-1 overflow-hidden">
+            {renderView()}
+          </main>
+        </div>
+        <Toaster />
       </div>
-      <Toaster />
-    </div>
+    </ActivityProvider>
   )
 }
 

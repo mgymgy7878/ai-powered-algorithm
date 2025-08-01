@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useKV } from '@github/spark/hooks'
+import { useActivity } from '@/contexts/ActivityContext'
 import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp } from '@phosphor-icons/react'
 
 interface ChatMessage {
@@ -16,6 +17,7 @@ interface ChatMessage {
 }
 
 export function TradingAssistant() {
+  const { addActivity } = useActivity()
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -200,6 +202,38 @@ Kullanıcı mesajı: ${userMessage.content}`
   const handleAgentActions = async (message: string) => {
     const content = message.toLowerCase()
 
+    // Strateji başlatma komutları
+    if (content.includes("strateji başlat") || content.includes("grid bot")) {
+      try {
+        await startStrategy("grid-bot")
+        addActivity('Grid Bot stratejisi AI tarafından başlatıldı', 'success')
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: '✅ Grid Bot stratejisi başarıyla başlatıldı ve çalışmaya başladı.',
+          timestamp: new Date()
+        }])
+      } catch (error) {
+        addActivity('Grid Bot stratejisi başlatılamadı', 'error')
+      }
+    }
+
+    // Strateji durdurma komutları
+    if (content.includes("strateji durdur") || content.includes("stratejileri durdur")) {
+      try {
+        await stopStrategy("scalper")
+        addActivity('Scalper stratejisi AI tarafından durduruldu', 'warning')
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: '⏸️ Aktif stratejiler durduruldu.',
+          timestamp: new Date()
+        }])
+      } catch (error) {
+        addActivity('Strateji durdurulamadı', 'error')
+      }
+    }
+
     // Ekonomik takvim sorguları
     if (content.includes("ekonomik olay") || content.includes("yüksek etkili")) {
       try {
@@ -298,31 +332,10 @@ Kullanıcı mesajı: ${userMessage.content}`
       }
     }
 
-    // Grid bot stratejisi başlatma
-    if (content.includes("grid bot") && content.includes("başlat")) {
-      await startStrategy("grid-bot")
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: '✅ Grid-bot stratejisi başarıyla başlatıldı.',
-        timestamp: new Date()
-      }])
-    }
-
-    // Genel strateji durdurma
-    if (content.includes("durdur") || content.includes("kapat")) {
-      await stopStrategy("aktif-strateji")
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: '⏹️ Aktif strateji durduruldu.',
-        timestamp: new Date()
-      }])
-    }
-
-    // Portföy değerlendirmesi
-    if (content.includes("portföyü değerlendir") || content.includes("portföy analizi")) {
+    // Portföy analizi
+    if (content.includes("portföy") && (content.includes("değerlendir") || content.includes("analiz"))) {
       const p = await fetchPortfolioData()
+      addActivity('AI portföy analizi tamamlandı', 'info')
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
@@ -340,6 +353,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         general: "Kripto piyasalar pozitif seyirde"
       }
       
+      addActivity('AI piyasa özeti oluşturuldu', 'info')
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
@@ -358,6 +372,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         avgLoss: -95.25
       }
       
+      addActivity('AI K/Z analizi tamamlandı', 'info')
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
