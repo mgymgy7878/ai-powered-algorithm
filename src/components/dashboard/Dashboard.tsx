@@ -14,6 +14,10 @@ interface PortfolioMetrics {
   totalPnL: number
   winRate: number
   activeStrategies: number
+  activeTrades: number
+  totalTrades: number
+  avgReturn: number
+  maxDrawdown: number
 }
 
 export function Dashboard() {
@@ -70,7 +74,11 @@ export function Dashboard() {
     dailyPnL: 1250.50,
     totalPnL: 8750.25,
     winRate: 68.5,
-    activeStrategies: 3
+    activeStrategies: 3,
+    activeTrades: 12,
+    totalTrades: 1247,
+    avgReturn: 2.4,
+    maxDrawdown: -5.2
   })
 
   const formatCurrency = (value: number | undefined) => {
@@ -84,48 +92,42 @@ export function Dashboard() {
     return `${(value ?? 0).toFixed(2)}%`
   }
 
+  // Dashboard gösterge kutuları - üst kısım
+  const topMetrics = [
+    { label: "Portföy Değeri", value: formatCurrency(portfolioMetrics.totalValue), color: 'text-primary' },
+    { label: "Günlük K/Z", value: formatCurrency(portfolioMetrics.dailyPnL), color: portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600', icon: portfolioMetrics.dailyPnL >= 0 ? TrendingUp : TrendingDown },
+    { label: "Toplam K/Z", value: formatCurrency(portfolioMetrics.totalPnL), color: portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600' },
+    { label: "Başarı Oranı", value: formatPercentage(portfolioMetrics.winRate), color: 'text-blue-600' },
+    { label: "Aktif Stratejiler", value: portfolioMetrics.activeStrategies.toString(), color: 'text-green-500', pulse: true }
+  ]
+
+  // Alt metrikler (görünmeyenler)
+  const bottomMetrics = [
+    { label: "Aktif İşlemler", value: portfolioMetrics.activeTrades.toString(), color: 'text-orange-600' },
+    { label: "Toplam İşlem", value: portfolioMetrics.totalTrades.toLocaleString(), color: 'text-blue-500' },
+    { label: "Ortalama Getiri", value: `+${portfolioMetrics.avgReturn.toFixed(1)}%`, color: 'text-green-600' },
+    { label: "Max Drawdown", value: `${portfolioMetrics.maxDrawdown.toFixed(1)}%`, color: 'text-red-600' }
+  ]
+
   return (
     <div className="relative p-2 space-y-2">
       {/* Portfolio Metrics - Ekranın en üstünde, menü ile bildirim arasında */}
       <div className="absolute top-3 left-[60px] right-[280px] z-40 px-2 flex items-center gap-2 overflow-x-auto">
-        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-          <p className="text-muted-foreground truncate">Portföy Değeri</p>
-          <p className="font-semibold text-xs text-primary">{formatCurrency(portfolioMetrics.totalValue)}</p>
-        </div>
-        
-        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-          <p className="text-muted-foreground truncate">Günlük K/Z</p>
-          <div className="flex items-center justify-center gap-1">
-            <p className={`font-semibold text-xs ${portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(portfolioMetrics.dailyPnL)}
-            </p>
-            {portfolioMetrics.dailyPnL >= 0 ? (
-              <TrendingUp className="h-2 w-2 text-green-600" />
-            ) : (
-              <TrendingDown className="h-2 w-2 text-red-600" />
-            )}
-          </div>
-        </div>
-        
-        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-          <p className="text-muted-foreground truncate">Toplam K/Z</p>
-          <p className={`font-semibold text-xs ${portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatCurrency(portfolioMetrics.totalPnL)}
-          </p>
-        </div>
-        
-        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-          <p className="text-muted-foreground truncate">Başarı Oranı</p>
-          <p className="font-semibold text-xs text-blue-600">{formatPercentage(portfolioMetrics.winRate)}</p>
-        </div>
-        
-        <div className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
-          <p className="text-muted-foreground truncate">Aktif Stratejiler</p>
-          <div className="flex items-center justify-center gap-1">
-            <p className="font-semibold text-xs text-green-500">{portfolioMetrics.activeStrategies}</p>
-            <div className="h-1 w-1 bg-green-500 rounded-full animate-pulse"></div>
-          </div>
-        </div>
+        {topMetrics.map((metric, index) => {
+          const IconComponent = metric.icon
+          return (
+            <div key={index} className="bg-muted rounded-md px-2 py-1 text-[11px] min-w-[100px] text-center shadow-sm">
+              <p className="text-muted-foreground truncate">{metric.label}</p>
+              <div className="flex items-center justify-center gap-1">
+                <p className={`font-semibold text-xs ${metric.color}`}>
+                  {metric.value}
+                </p>
+                {IconComponent && <IconComponent className="h-2 w-2" />}
+                {metric.pulse && <div className="h-1 w-1 bg-green-500 rounded-full animate-pulse"></div>}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
@@ -216,6 +218,25 @@ export function Dashboard() {
                   </Badge>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bottom Metrics - Additional metrics at the bottom */}
+        <Card className="mt-2">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-sm">Detaylı İstatistikler</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {bottomMetrics.map((metric, index) => (
+                <div key={index} className="bg-muted/50 rounded-lg px-3 py-2 text-center">
+                  <p className="text-[10px] text-muted-foreground truncate">{metric.label}</p>
+                  <p className={`font-semibold text-sm ${metric.color}`}>
+                    {metric.value}
+                  </p>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
