@@ -95,7 +95,7 @@ export function Dashboard() {
       </div>
 
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
-      <div className="absolute top-16 right-4 w-[360px] z-50">
+      <div className="absolute top-16 right-4 w-[360px] z-30">
         <TradingAssistant />
       </div>
 

@@ -60,6 +60,23 @@ function App() {
       }
     }
 
+    // Demo bildirimler için test fonksiyonu - 3 saniye sonra başlat
+    setTimeout(() => {
+      if ((window as any).pushNotification) {
+        ;(window as any).pushNotification('🚀 AI Trading Platformu aktif! Tüm sistemler çalışıyor.', 'success')
+        
+        // İkinci bildirim 10 saniye sonra
+        setTimeout(() => {
+          ;(window as any).pushNotification('📊 BTCUSDT için güçlü alım sinyali tespit edildi.', 'info')
+        }, 10000)
+        
+        // Üçüncü bildirim 20 saniye sonra
+        setTimeout(() => {
+          ;(window as any).pushNotification('⚠️ Yüksek volatilite bekleniyor - pozisyonları gözden geçirin.', 'warning')
+        }, 20000)
+      }
+    }, 3000)
+
     // Listen for navigation events from components
     const handleNavigateToSettings = () => {
       setCurrentView('settings')

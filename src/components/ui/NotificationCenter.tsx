@@ -35,7 +35,7 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
         isRead: false
       }
 
-      setNotifications(prev => [newNotification, ...prev.slice(0, 19)]) // Max 20 bildirim saklayalım
+      setNotifications(prev => [newNotification, ...prev.slice(0, 9)]) // Max 10 bildirim saklayalım
       setUnreadCount(prev => prev + 1)
     }
 
@@ -145,7 +145,7 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
 
       {/* Geçmiş Bildirimler Dropdown */}
       {isDropdownOpen && (
-        <Card className="absolute top-full left-0 mt-1 w-full max-h-64 shadow-lg border z-50">
+        <Card className="absolute top-full left-0 mt-1 w-[320px] max-h-[300px] shadow-lg border z-[999] bg-background">
           {/* Başlık */}
           <div className="p-2 border-b flex items-center justify-between bg-muted/50">
             <span className="text-xs font-semibold">Bildirimler</span>
@@ -172,9 +172,9 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
           </div>
 
           {/* Bildirim Listesi */}
-          <div className="max-h-52 overflow-y-auto">
+          <div className="max-h-48 overflow-y-auto">
             {notifications.length > 0 ? (
-              notifications.map((notification, index) => (
+              notifications.slice(0, 10).map((notification, index) => (
                 <div
                   key={notification.id}
                   className={`p-2 border-b last:border-none hover:bg-muted/30 transition-colors ${

@@ -504,7 +504,7 @@ Kullanıcı mesajı: ${userMessage.content}`
   }
 
   return (
-    <Card className="w-full h-[520px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
+    <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
       {/* Başlık ve Ayarlar */}
       <div className="p-2 border-b bg-muted/50 flex items-center justify-between">
         <div className="flex items-center gap-2">
