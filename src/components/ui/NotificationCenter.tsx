@@ -74,34 +74,30 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <div className="w-full">
-            {/* Son bildirim gösterici kutu - Genişletilmiş ve hizalı */}
-            <div className="flex items-center justify-between px-3 py-1 bg-muted rounded-md text-[10px] shadow-sm cursor-pointer hover:bg-muted/80 transition-colors overflow-hidden">
+            {/* Son bildirim gösterici kutu - Metriklerle uyumlu tasarım */}
+            <div className="flex items-center justify-between px-2 py-1.5 bg-muted/50 rounded-md text-[10px] shadow-sm cursor-pointer hover:bg-muted/80 transition-colors overflow-hidden border border-border/30">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Bell className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Bell className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                 {latestNotification ? (
                   <>
-                    <span className="text-xs flex-shrink-0">{getTypeIcon(latestNotification.type)}</span>
+                    <span className="text-[10px] flex-shrink-0">{getTypeIcon(latestNotification.type)}</span>
                     <span 
-                      className="truncate flex-1 text-xs font-medium"
-                      style={{ 
-                        overflow: 'hidden', 
-                        textOverflow: 'ellipsis', 
-                        whiteSpace: 'nowrap' 
-                      }}
+                      className="truncate flex-1 text-[10px] font-medium leading-tight"
+                      title={latestNotification.message}
                     >
                       {latestNotification.message}
                     </span>
                   </>
                 ) : (
-                  <span className="text-muted-foreground text-xs">Henüz bildirim yok</span>
+                  <span className="text-muted-foreground text-[10px] leading-tight">Henüz bildirim yok</span>
                 )}
               </div>
               
               {latestNotification && (
-                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                  <span className="text-muted-foreground text-[10px]">{latestNotification.time}</span>
+                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                  <span className="text-muted-foreground text-[9px] leading-tight">{latestNotification.time}</span>
                   {notifications.length > 1 && (
-                    <Badge variant="secondary" className="text-[9px] px-1 py-0.5 h-4 min-w-[24px] flex items-center justify-center">
+                    <Badge variant="secondary" className="text-[8px] px-1 py-0.5 h-3.5 min-w-[20px] flex items-center justify-center leading-none">
                       +{notifications.length - 1}
                     </Badge>
                   )}
@@ -111,7 +107,7 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
           </div>
         </PopoverTrigger>
 
-        <PopoverContent className="w-full max-w-[400px] p-0" align="start" side="bottom">
+        <PopoverContent className="w-[380px] max-w-[90vw] p-0" align="start" side="bottom">
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <h3 className="text-sm font-semibold">Son Bildirimler</h3>
             <div className="flex items-center gap-2">

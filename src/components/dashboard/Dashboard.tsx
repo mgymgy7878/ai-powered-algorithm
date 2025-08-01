@@ -52,34 +52,34 @@ export function Dashboard() {
 
   return (
     <div className="relative min-h-screen bg-background">
-      {/* Ana Metrikler ve Bildirim Merkezi - Tek satırda hizalı */}
-      <div className="absolute top-2 left-[60px] right-4 z-40 flex items-center gap-0 overflow-hidden">
-        {/* Metrik kutuları */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Ana Metrikler ve Bildirim Merkezi - Tek satırda hizalı, responsive */}
+      <div className="absolute top-3 left-14 right-4 z-40 flex items-center gap-1 overflow-hidden">
+        {/* Metrik kutuları - Menü butonunun hemen sağına yapışık */}
+        <div className="flex items-center gap-1 flex-shrink-0 overflow-x-auto scrollbar-hide">
           {mainMetrics.map((metric, index) => (
             <div 
               key={index}
-              className="bg-muted rounded-md px-2 py-1 text-[10px] min-w-[100px] max-w-[120px] text-center shadow-sm flex-shrink-0"
+              className="bg-muted/50 rounded-md px-2 py-1.5 text-[10px] min-w-[95px] max-w-[110px] text-center shadow-sm flex-shrink-0 border border-border/30"
             >
-              <p className="text-muted-foreground truncate font-medium">{metric.label}</p>
-              <p className={`font-semibold text-sm ${metric.color} truncate`}>{metric.value}</p>
+              <p className="text-muted-foreground truncate font-medium leading-tight" title={metric.label}>{metric.label}</p>
+              <p className={`font-semibold text-xs ${metric.color} truncate leading-tight`} title={metric.value}>{metric.value}</p>
             </div>
           ))}
         </div>
 
         {/* Bildirim Merkezi - Metriklerden hemen sonra başlayacak şekilde genişletilmiş */}
-        <div className="flex-1 ml-2 z-50">
+        <div className="flex-1 ml-1 z-50 min-w-0">
           <NotificationCenter />
         </div>
       </div>
       
       {/* Yapay Zeka Trading Yöneticisi - Bildirim kutusunun altında */}
-      <div className="absolute top-14 right-4 w-[280px] z-40">
+      <div className="absolute top-12 right-4 w-[280px] z-40">
         <TradingAssistant />
       </div>
       
-      {/* Ana İçerik Alanı - Sol kenara hizalı, sağda AI için boşluk, üstte metrikler için boşluk */}
-      <div className="pl-4 pr-[300px] pt-16">
+      {/* Ana İçerik Alanı - Sol kenara hizalı, sağda AI için boş alan, üstte metrikler için boş alan */}
+      <div className="pl-4 pr-[300px] pt-14">
         {/* Ana Grafik ve Analiz Alanı */}
         <div className="grid grid-cols-1 gap-4 mt-2">
           {/* Portföy Performans Grafiği */}
