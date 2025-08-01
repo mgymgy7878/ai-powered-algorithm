@@ -151,17 +151,6 @@ Kullanıcı mesajı: ${userMessage.content}`
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
 
-    // Check if AI is configured
-    if (!aiService?.isConfigured()) {
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: '⚠️ AI servisleri yapılandırılmamış. Lütfen sağ üstteki ayarlar ikonuna tıklayarak API anahtarlarınızı girin.',
-        timestamp: new Date()
-      }])
-      return
-    }
-
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -174,24 +163,32 @@ Kullanıcı mesajı: ${userMessage.content}`
     setIsLoading(true)
 
     try {
-      // AI yanıtı için prompt oluştur
+      // AI yanıtı için prompt oluştur - Türkçe sistem talimatları
       const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
-- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
+- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek (1D, 4H, 1H, 15M, 1M)
 - Ekonomik takvimi ve haber akışını takip edip yorumlamak (Fed faiz kararları, istihdam verileri, enflasyon, GSYİH gibi)
-- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak 
 - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
 - Ekonomik olayların piyasa etkilerini öngörmek ve strateji önerileri sunmak
-- Türkçe yanıtlar üretmek
+- Türkçe yanıtlar üretmek ve trading terminolojisini doğru kullanmak
 
 Önemli: Ekonomik takvim sorularında güncel ekonomik olayları (Fed kararları, ECB toplantıları, istihdam verileri vb.) dikkate al ve bunların piyasa volatilitesine etkilerini değerlendir.
 
 Kullanıcı mesajı: ${userMessage.content}`
 
-      // Spark LLM API doğru kullanımı - API key otomatik sistem tarafından yönetiliyor
-      // Model seçimi için sadece model ismini geçiyoruz
-      const response = await spark.llm(prompt, model)
+      // Spark LLM API ile model seçimi - kullanıcının tercih ettiği modeli kullan
+      let response: string
+      
+      if (model === 'gpt-4o') {
+        response = await spark.llm(prompt, 'gpt-4o')
+      } else if (model === 'gpt-4o-mini') {
+        response = await spark.llm(prompt, 'gpt-4o-mini')
+      } else {
+        // Varsayılan olarak gpt-4o kullan
+        response = await spark.llm(prompt, 'gpt-4o')
+      }
 
-      // AI yanıtını ekle
+      // AI yanıtını mesaj listesine ekle
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -201,13 +198,13 @@ Kullanıcı mesajı: ${userMessage.content}`
 
       setMessages(prev => [...prev, assistantMessage])
 
-      // AI yanıtından sonra ajan aksiyonlarını kontrol et
+      // AI yanıtından sonra ajan aksiyonlarını kontrol et (strateji başlat/durdur vb.)
       await handleAgentActions(userMessage.content)
       
-      // AI etkileşimi için aktivite ekle
+      // AI etkileşimi için aktivite günlüğüne ekle
       addActivity(`AI ile etkileşim: ${userMessage.content.slice(0, 50)}...`, 'info')
 
-      // Her AI yanıtından sonra bildirim gönder
+      // Global bildirim merkezi üzerinden bildirim gönder
       if ((window as any).pushNotification) {
         ;(window as any).pushNotification(`AI yanıtı: ${response.slice(0, 80)}...`, 'info')
       }
@@ -215,11 +212,11 @@ Kullanıcı mesajı: ${userMessage.content}`
     } catch (error) {
       console.error('AI yanıt hatası:', error)
       
-      // Hata mesajı ekle
+      // Hata durumunda kullanıcıya açıklayıcı mesaj göster
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen API ayarlarınızı kontrol edin veya daha sonra tekrar deneyin.',
+        content: '❌ Üzgünüm, şu anda AI servisiyle iletişim kuramıyorum. Lütfen daha sonra tekrar deneyin veya API ayarlarınızı kontrol edin.',
         timestamp: new Date()
       }
 
