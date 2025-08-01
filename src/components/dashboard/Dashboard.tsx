@@ -105,7 +105,7 @@ export function Dashboard() {
   }
 
   // Sidebar durumuna göre dinamik padding hesapla
-  const contentPadding = isSidebarOpen ? 'pl-16 pr-[380px]' : 'pl-16 pr-[380px]'
+  const contentPadding = isSidebarOpen ? 'pl-16 pr-[390px]' : 'pl-16 pr-[390px]'
 
   return (
     <div className="relative p-6 space-y-6">
@@ -115,7 +115,7 @@ export function Dashboard() {
       </div>
 
       {/* Son Aktiviteler Dropdown - Sağ üst köşede aktivite ikonu */}
-      <div className="absolute top-4 right-[380px] z-40">
+      <div className="absolute top-4 right-[390px] z-40">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full relative">
