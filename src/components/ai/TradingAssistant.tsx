@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useKV } from '@github/spark/hooks'
-import { Brain, Send, Loader2, User, Settings } from '@phosphor-icons/react'
+import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp, Play } from '@phosphor-icons/react'
 
 interface ChatMessage {
   id: string
@@ -28,8 +28,91 @@ export function TradingAssistant() {
   const [isLoading, setIsLoading] = useState(false)
   const [apiKey, setApiKey] = useKV<string>('openai-api-key', '')
   const [model, setModel] = useKV<string>('ai-model', 'gpt-4o')
+  const [showSuggestions, setShowSuggestions] = useState(true)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // AI önerileri listesi
+  const aiSuggestions = [
+    {
+      id: 1,
+      title: "Portföy Analizi",
+      description: "Mevcut portföyümü değerlendir",
+      command: "portföyü değerlendir"
+    },
+    {
+      id: 2,
+      title: "Piyasa Özeti",
+      description: "Güncel piyasa durumunu özetle",
+      command: "piyasa özeti ver"
+    },
+    {
+      id: 3,
+      title: "Strateji Önerisi", 
+      description: "Yeni strateji öner",
+      command: "yeni strateji öner"
+    },
+    {
+      id: 4,
+      title: "Risk Analizi",
+      description: "Risk seviyemi değerlendir",
+      command: "risk analizi yap"
+    }
+  ]
+
+  // Öneri uygulama fonksiyonu
+  const applySuggestion = async (command: string) => {
+    setInputMessage(command)
+    
+    // Kullanıcı mesajını otomatik gönder
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: command,
+      timestamp: new Date()
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setInputMessage('')
+    setIsLoading(true)
+
+    try {
+      const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
+- Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
+- Ekonomik takvimi ve haber akışını takip edip yorumlamak
+- Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
+- Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+- Türkçe yanıtlar üretmek
+
+Kullanıcı mesajı: ${userMessage.content}`
+
+      const response = await spark.llm(prompt, model)
+
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: response,
+        timestamp: new Date()
+      }
+
+      setMessages(prev => [...prev, assistantMessage])
+      await handleAgentActions(userMessage.content)
+
+    } catch (error) {
+      console.error('AI yanıt hatası:', error)
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Üzgünüm, şu anda bir teknik sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.',
+        timestamp: new Date()
+      }
+
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   // Otomatik kaydırma - yeni mesaj geldiğinde en alta git
   useEffect(() => {
@@ -40,11 +123,9 @@ export function TradingAssistant() {
     // API key zaten useKV ile otomatik kaydediliyor
     console.log('API key kaydedildi')
   }
-
   const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return
 
-    // Kullanıcı mesajını ekle
+    if (!inputMessage.trim() || isLoading) return
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -167,7 +248,7 @@ Kullanıcı mesajı: ${userMessage.content}`
   }
 
   return (
-    <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
+    <Card className="w-full h-[520px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
       {/* Başlık ve Model Seçimi */}
       <div className="p-3 border-b bg-muted/50 flex items-center gap-2 justify-between">
         <div className="flex items-center gap-2">
@@ -251,6 +332,57 @@ Kullanıcı mesajı: ${userMessage.content}`
         </div>
         <div ref={messagesEndRef} />
       </ScrollArea>
+
+      {/* AI Önerileri Paneli */}
+      {showSuggestions && (
+        <div className="border-t bg-muted/30 p-2">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-medium text-muted-foreground">AI Önerileri</h4>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSuggestions(false)}
+              className="h-5 w-5 p-0"
+            >
+              <ChevronUp className="w-3 h-3" />
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-1">
+            {aiSuggestions.map((suggestion) => (
+              <div key={suggestion.id} className="bg-background rounded border p-2">
+                <div className="flex items-center justify-between mb-1">
+                  <h5 className="text-xs font-medium truncate">{suggestion.title}</h5>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => applySuggestion(suggestion.command)}
+                    disabled={isLoading}
+                    className="h-5 w-5 p-0 ml-1"
+                  >
+                    <Play className="w-3 h-3" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground truncate">{suggestion.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Öneriler Göster/Gizle Butonu - Kapalıyken */}
+      {!showSuggestions && (
+        <div className="border-t p-2 flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSuggestions(true)}
+            className="text-xs h-6"
+          >
+            <ChevronDown className="w-3 h-3 mr-1" />
+            AI Önerilerini Göster
+          </Button>
+        </div>
+      )}
 
       {/* Mesaj Gönderme Alanı */}
       <div className="border-t p-3 flex gap-2 items-center bg-background">
