@@ -41,9 +41,31 @@ export function Dashboard() {
     }
   }, [])
 
+  // Ana metrikler - sadece önemli 5 tanesi
+  const mainMetrics = [
+    { label: "Portföy Değeri", value: "$50,000.00", color: "text-blue-700" },
+    { label: "Günlük K/Z", value: "$1,250.50", color: "text-green-600" },
+    { label: "Toplam K/Z", value: "$8,750.25", color: "text-green-600" },
+    { label: "Başarı Oranı", value: "68.50%", color: "text-blue-600" },
+    { label: "Aktif Stratejiler", value: "3", color: "text-primary" }
+  ]
+
   return (
     <div className="relative min-h-screen bg-background">
-      {/* Sadece Bildirim Merkezi - Sağ üst köşede sabitlenmiş */}
+      {/* Ana Metrikler - Üst satırda tek sıra */}
+      <div className="absolute top-2 left-[60px] right-[300px] z-40 flex items-center gap-2 overflow-hidden">
+        {mainMetrics.map((metric, index) => (
+          <div 
+            key={index}
+            className="bg-muted rounded-md px-2 py-1 text-[10px] min-w-[100px] max-w-[120px] text-center shadow-sm flex-shrink-0"
+          >
+            <p className="text-muted-foreground truncate font-medium">{metric.label}</p>
+            <p className={`font-semibold text-sm ${metric.color} truncate`}>{metric.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Bildirim Merkezi - Sağ üst köşede sabitlenmiş */}
       <div className="absolute top-2 right-4 w-[280px] z-50">
         <NotificationCenter />
       </div>
@@ -53,8 +75,8 @@ export function Dashboard() {
         <TradingAssistant />
       </div>
       
-      {/* Ana İçerik Alanı - Sol kenara hizalı, sağda AI için boşluk */}
-      <div className="pl-4 pr-[300px] pt-4">
+      {/* Ana İçerik Alanı - Sol kenara hizalı, sağda AI için boşluk, üstte metrikler için boşluk */}
+      <div className="pl-4 pr-[300px] pt-16">
         {/* Ana Grafik ve Analiz Alanı */}
         <div className="grid grid-cols-1 gap-4 mt-2">
           {/* Portföy Performans Grafiği */}
