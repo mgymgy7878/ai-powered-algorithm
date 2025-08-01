@@ -304,6 +304,7 @@ export function TradingAssistant() {
                     Ayarları Kaydet
                   </Button>
                 </div>
+              </DialogContent>
             </Dialog>
           </div>
         </div>
