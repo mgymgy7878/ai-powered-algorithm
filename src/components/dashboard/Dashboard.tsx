@@ -5,7 +5,7 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { TrendingUp, TrendingDown, BarChart } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
-import { NotificationCenter, type Notification } from '../ui/NotificationCenter'
+import { NotificationCenter } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 
 interface PortfolioMetrics {
@@ -20,37 +20,6 @@ export function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const { activities, addActivity } = useActivity()
   
-  // Bildirimler için state
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      message: 'AI Trading Platformu başarıyla başlatıldı',
-      time: '2 dakika önce',
-      type: 'success'
-    }
-  ])
-  
-  // Bildirim ekleme fonksiyonu
-  const addNotification = (notif: Omit<Notification, 'id' | 'time'>) => {
-    const newNotification: Notification = {
-      ...notif,
-      id: Date.now().toString(),
-      time: 'şimdi'
-    }
-    setNotifications(prev => [newNotification, ...prev.slice(0, 9)]) // Son 10 bildirimi tut
-  }
-
-  // Test amaçlı pushNotification fonksiyonu
-  const pushNotification = (msg: string, type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
-    const newNote: Notification = {
-      id: Date.now().toString(),
-      message: msg,
-      time: new Date().toLocaleTimeString("tr-TR"),
-      type
-    }
-    setNotifications((prev) => [newNote, ...prev.slice(0, 9)])
-  }
-  
   // Sidebar durumu değişikliklerini dinle
   useEffect(() => {
     const handleSidebarToggle = (event: CustomEvent) => {
@@ -64,33 +33,37 @@ export function Dashboard() {
     }
   }, [])
   
-  // Otomatik bildirim sistemi - gerçek piyasa olaylarını simüle eder
+  // Otomatik demo bildirimler sistemi
   useEffect(() => {
-    // Demo bildirimler gönder
-    setTimeout(() => {
-      addNotification({
-        message: 'AI Trading Platformu başarıyla başlatıldı. Tüm sistemler aktif.',
-        type: 'success'
-      })
-    }, 1000)
+    // Demo bildirimleri global pushNotification ile gönder
+    const sendInitialNotification = () => {
+      if ((window as any).pushNotification) {
+        (window as any).pushNotification('AI Trading Platformu başarıyla başlatıldı. Tüm sistemler aktif.', 'success')
+      }
+    }
+
+    // 2 saniye sonra başlat
+    setTimeout(sendInitialNotification, 2000)
 
     // Periyodik demo bildirimler
     const interval = setInterval(() => {
-      const demoNotifications = [
-        { message: 'BTCUSDT için güçlü trend sinyali tespit edildi.', type: 'info' as const },
-        { message: 'Grid Bot stratejisi pozisyon güncelledi.', type: 'success' as const },
-        { message: 'Volatilite artışı tespit edildi.', type: 'warning' as const },
-        { message: 'ETHUSDT için alım sinyali oluştu.', type: 'info' as const }
-      ]
-      
-      const randomNotification = demoNotifications[Math.floor(Math.random() * demoNotifications.length)]
-      addNotification(randomNotification)
-    }, 30000) // Her 30 saniyede bir
+      if ((window as any).pushNotification) {
+        const demoNotifications = [
+          { message: 'BTCUSDT için güçlü trend sinyali tespit edildi.', type: 'info' },
+          { message: 'Grid Bot stratejisi pozisyon güncelledi.', type: 'success' },
+          { message: 'Volatilite artışı tespit edildi.', type: 'warning' },
+          { message: 'ETHUSDT için alım sinyali oluştu.', type: 'info' }
+        ]
+        
+        const randomNotification = demoNotifications[Math.floor(Math.random() * demoNotifications.length)]
+        ;(window as any).pushNotification(randomNotification.message, randomNotification.type)
+      }
+    }, 45000) // Her 45 saniyede bir
 
     return () => {
       clearInterval(interval)
     }
-  }, [addActivity])
+  }, [])
   
   const [portfolioMetrics] = useKV<PortfolioMetrics>('portfolio-metrics', {
     totalValue: 50000,
@@ -116,41 +89,14 @@ export function Dashboard() {
 
   return (
     <div className="relative p-6 space-y-6">
+      {/* Bildirim Merkezi - AI panelinin üst kısmında */}
+      <div className="absolute top-2 right-4 w-[360px] z-40">
+        <NotificationCenter />
+      </div>
+
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
       <div className="absolute top-16 right-4 w-[360px] z-50">
-        <TradingAssistant 
-          onNotification={(message, type) => {
-            addNotification({ message, type: type || 'info' })
-          }}
-        />
-      </div>
-
-      {/* Bildirim Merkezi - AI panelinin üst kısmında */}
-      <div className="absolute top-4 right-4 w-[360px] z-50">
-        <NotificationCenter notifications={notifications} />
-      </div>
-
-      {/* Test Bildirimleri Butonu (geliştirme amaçlı) */}
-      <div className="absolute top-4 right-[100px] z-40">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="text-xs"
-          onClick={() => {
-            // Test bildirimleri gönder
-            pushNotification('BTCUSDT için güçlü alım sinyali tespit edildi. RSI: 28, MACD pozitif kesişim.', 'success')
-            
-            setTimeout(() => {
-              pushNotification('Grid Bot ETHUSDT stratejisi 145$ kar elde etti ve pozisyonları yeniden ayarlandı.', 'info')
-            }, 2000)
-            
-            setTimeout(() => {
-              pushNotification('Volatilite artıyor, pozisyon boyutlarını azaltmayı düşünün.', 'warning')
-            }, 4000)
-          }}
-        >
-          Test Bildirimi
-        </Button>
+        <TradingAssistant />
       </div>
 
 

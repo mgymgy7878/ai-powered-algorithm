@@ -16,11 +16,9 @@ interface ChatMessage {
   timestamp: Date
 }
 
-interface TradingAssistantProps {
-  onNotification?: (message: string, type?: 'success' | 'info' | 'warning' | 'error') => void
-}
+interface TradingAssistantProps {}
 
-export function TradingAssistant({ onNotification }: TradingAssistantProps = {}) {
+export function TradingAssistant({}: TradingAssistantProps = {}) {
   const { addActivity } = useActivity()
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -164,6 +162,11 @@ Kullanıcı mesajı: ${userMessage.content}`
       // AI etkileşimi için aktivite ekle
       addActivity(`AI ile etkileşim: ${userMessage.content.slice(0, 50)}...`, 'info')
 
+      // Her AI yanıtından sonra bildirim gönder
+      if ((window as any).pushNotification) {
+        ;(window as any).pushNotification(`AI yanıtı: ${response.slice(0, 80)}...`, 'info')
+      }
+
     } catch (error) {
       console.error('AI yanıt hatası:', error)
       
@@ -215,8 +218,10 @@ Kullanıcı mesajı: ${userMessage.content}`
         await startStrategy("grid-bot")
         addActivity('Grid Bot stratejisi AI tarafından başlatıldı', 'success')
         
-        // Bildirim merkezi bildirimi gönder
-        onNotification?.('Grid Bot stratejisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.', 'success')
+        // Global bildirim merkezi bildirimi gönder
+        if ((window as any).pushNotification) {
+          ;(window as any).pushNotification('Grid Bot stratejisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.', 'success')
+        }
         
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -236,8 +241,10 @@ Kullanıcı mesajı: ${userMessage.content}`
         await stopStrategy("scalper")
         addActivity('Scalper stratejisi AI tarafından durduruldu', 'warning')
         
-        // Bildirim merkezi bildirimi gönder
-        onNotification?.('Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.', 'warning')
+        // Global bildirim merkezi bildirimi gönder
+        if ((window as any).pushNotification) {
+          ;(window as any).pushNotification('Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.', 'warning')
+        }
         
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -247,7 +254,9 @@ Kullanıcı mesajı: ${userMessage.content}`
         }])
       } catch (error) {
         addActivity('Strateji durdurulamadı', 'error')
-        onNotification?.('Strateji durdurma işlemi başarısız oldu.', 'error')
+        if ((window as any).pushNotification) {
+          ;(window as any).pushNotification('Strateji durdurma işlemi başarısız oldu.', 'error')
+        }
       }
     }
 
@@ -354,12 +363,10 @@ Kullanıcı mesajı: ${userMessage.content}`
       const p = await fetchPortfolioData()
       addActivity('AI portföy analizi tamamlandı', 'info')
       
-      // Bildirim merkezi bildirimi gönder
-      addNotification({
-        title: 'Portföy Analizi',
-        message: `Portföy değerlendirmesi tamamlandı. Toplam değer: $${p.total.toLocaleString()}, Günlük K/Z: $${p.dailyPnl}`,
-        type: 'info'
-      })
+      // Global bildirim merkezi bildirimi gönder
+      if ((window as any).pushNotification) {
+        ;(window as any).pushNotification(`Portföy değerlendirmesi tamamlandı. Toplam değer: $${p.total.toLocaleString()}, Günlük K/Z: $${p.dailyPnl}`, 'info')
+      }
       
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
