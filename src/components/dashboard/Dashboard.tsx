@@ -85,10 +85,10 @@ export function Dashboard() {
   }
 
   // Sidebar durumuna göre dinamik padding hesapla
-  const contentPadding = isSidebarOpen ? 'pl-16 pr-[320px]' : 'pl-16 pr-[320px]'
+  const contentPadding = 'pl-4 pr-[320px]'
 
   return (
-    <div className="relative p-6 space-y-6">
+    <div className="relative p-4 space-y-4">
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
       <div className="absolute top-2 right-4 w-[280px] z-50">
         <NotificationCenter />
@@ -98,8 +98,6 @@ export function Dashboard() {
       <div className="absolute top-16 right-4 w-[280px] z-20">
         <TradingAssistant />
       </div>
-
-
 
       {/* Portfolio Metrics - Küçük yatay kutular */}
       <div className={`${contentPadding}`}>
@@ -147,9 +145,8 @@ export function Dashboard() {
 
       {/* Ana İçerik Alanı */}
       <div className={`${contentPadding}`}>
-        
         {/* Hızlı İstatistikler - %50 küçültülmüş boyutlar */}
-        <div className="flex flex-wrap items-center gap-1 mb-3">
+        <div className="flex flex-wrap items-center gap-1 mb-2">
           <div className="flex flex-col items-start justify-center px-2 py-1 min-w-[120px] bg-muted rounded-md text-xs leading-tight">
             <span className="text-[10px] text-muted-foreground">Aktif İşlemler</span>
             <span className="text-sm font-bold text-foreground">12</span>
@@ -172,79 +169,78 @@ export function Dashboard() {
         </div>
 
         {/* Ana Grafik ve Analiz Alanı */}
-        <div className="grid grid-cols-1 gap-6">
-          
+        <div className="grid grid-cols-1 gap-4 mt-2">
           {/* Portföy Performans Grafiği */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart className="h-5 w-5" />
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <BarChart className="h-4 w-4" />
                 Portföy Performansı
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] flex items-center justify-center bg-muted/50 rounded-lg">
-                <p className="text-muted-foreground">Grafik yükleniyor...</p>
+              <div className="h-[250px] flex items-center justify-center bg-muted/50 rounded-lg">
+                <p className="text-muted-foreground text-sm">Grafik yükleniyor...</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Top Performing Strategies */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>En İyi Performans Gösteren Stratejiler</CardTitle>
+        <Card className="mt-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">En İyi Performans Gösteren Stratejiler</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Grid Bot BTCUSDT</p>
-                    <p className="text-sm text-muted-foreground">Son 7 gün</p>
+                    <p className="font-medium text-sm">Grid Bot BTCUSDT</p>
+                    <p className="text-xs text-muted-foreground">Son 7 gün</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-green-600">+12.4%</p>
+                  <p className="font-medium text-green-600 text-sm">+12.4%</p>
                   <Badge variant="secondary" className="text-xs">
                     247 işlem
                   </Badge>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <BarChart className="h-5 w-5 text-blue-600" />
+              <div className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <BarChart className="h-4 w-4 text-blue-600" />
                   </div>
                   <div>
-                    <p className="font-medium">RSI Scalper ETHUSDT</p>
-                    <p className="text-sm text-muted-foreground">Son 7 gün</p>
+                    <p className="font-medium text-sm">RSI Scalper ETHUSDT</p>
+                    <p className="text-xs text-muted-foreground">Son 7 gün</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-green-600">+8.7%</p>
+                  <p className="font-medium text-green-600 text-sm">+8.7%</p>
                   <Badge variant="secondary" className="text-xs">
                     89 işlem
                   </Badge>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-yellow-600" />
+              <div className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4 text-yellow-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Moving Average Cross</p>
-                    <p className="text-sm text-muted-foreground">Son 7 gün</p>
+                    <p className="font-medium text-sm">Moving Average Cross</p>
+                    <p className="text-xs text-muted-foreground">Son 7 gün</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-green-600">+5.2%</p>
+                  <p className="font-medium text-green-600 text-sm">+5.2%</p>
                   <Badge variant="secondary" className="text-xs">
                     34 işlem
                   </Badge>
