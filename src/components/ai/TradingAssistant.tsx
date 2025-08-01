@@ -110,11 +110,6 @@ Kullanıcı mesajı: ${userMessage.content}`
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  const saveApiKey = () => {
-    // API key zaten useKV ile otomatik kaydediliyor
-    console.log('API key kaydedildi')
-  }
   const sendMessage = async () => {
 
     if (!inputMessage.trim() || isLoading) return
@@ -380,41 +375,37 @@ Kullanıcı mesajı: ${userMessage.content}`
 
   return (
     <Card className="w-full h-[520px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Başlık ve Model Seçimi */}
-      <div className="p-3 border-b bg-muted/50 flex items-center gap-2 justify-between">
-        <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5" />
-          <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
-        </div>
-        
-        {/* Model Seçimi */}
-        <Select onValueChange={setModel} value={model}>
-          <SelectTrigger className="w-32 text-xs h-7">
-            <SelectValue placeholder="Model Seç" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-            <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
-            <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Başlık */}
+      <div className="p-3 border-b bg-muted/50 flex items-center gap-2">
+        <Brain className="w-5 h-5" />
+        <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
       </div>
 
-      {/* API Key Ayarı */}
-      {!apiKey && (
-        <div className="p-2 bg-yellow-50 border-b">
-          <div className="flex gap-2 items-center">
-            <Input
-              placeholder="OpenAI API Key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="text-xs"
-              type="password"
-            />
-            <Button onClick={saveApiKey} size="sm">Kaydet</Button>
-          </div>
+      {/* API Key ve Model Ayarları */}
+      <div className="p-2 bg-muted/30 border-b">
+        <div className="flex gap-2 mb-2">
+          <Input 
+            placeholder="API Key" 
+            value={apiKey} 
+            onChange={(e) => setApiKey(e.target.value)} 
+            className="flex-1 text-xs h-8"
+            type="password"
+          />
+          <Select value={model} onValueChange={setModel}>
+            <SelectTrigger className="w-36 text-xs h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+              <SelectItem value="claude-3-opus">Claude 3</SelectItem>
+              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      )}
+        {!apiKey && (
+          <p className="text-xs text-muted-foreground">AI kullanımı için API key gerekli</p>
+        )}
+      </div>
 
       {/* Mesaj Listesi */}
       <ScrollArea className="flex-1 p-3">
