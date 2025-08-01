@@ -32,7 +32,7 @@ export function TradingAssistant() {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState(true)
+  const [showSuggestions, setShowSuggestions] = useState(false) // ilk başta kapalı başlasın
   const [showSettings, setShowSettings] = useState(false)
   const [showApiKeys, setShowApiKeys] = useState({ openai: false, anthropic: false })
   
