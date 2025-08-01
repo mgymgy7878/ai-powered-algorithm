@@ -26,7 +26,6 @@ export function TradingAssistant() {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [apiKey, setApiKey] = useKV<string>('openai-api-key', '')
   const [model, setModel] = useKV<string>('ai-model', 'gpt-4o')
   const [showSuggestions, setShowSuggestions] = useState(true)
   
@@ -77,6 +76,7 @@ export function TradingAssistant() {
 
 Kullanıcı mesajı: ${userMessage.content}`
 
+        // Spark LLM API doğru kullanımı: spark.llm(prompt, modelName?, jsonMode?)
         const response = await spark.llm(prompt, model)
 
         const assistantMessage: ChatMessage = {
@@ -138,7 +138,8 @@ Kullanıcı mesajı: ${userMessage.content}`
 
 Kullanıcı mesajı: ${userMessage.content}`
 
-      // AI'dan yanıt al - seçilen modeli kullan
+      // Spark LLM API doğru kullanımı - API key otomatik sistem tarafından yönetiliyor
+      // Model seçimi için sadece model ismini geçiyoruz
       const response = await spark.llm(prompt, model)
 
       // AI yanıtını ekle
@@ -381,30 +382,23 @@ Kullanıcı mesajı: ${userMessage.content}`
         <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
       </div>
 
-      {/* API Key ve Model Ayarları */}
+      {/* Model Seçimi */}
       <div className="p-2 bg-muted/30 border-b">
-        <div className="flex gap-2 mb-2">
-          <Input 
-            placeholder="API Key" 
-            value={apiKey} 
-            onChange={(e) => setApiKey(e.target.value)} 
-            className="flex-1 text-xs h-8"
-            type="password"
-          />
+        <div className="flex items-center gap-2">
+          <Settings className="w-4 h-4 text-muted-foreground" />
           <Select value={model} onValueChange={setModel}>
-            <SelectTrigger className="w-36 text-xs h-8">
+            <SelectTrigger className="w-48 text-xs h-8">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-              <SelectItem value="claude-3-opus">Claude 3</SelectItem>
-              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+              <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
             </SelectContent>
           </Select>
+          <Badge variant="secondary" className="text-xs">
+            Spark LLM
+          </Badge>
         </div>
-        {!apiKey && (
-          <p className="text-xs text-muted-foreground">AI kullanımı için API key gerekli</p>
-        )}
       </div>
 
       {/* Mesaj Listesi */}
