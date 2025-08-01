@@ -85,17 +85,17 @@ export function Dashboard() {
   }
 
   // Sidebar durumuna göre dinamik padding hesapla
-  const contentPadding = isSidebarOpen ? 'pl-16 pr-[390px]' : 'pl-16 pr-[390px]'
+  const contentPadding = isSidebarOpen ? 'pl-16 pr-[320px]' : 'pl-16 pr-[320px]'
 
   return (
     <div className="relative p-6 space-y-6">
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
-      <div className="absolute top-2 right-4 w-[360px] z-50">
+      <div className="absolute top-2 right-4 w-[280px] z-50">
         <NotificationCenter />
       </div>
 
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
-      <div className="absolute top-16 right-4 w-[360px] z-20">
+      <div className="absolute top-16 right-4 w-[300px] z-20">
         <TradingAssistant />
       </div>
 
