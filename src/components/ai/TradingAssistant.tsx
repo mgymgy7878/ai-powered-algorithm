@@ -122,24 +122,22 @@ export function TradingAssistant() {
       `
 
       const response = await spark.llm(prompt)
+      
+      // Güvenli yanıt kontrolü
+      const safeResponse = response || 'AI yanıtı alınamadı.'
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response,
+        content: safeResponse,
         timestamp: new Date()
       }
 
       setMessages(prev => [...prev, assistantMessage])
       
-      // Aktivite log'a ekle
-      addActivity({
-        id: Date.now().toString(),
-        type: 'ai',
-        message: `AI analiz tamamlandı: ${text.substring(0, 50)}...`,
-        timestamp: new Date(),
-        details: { query: text, response: response.substring(0, 100) + '...' }
-      })
+      // Aktivite log'a ekle - güvenli substring kullanımı
+      const safeText = text || 'Bilinmeyen sorgu'
+      addActivity(`AI analiz tamamlandı: ${safeText.substring(0, 50)}...`, 'success')
 
       // Bildirim gönder
       if ((window as any).pushNotification) {
@@ -370,10 +368,13 @@ export function TradingAssistant() {
                 <p className={`text-[10px] mt-0.5 opacity-70 ${
                   message.role === 'user' ? 'text-primary-foreground' : 'text-muted-foreground'
                 }`}>
-                  {message.timestamp.toLocaleTimeString('tr-TR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
+                  {message.timestamp && message.timestamp instanceof Date 
+                    ? message.timestamp.toLocaleTimeString('tr-TR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })
+                    : 'Şimdi'
+                  }
                 </p>
               </div>
               

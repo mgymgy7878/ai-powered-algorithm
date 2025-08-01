@@ -81,32 +81,61 @@ export function Dashboard() {
     maxDrawdown: -5.2
   })
 
-  const formatCurrency = (value: number | undefined) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value ?? 0)
+  // Portfolio metrics için güvenli erişim - extra safety layer
+  const safePortfolioMetrics = portfolioMetrics || {
+    totalValue: 0,
+    dailyPnL: 0,
+    totalPnL: 0,
+    winRate: 0,
+    activeStrategies: 0,
+    activeTrades: 0,
+    totalTrades: 0,
+    avgReturn: 0,
+    maxDrawdown: 0
   }
 
-  const formatPercentage = (value: number | undefined) => {
-    return `${(value ?? 0).toFixed(2)}%`
+  const formatCurrency = (value?: number) => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '$0.00'
+    }
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(value)
+    } catch (error) {
+      console.warn('Currency formatting error:', error)
+      return `$${value.toFixed(2)}`
+    }
+  }
+
+  const formatPercentage = (value?: number) => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '0.00%'
+    }
+    try {
+      return `${value.toFixed(2)}%`
+    } catch (error) {
+      console.warn('Percentage formatting error:', error)
+      return '0.00%'
+    }
   }
 
   // Dashboard gösterge kutuları - üst kısım
   const topMetrics = [
-    { label: "Portföy Değeri", value: formatCurrency(portfolioMetrics.totalValue), color: 'text-primary' },
-    { label: "Günlük K/Z", value: formatCurrency(portfolioMetrics.dailyPnL), color: portfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600', icon: portfolioMetrics.dailyPnL >= 0 ? TrendingUp : TrendingDown },
-    { label: "Toplam K/Z", value: formatCurrency(portfolioMetrics.totalPnL), color: portfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600' },
-    { label: "Başarı Oranı", value: formatPercentage(portfolioMetrics.winRate), color: 'text-blue-600' },
-    { label: "Aktif Stratejiler", value: portfolioMetrics.activeStrategies.toString(), color: 'text-green-500', pulse: true }
+    { label: "Portföy Değeri", value: formatCurrency(safePortfolioMetrics.totalValue), color: 'text-primary' },
+    { label: "Günlük K/Z", value: formatCurrency(safePortfolioMetrics.dailyPnL), color: safePortfolioMetrics.dailyPnL >= 0 ? 'text-green-600' : 'text-red-600', icon: safePortfolioMetrics.dailyPnL >= 0 ? TrendingUp : TrendingDown },
+    { label: "Toplam K/Z", value: formatCurrency(safePortfolioMetrics.totalPnL), color: safePortfolioMetrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600' },
+    { label: "Başarı Oranı", value: formatPercentage(safePortfolioMetrics.winRate), color: 'text-blue-600' },
+    { label: "Aktif Stratejiler", value: safePortfolioMetrics.activeStrategies.toString(), color: 'text-green-500', pulse: true }
   ]
 
   // Alt metrikler (görünmeyenler)
   const bottomMetrics = [
-    { label: "Aktif İşlemler", value: portfolioMetrics.activeTrades.toString(), color: 'text-orange-600' },
-    { label: "Toplam İşlem", value: portfolioMetrics.totalTrades.toLocaleString(), color: 'text-blue-500' },
-    { label: "Ortalama Getiri", value: `+${portfolioMetrics.avgReturn.toFixed(1)}%`, color: 'text-green-600' },
-    { label: "Max Drawdown", value: `${portfolioMetrics.maxDrawdown.toFixed(1)}%`, color: 'text-red-600' }
+    { label: "Aktif İşlemler", value: safePortfolioMetrics.activeTrades.toString(), color: 'text-orange-600' },
+    { label: "Toplam İşlem", value: safePortfolioMetrics.totalTrades.toLocaleString(), color: 'text-blue-500' },
+    { label: "Ortalama Getiri", value: `+${safePortfolioMetrics.avgReturn.toFixed(1)}%`, color: 'text-green-600' },
+    { label: "Max Drawdown", value: `${safePortfolioMetrics.maxDrawdown.toFixed(1)}%`, color: 'text-red-600' }
   ]
 
   return (
