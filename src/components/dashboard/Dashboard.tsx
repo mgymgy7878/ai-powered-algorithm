@@ -108,7 +108,7 @@ export function Dashboard() {
       <div className={`${contentPadding}`}>
         
         {/* Hızlı İstatistikler - %50 küçültülmüş boyutlar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-3">
+        <div className="grid grid-cols-4 gap-1 mb-3">
           <Card className="!p-1 !text-xs !h-auto !min-h-0 !rounded-md bg-muted shadow-sm">
             <CardContent className="!p-1.5">
               <div className="flex items-center justify-between">
