@@ -3,9 +3,9 @@ import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
-import { TrendingUp, TrendingDown, BarChart, Bell } from 'lucide-react'
+import { TrendingUp, TrendingDown, BarChart } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
+import { NotificationCenter, addNotification } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 import { activityMonitor } from '../../services/activityMonitor'
 
@@ -39,13 +39,38 @@ export function Dashboard() {
   
   // Otomatik bildirim sistemi - gerçek piyasa olaylarını simüle eder
   useEffect(() => {
-    // Activity monitor'ı addActivity ile bağla
+    // Activity monitor'ı addActivity ile bağla ve notification center'a da gönder
     const handleActivityNotification = (message: string, type: 'success' | 'info' | 'warning' | 'error') => {
       addActivity(message, type)
+      
+      // NotificationCenter'a da bildirim gönder
+      addNotification({
+        title: getNotificationTitle(type, message),
+        message: message,
+        type: type
+      })
+    }
+
+    // Bildirim başlığını belirle
+    const getNotificationTitle = (type: string, message: string) => {
+      if (message.includes('sinyali')) return 'Trade Sinyali'
+      if (message.includes('strateji')) return 'Strateji Güncellemesi' 
+      if (message.includes('AI') || message.includes('öneri')) return 'AI Önerisi'
+      if (message.includes('risk') || message.includes('uyarı')) return 'Risk Uyarısı'
+      return 'Sistem Bildirimi'
     }
 
     activityMonitor.addListener(handleActivityNotification)
     activityMonitor.startMarketSimulation()
+
+    // Demo bildirimler gönder
+    setTimeout(() => {
+      addNotification({
+        title: 'Hoş Geldiniz',
+        message: 'AI Trading Platformu başarıyla başlatıldı. Tüm sistemler aktif.',
+        type: 'success'
+      })
+    }, 1000)
 
     return () => {
       activityMonitor.removeListener(handleActivityNotification)
@@ -82,49 +107,44 @@ export function Dashboard() {
         <TradingAssistant />
       </div>
 
-      {/* Geçmiş Bildirimler Dropdown - Sağ üst köşede aktivite ikonu */}
-      <div className="absolute top-4 right-[390px] z-40">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="rounded-full relative hover:bg-muted transition-colors"
-              onClick={() => {
-                // Test trading sinyalleri gönder (tıklama ile aktivasyon)
-                activityMonitor.notifyTradeSignal('BTCUSDT', 'buy', 42500, 0.025)
-                setTimeout(() => activityMonitor.notifyStrategyEvent('Grid Bot ETHUSDT', 'profit', '+$145'), 2000)
-                setTimeout(() => activityMonitor.notifyAIRecommendation('Volatilite artıyor, pozisyon boyutlarını azaltın', 'high'), 4000)
-                setTimeout(() => activityMonitor.notifyRiskAlert('Stop-loss seviyeleri dar tutuluyor', 'medium'), 6000)
-              }}
-            >
-              <Bell className="w-4 h-4" />
-              {activities.length > 0 && (
-                <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-80" align="end">
-            <DropdownMenuLabel>Geçmiş Bildirimler</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-[400px] overflow-y-auto">
-              {activities.slice(0, 10).map((activity) => (
-                <DropdownMenuItem key={activity.id} className="flex gap-2 items-start text-xs p-3 cursor-default">
-                  <span className={`w-2 h-2 mt-1 rounded-full ${activity.color} flex-shrink-0`} />
-                  <div className="flex flex-col gap-1 flex-1">
-                    <span className="font-medium text-sm leading-tight">{activity.title}</span>
-                    <span className="text-muted-foreground text-xs">{activity.timeAgo}</span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </div>
-            {activities.length === 0 && (
-              <div className="text-center py-6 text-muted-foreground text-sm">
-                Henüz bildirim bulunmuyor
-              </div>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {/* Bildirim Merkezi - AI panelinin üst kısmında */}
+      <div className="absolute top-4 right-4 z-50">
+        <NotificationCenter />
+      </div>
+
+      {/* Test Bildirimleri Butonu (geliştirme amaçlı) */}
+      <div className="absolute top-4 right-[100px] z-40">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="text-xs"
+          onClick={() => {
+            // Test bildirimleri gönder
+            addNotification({
+              title: 'Trade Sinyali',
+              message: 'BTCUSDT için güçlü alım sinyali tespit edildi. RSI: 28, MACD pozitif kesişim.',
+              type: 'success'
+            })
+            
+            setTimeout(() => {
+              addNotification({
+                title: 'Strateji Güncellemesi',
+                message: 'Grid Bot ETHUSDT stratejisi 145$ kar elde etti ve pozisyonları yeniden ayarlandı.',
+                type: 'info'
+              })
+            }, 2000)
+            
+            setTimeout(() => {
+              addNotification({
+                title: 'Risk Uyarısı',
+                message: 'Volatilite artıyor, pozisyon boyutlarını azaltmayı düşünün.',
+                type: 'warning'
+              })
+            }, 4000)
+          }}
+        >
+          Test Bildirimi
+        </Button>
       </div>
 
 

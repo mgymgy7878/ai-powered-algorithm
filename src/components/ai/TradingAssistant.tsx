@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useKV } from '@github/spark/hooks'
 import { useActivity } from '@/contexts/ActivityContext'
+import { addNotification } from '@/components/ui/NotificationCenter'
 import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp } from '@phosphor-icons/react'
 
 interface ChatMessage {
@@ -210,6 +211,14 @@ Kullanıcı mesajı: ${userMessage.content}`
       try {
         await startStrategy("grid-bot")
         addActivity('Grid Bot stratejisi AI tarafından başlatıldı', 'success')
+        
+        // Bildirim merkezi bildirimi gönder
+        addNotification({
+          title: 'Strateji Başlatıldı',
+          message: 'Grid Bot stratejisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.',
+          type: 'success'
+        })
+        
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
@@ -218,6 +227,11 @@ Kullanıcı mesajı: ${userMessage.content}`
         }])
       } catch (error) {
         addActivity('Grid Bot stratejisi başlatılamadı', 'error')
+        addNotification({
+          title: 'Strateji Hatası',
+          message: 'Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.',
+          type: 'error'
+        })
       }
     }
 
@@ -226,6 +240,14 @@ Kullanıcı mesajı: ${userMessage.content}`
       try {
         await stopStrategy("scalper")
         addActivity('Scalper stratejisi AI tarafından durduruldu', 'warning')
+        
+        // Bildirim merkezi bildirimi gönder
+        addNotification({
+          title: 'Strateji Durduruldu',
+          message: 'Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.',
+          type: 'warning'
+        })
+        
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
@@ -234,6 +256,11 @@ Kullanıcı mesajı: ${userMessage.content}`
         }])
       } catch (error) {
         addActivity('Strateji durdurulamadı', 'error')
+        addNotification({
+          title: 'Strateji Hatası',
+          message: 'Strateji durdurma işlemi başarısız oldu.',
+          type: 'error'
+        })
       }
     }
 
@@ -339,6 +366,14 @@ Kullanıcı mesajı: ${userMessage.content}`
     if (content.includes("portföy") && (content.includes("değerlendir") || content.includes("analiz"))) {
       const p = await fetchPortfolioData()
       addActivity('AI portföy analizi tamamlandı', 'info')
+      
+      // Bildirim merkezi bildirimi gönder
+      addNotification({
+        title: 'Portföy Analizi',
+        message: `Portföy değerlendirmesi tamamlandı. Toplam değer: $${p.total.toLocaleString()}, Günlük K/Z: $${p.dailyPnl}`,
+        type: 'info'
+      })
+      
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
