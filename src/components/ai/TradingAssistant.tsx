@@ -195,27 +195,26 @@ export function TradingAssistant() {
 
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Header - Sabit üst bar (sticky) - gereksiz boşluk kaldırıldı */}
-      <div className="sticky top-0 z-30 bg-background border-b px-2 py-1 flex flex-col gap-1 font-thin text-xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-semibold">
-            <Brain className="w-4 h-4 text-primary" />
-            <span>AI Trading Yöneticisi</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Badge variant="outline" className="text-xs px-2 py-1">
-              {getActiveModel()}
-            </Badge>
-            
-            <Dialog open={showSettings} onOpenChange={setShowSettings}>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowSettings(true)}
-                className="h-6 w-6 p-0"
-              >
-                <Settings className="w-3 h-3" />
-              </Button>
+      {/* Header - Sabit üst bar (sticky) - boşluk kaldırıldı, daha kompakt */}
+      <div className="sticky top-0 z-50 bg-background border-b px-2 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-xs font-semibold">
+          <Brain className="w-4 h-4 text-primary" />
+          <span>AI Trading Yöneticisi</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-xs px-2 py-1 h-6">
+            {getActiveModel()}
+          </Badge>
+          
+          <Dialog open={showSettings} onOpenChange={setShowSettings}>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setShowSettings(true)}
+              className="h-6 w-6"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
               
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
@@ -305,29 +304,30 @@ export function TradingAssistant() {
                     Ayarları Kaydet
                   </Button>
                 </div>
-              </DialogContent>
             </Dialog>
           </div>
         </div>
 
-        {/* Sabitlenmiş öneri gizle/göster butonu - padding azaltıldı */}
-        <Button
-          onClick={() => setShowSuggestions(!showSuggestions)}
-          variant="ghost"
-          className="text-[10px] self-start px-1 py-0.5 h-auto"
-        >
-          {showSuggestions ? (
-            <>
-              <ChevronUp className="w-3 h-3 mr-1" />
-              Önerileri Gizle
-            </>
-          ) : (
-            <>
-              <ChevronDown className="w-3 h-3 mr-1" />
-              Önerileri Göster
-            </>
-          )}
-        </Button>
+        {/* Sabitlenmiş öneri gizle/göster butonu - header içinde tek satırda */}
+        <div className="mt-1">
+          <Button
+            onClick={() => setShowSuggestions(!showSuggestions)}
+            variant="ghost"
+            className="text-[10px] px-2 py-1 h-5"
+          >
+            {showSuggestions ? (
+              <>
+                <ChevronUp className="w-3 h-3 mr-1" />
+                Önerileri Gizle
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-3 h-3 mr-1" />
+                Önerileri Göster
+              </>
+            )}
+          </Button>
+        </div>
       </div>
       {/* AI Önerileri - Gizlenebilir panel - taşma sorunu düzeltildi */}
       {showSuggestions && (
