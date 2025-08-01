@@ -13,7 +13,8 @@ import {
   Rocket,
   Brain,
   List,
-  X
+  X,
+  Calendar
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -38,6 +39,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount, runningStrat
     { id: 'backtest', label: 'Backtesting', icon: BarChart },
     { id: 'portfolio', label: 'Portföy', icon: PieChart },
     { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
+    { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
     { id: 'settings', label: 'API Ayarları', icon: Settings },
   ] as const
 

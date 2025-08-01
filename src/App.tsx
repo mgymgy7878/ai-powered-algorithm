@@ -8,13 +8,14 @@ import { LiveTrading } from './components/live/LiveTrading'
 import { PortfolioView } from './components/portfolio/PortfolioView'
 import { MarketAnalysis } from './components/analysis/MarketAnalysis'
 import { TradingAssistant } from './components/ai/TradingAssistant'
+import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import { APISettings } from './components/settings/APISettings'
 import { Toaster } from './components/ui/sonner'
 import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'settings'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -84,6 +85,8 @@ function App() {
         return <PortfolioView />
       case 'analysis':
         return <MarketAnalysis />
+      case 'economic':
+        return <EconomicCalendar />
       case 'settings':
         return <APISettings />
       default:

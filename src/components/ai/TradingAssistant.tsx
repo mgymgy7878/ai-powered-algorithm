@@ -32,10 +32,13 @@ export function TradingAssistant() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // AI önerileri listesi - kullanıcı tarafından tanımlanan komutlar
+  // AI önerileri listesi - ekonomik takvim entegrasyonu eklendi
   const suggestions = [
     { label: "Portföyü değerlendir", command: "portföyü değerlendir" },
-    { label: "Strateji başlat (grid bot)", command: "grid bot stratejisini başlat" },
+    { label: "Bugünkü önemli ekonomik olayları göster", command: "bugünkü yüksek etkili ekonomik olayları listele" },
+    { label: "Sonraki 24 saatteki kritik olaylar", command: "gelecek 24 saatte hangi önemli ekonomik olaylar var" },
+    { label: "Ekonomik takvime göre strateji öner", command: "ekonomik takvim analizi yaparak strateji önerisi ver" },
+    { label: "Grid bot stratejisini başlat", command: "grid bot stratejisini başlat" },
     { label: "AI'dan piyasa özeti al", command: "bugünkü piyasa özetini sun" },
     { label: "Kazanç/zarar analizi", command: "kazanç zarar analizi yap" }
   ]
@@ -64,10 +67,13 @@ export function TradingAssistant() {
       try {
         const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
 - Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
-- Ekonomik takvimi ve haber akışını takip edip yorumlamak
+- Ekonomik takvimi ve haber akışını takip edip yorumlamak (Fed faiz kararları, istihdam verileri, enflasyon, GSYİH gibi)
 - Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
 - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+- Ekonomik olayların piyasa etkilerini öngörmek ve strateji önerileri sunmak
 - Türkçe yanıtlar üretmek
+
+Önemli: Ekonomik takvim sorularında güncel ekonomik olayları (Fed kararları, ECB toplantıları, istihdam verileri vb.) dikkate al ve bunların piyasa volatilitesine etkilerini değerlendir.
 
 Kullanıcı mesajı: ${userMessage.content}`
 
@@ -127,10 +133,13 @@ Kullanıcı mesajı: ${userMessage.content}`
       // AI yanıtı için prompt oluştur
       const prompt = spark.llmPrompt`Sen yapay zekâ destekli bir algoritmik trader yöneticisisin. Görevin:
 - Farklı zaman dilimlerinde tüm piyasa enstrümanlarını analiz etmek
-- Ekonomik takvimi ve haber akışını takip edip yorumlamak
+- Ekonomik takvimi ve haber akışını takip edip yorumlamak (Fed faiz kararları, istihdam verileri, enflasyon, GSYİH gibi)
 - Kullanıcının portföyünü değerlendirerek özet çıkarım yapmak
 - Hangi stratejiler çalıştırılmalı/durdurulmalı bunu tahmin etmek
+- Ekonomik olayların piyasa etkilerini öngörmek ve strateji önerileri sunmak
 - Türkçe yanıtlar üretmek
+
+Önemli: Ekonomik takvim sorularında güncel ekonomik olayları (Fed kararları, ECB toplantıları, istihdam verileri vb.) dikkate al ve bunların piyasa volatilitesine etkilerini değerlendir.
 
 Kullanıcı mesajı: ${userMessage.content}`
 
@@ -191,9 +200,107 @@ Kullanıcı mesajı: ${userMessage.content}`
     }
   }
 
-  // AI ajan aksiyonlarını işleme fonksiyonu - yeni komutlara göre güncellendi
+  // AI ajan aksiyonlarını işleme fonksiyonu - ekonomik takvim entegrasyonu eklendi
   const handleAgentActions = async (message: string) => {
     const content = message.toLowerCase()
+
+    // Ekonomik takvim sorguları
+    if (content.includes("ekonomik olay") || content.includes("yüksek etkili")) {
+      try {
+        const { economicCalendarService } = await import('@/services/economicCalendarService')
+        const todayEvents = await economicCalendarService.getTodayHighImpactEvents()
+        
+        if (todayEvents.length > 0) {
+          const eventsList = todayEvents.map(event => 
+            `🔔 ${event.time} - ${event.olay} (${event.currency}) - Etki: ${event.etki}`
+          ).join('\n')
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: `📅 **Bugünkü Yüksek Etkili Ekonomik Olaylar:**\n\n${eventsList}\n\n⚠️ Bu olaylar piyasada volatiliteye neden olabilir. Strateji ayarlamalarınızı buna göre planlayın.`,
+            timestamp: new Date()
+          }])
+        } else {
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: '📅 Bugün yüksek etkili ekonomik olay bulunmuyor. Piyasalar sakin seyredebilir.',
+            timestamp: new Date()
+          }])
+        }
+      } catch (error) {
+        console.error('Ekonomik takvim hatası:', error)
+      }
+    }
+
+    // Gelecek 24 saatteki olaylar
+    if (content.includes("24 saat") || content.includes("gelecek") && content.includes("ekonomik")) {
+      try {
+        const { economicCalendarService } = await import('@/services/economicCalendarService')
+        const upcomingEvents = await economicCalendarService.getUpcomingHighImpactEvents()
+        
+        if (upcomingEvents.length > 0) {
+          const eventsList = upcomingEvents.map(event => 
+            `📅 ${event.date} ${event.time} - ${event.olay} (${event.currency})`
+          ).join('\n')
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: `⏰ **Gelecek 24 Saatteki Kritik Olaylar:**\n\n${eventsList}\n\n🚨 Bu olaylar öncesinde pozisyonlarınızı gözden geçirmenizi öneririm.`,
+            timestamp: new Date()
+          }])
+        } else {
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: '⏰ Gelecek 24 saatte yüksek etkili ekonomik olay bulunmuyor.',
+            timestamp: new Date()
+          }])
+        }
+      } catch (error) {
+        console.error('Ekonomik takvim hatası:', error)
+      }
+    }
+
+    // Ekonomik takvim bazlı strateji önerisi
+    if (content.includes("ekonomik takvim") && content.includes("strateji")) {
+      try {
+        const { economicCalendarService } = await import('@/services/economicCalendarService')
+        const todayEvents = await economicCalendarService.getTodayHighImpactEvents()
+        const upcomingEvents = await economicCalendarService.getUpcomingHighImpactEvents()
+        
+        let recommendation = '📊 **Ekonomik Takvim Bazlı Strateji Önerisi:**\n\n'
+        
+        if (todayEvents.length > 0 || upcomingEvents.length > 0) {
+          recommendation += '⚠️ **Yüksek Volatilite Beklentisi:**\n'
+          recommendation += '• Grid bot stratejilerini durdurun\n'
+          recommendation += '• Scalping stratejilerini aktifleştirin\n'
+          recommendation += '• Stop-loss seviyelerini daraltın\n'
+          recommendation += '• Pozisyon boyutlarını azaltın\n\n'
+          recommendation += '🎯 **Önerilen Aksiyonlar:**\n'
+          recommendation += '• Haber öncesi 30 dakika pozisyon almayın\n'
+          recommendation += '• Haber sonrası ilk 15 dakika momentum takibi yapın\n'
+          recommendation += '• ATR bazlı stop-loss kullanın'
+        } else {
+          recommendation += '😌 **Düşük Volatilite Ortamı:**\n'
+          recommendation += '• Grid bot stratejileri ideal\n'
+          recommendation += '• Range trading stratejileri çalıştırabilirsiniz\n'
+          recommendation += '• Carry trade pozisyonları değerlendirin\n'
+          recommendation += '• Uzun vadeli trend takibi yapabilirsiniz'
+        }
+        
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: recommendation,
+          timestamp: new Date()
+        }])
+      } catch (error) {
+        console.error('Ekonomik takvim analizi hatası:', error)
+      }
+    }
 
     // Grid bot stratejisi başlatma
     if (content.includes("grid bot") && content.includes("başlat")) {
