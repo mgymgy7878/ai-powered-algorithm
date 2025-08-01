@@ -39,6 +39,17 @@ export function Dashboard() {
     }
     setNotifications(prev => [newNotification, ...prev.slice(0, 9)]) // Son 10 bildirimi tut
   }
+
+  // Test amaçlı pushNotification fonksiyonu
+  const pushNotification = (msg: string, type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
+    const newNote: Notification = {
+      id: Date.now().toString(),
+      message: msg,
+      time: new Date().toLocaleTimeString("tr-TR"),
+      type
+    }
+    setNotifications((prev) => [newNote, ...prev.slice(0, 9)])
+  }
   
   // Sidebar durumu değişikliklerini dinle
   useEffect(() => {
@@ -107,7 +118,11 @@ export function Dashboard() {
     <div className="relative p-6 space-y-6">
       {/* Yapay Zeka Trading Yöneticisi - Sağ üst köşede sabit */}
       <div className="absolute top-16 right-4 w-[360px] z-50">
-        <TradingAssistant />
+        <TradingAssistant 
+          onNotification={(message, type) => {
+            addNotification({ message, type: type || 'info' })
+          }}
+        />
       </div>
 
       {/* Bildirim Merkezi - AI panelinin üst kısmında */}
@@ -123,23 +138,14 @@ export function Dashboard() {
           className="text-xs"
           onClick={() => {
             // Test bildirimleri gönder
-            addNotification({
-              message: 'BTCUSDT için güçlü alım sinyali tespit edildi. RSI: 28, MACD pozitif kesişim.',
-              type: 'success'
-            })
+            pushNotification('BTCUSDT için güçlü alım sinyali tespit edildi. RSI: 28, MACD pozitif kesişim.', 'success')
             
             setTimeout(() => {
-              addNotification({
-                message: 'Grid Bot ETHUSDT stratejisi 145$ kar elde etti ve pozisyonları yeniden ayarlandı.',
-                type: 'info'
-              })
+              pushNotification('Grid Bot ETHUSDT stratejisi 145$ kar elde etti ve pozisyonları yeniden ayarlandı.', 'info')
             }, 2000)
             
             setTimeout(() => {
-              addNotification({
-                message: 'Volatilite artıyor, pozisyon boyutlarını azaltmayı düşünün.',
-                type: 'warning'
-              })
+              pushNotification('Volatilite artıyor, pozisyon boyutlarını azaltmayı düşünün.', 'warning')
             }, 4000)
           }}
         >

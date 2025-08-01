@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useKV } from '@github/spark/hooks'
 import { useActivity } from '@/contexts/ActivityContext'
-import { addNotification } from '@/components/ui/NotificationCenter'
 import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp } from '@phosphor-icons/react'
 
 interface ChatMessage {
@@ -17,7 +16,11 @@ interface ChatMessage {
   timestamp: Date
 }
 
-export function TradingAssistant() {
+interface TradingAssistantProps {
+  onNotification?: (message: string, type?: 'success' | 'info' | 'warning' | 'error') => void
+}
+
+export function TradingAssistant({ onNotification }: TradingAssistantProps = {}) {
   const { addActivity } = useActivity()
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -213,10 +216,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         addActivity('Grid Bot stratejisi AI tarafından başlatıldı', 'success')
         
         // Bildirim merkezi bildirimi gönder
-        addNotification({
-          message: 'Grid Bot stratujisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.',
-          type: 'success'
-        })
+        onNotification?.('Grid Bot stratejisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.', 'success')
         
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -226,10 +226,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         }])
       } catch (error) {
         addActivity('Grid Bot stratejisi başlatılamadı', 'error')
-        addNotification({
-          message: 'Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.',
-          type: 'error'
-        })
+        onNotification?.('Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.', 'error')
       }
     }
 
@@ -240,10 +237,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         addActivity('Scalper stratejisi AI tarafından durduruldu', 'warning')
         
         // Bildirim merkezi bildirimi gönder
-        addNotification({
-          message: 'Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.',
-          type: 'warning'
-        })
+        onNotification?.('Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.', 'warning')
         
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -253,10 +247,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         }])
       } catch (error) {
         addActivity('Strateji durdurulamadı', 'error')
-        addNotification({
-          message: 'Strateji durdurma işlemi başarısız oldu.',
-          type: 'error'
-        })
+        onNotification?.('Strateji durdurma işlemi başarısız oldu.', 'error')
       }
     }
 
