@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useKV } from '@github/spark/hooks'
-import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp, Play } from '@phosphor-icons/react'
+import { Brain, Send, Loader2, User, Settings, ChevronDown, ChevronUp } from '@phosphor-icons/react'
 
 interface ChatMessage {
   id: string
@@ -32,36 +32,16 @@ export function TradingAssistant() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // AI önerileri listesi
-  const aiSuggestions = [
-    {
-      id: 1,
-      title: "Portföy Analizi",
-      description: "Mevcut portföyümü değerlendir",
-      command: "portföyü değerlendir"
-    },
-    {
-      id: 2,
-      title: "Piyasa Özeti",
-      description: "Güncel piyasa durumunu özetle",
-      command: "piyasa özeti ver"
-    },
-    {
-      id: 3,
-      title: "Strateji Önerisi", 
-      description: "Yeni strateji öner",
-      command: "yeni strateji öner"
-    },
-    {
-      id: 4,
-      title: "Risk Analizi",
-      description: "Risk seviyemi değerlendir",
-      command: "risk analizi yap"
-    }
+  // AI önerileri listesi - kullanıcı tarafından tanımlanan komutlar
+  const suggestions = [
+    { label: "Portföyü değerlendir", command: "portföyü değerlendir" },
+    { label: "Strateji başlat (grid bot)", command: "grid bot stratejisini başlat" },
+    { label: "AI'dan piyasa özeti al", command: "bugünkü piyasa özetini sun" },
+    { label: "Kazanç/zarar analizi", command: "kazanç zarar analizi yap" }
   ]
 
-  // Öneri uygulama fonksiyonu
-  const applySuggestion = async (command: string) => {
+  // Öneri uygulama fonksiyonu - kullanıcı tarafından tanımlanan komutları kullanır
+  const handleSuggestionApply = async (command: string) => {
     setInputMessage(command)
     
     // Kullanıcı mesajını otomatik gönder
@@ -205,11 +185,12 @@ Kullanıcı mesajı: ${userMessage.content}`
     }
   }
 
-  // AI ajan aksiyonlarını işleme fonksiyonu
+  // AI ajan aksiyonlarını işleme fonksiyonu - yeni komutlara göre güncellendi
   const handleAgentActions = async (message: string) => {
     const content = message.toLowerCase()
 
-    if (content.includes("başlat")) {
+    // Grid bot stratejisi başlatma
+    if (content.includes("grid bot") && content.includes("başlat")) {
       await startStrategy("grid-bot")
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -219,22 +200,59 @@ Kullanıcı mesajı: ${userMessage.content}`
       }])
     }
 
-    if (content.includes("durdur")) {
-      await stopStrategy("scalper")
+    // Genel strateji durdurma
+    if (content.includes("durdur") || content.includes("kapat")) {
+      await stopStrategy("aktif-strateji")
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
-        content: '⏹️ Scalper stratejisi durduruldu.',
+        content: '⏹️ Aktif strateji durduruldu.',
         timestamp: new Date()
       }])
     }
 
+    // Portföy değerlendirmesi
     if (content.includes("portföyü değerlendir") || content.includes("portföy analizi")) {
       const p = await fetchPortfolioData()
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
         content: `📊 **Portföy Değerlendirmesi:**\n\n💰 Toplam Bakiye: $${p.total.toLocaleString()}\n📈 Günlük K/Z: $${p.dailyPnl}\n💹 Toplam K/Z: $${p.totalPnl}\n🎯 Başarı Oranı: %${p.successRate}\n🤖 Aktif Stratejiler: ${p.activeStrategies}`,
+        timestamp: new Date()
+      }])
+    }
+
+    // Piyasa özeti
+    if (content.includes("piyasa özeti") || content.includes("piyasa özetini sun")) {
+      // Mock piyasa verisi
+      const marketData = {
+        btc: { price: 42500, change: 2.5 },
+        eth: { price: 2850, change: -1.2 },
+        general: "Kripto piyasalar pozitif seyirde"
+      }
+      
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `📈 **Günlük Piyasa Özeti:**\n\n₿ BTC: $${marketData.btc.price.toLocaleString()} (${marketData.btc.change > 0 ? '+' : ''}${marketData.btc.change}%)\nⒺ ETH: $${marketData.eth.price.toLocaleString()} (${marketData.eth.change > 0 ? '+' : ''}${marketData.eth.change}%)\n\n📊 Genel Durum: ${marketData.general}`,
+        timestamp: new Date()
+      }])
+    }
+
+    // Kazanç/zarar analizi
+    if (content.includes("kazanç zarar analizi") || content.includes("k/z analizi")) {
+      const analysisData = {
+        weeklyPnl: 3250.75,
+        monthlyPnl: 12450.30,
+        winRate: 72.5,
+        avgWin: 185.50,
+        avgLoss: -95.25
+      }
+      
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `💹 **Kazanç/Zarar Analizi:**\n\n📊 Haftalık K/Z: $${analysisData.weeklyPnl}\n📈 Aylık K/Z: $${analysisData.monthlyPnl}\n🎯 Kazanma Oranı: %${analysisData.winRate}\n💚 Ortalama Kazanç: $${analysisData.avgWin}\n🔴 Ortalama Kayıp: $${analysisData.avgLoss}`,
         timestamp: new Date()
       }])
     }
@@ -347,22 +365,19 @@ Kullanıcı mesajı: ${userMessage.content}`
               <ChevronUp className="w-3 h-3" />
             </Button>
           </div>
-          <div className="grid grid-cols-2 gap-1">
-            {aiSuggestions.map((suggestion) => (
-              <div key={suggestion.id} className="bg-background rounded border p-2">
-                <div className="flex items-center justify-between mb-1">
-                  <h5 className="text-xs font-medium truncate">{suggestion.title}</h5>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => applySuggestion(suggestion.command)}
-                    disabled={isLoading}
-                    className="h-5 w-5 p-0 ml-1"
-                  >
-                    <Play className="w-3 h-3" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground truncate">{suggestion.description}</p>
+          <div className="space-y-2 bg-muted rounded-md p-3 text-sm">
+            {suggestions.map((item, index) => (
+              <div key={index} className="flex items-center justify-between gap-2">
+                <span className="text-xs text-foreground">{item.label}</span>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => handleSuggestionApply(item.command)}
+                  disabled={isLoading}
+                  className="text-xs h-6 px-2"
+                >
+                  Uygula
+                </Button>
               </div>
             ))}
           </div>
