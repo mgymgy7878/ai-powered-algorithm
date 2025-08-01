@@ -1,147 +1,165 @@
-// Ekonomik takvim servisi - AI Trading Yöneticisi için
 export interface EconomicEvent {
   id: string
   date: string
   time: string
+  olay: string
   currency: string
-  olay: string // Event name in Turkish
-  etki: 'Düşük' | 'Orta' | 'Yüksek' // Impact level
-  beklenen?: string // Expected value
-  onceki?: string // Previous value
-  gercek?: string // Actual value
-}
-
-// API compatible interface
-export interface EconomicEventAPI {
-  id: string
-  date: string
-  time: string
-  currency: string
-  event: string
-  impact: 'low' | 'medium' | 'high'
-  forecast?: string
-  previous?: string
-  actual?: string
-  country?: string
-  category?: string
+  etki: 'Düşük' | 'Orta' | 'Yüksek'
+  onceki?: string
+  beklenen?: string
+  gercek?: string
 }
 
 class EconomicCalendarService {
-  private mockEvents: EconomicEvent[] = [
-    {
-      id: '1',
-      date: new Date().toLocaleDateString('tr-TR'),
-      time: '14:30',
-      currency: 'USD',
-      olay: 'Fed Faiz Kararı',
-      etki: 'Yüksek',
-      beklenen: '5.50%',
-      onceki: '5.25%'
-    },
-    {
-      id: '2',
-      date: new Date().toLocaleDateString('tr-TR'),
-      time: '16:00',
-      currency: 'USD', 
-      olay: 'İşsizlik Başvuruları',
-      etki: 'Orta',
-      beklenen: '220K',
-      onceki: '215K'
-    },
-    {
-      id: '3',
-      date: new Date(Date.now() + 24*60*60*1000).toLocaleDateString('tr-TR'),
-      time: '10:00',
-      currency: 'EUR',
-      olay: 'ECB Toplantısı',
-      etki: 'Yüksek',
-      beklenen: '4.25%',
-      onceki: '4.00%'
-    },
-    {
-      id: '4',
-      date: new Date(Date.now() + 12*60*60*1000).toLocaleDateString('tr-TR'),
-      time: '22:30',
-      currency: 'USD',
-      olay: 'Tüketici Fiyat Endeksi (CPI)',
-      etki: 'Yüksek',
-      beklenen: '3.2%',
-      onceki: '3.0%'
-    }
-  ]
+  private static instance: EconomicCalendarService
+  private events: EconomicEvent[] = []
 
-  private config: any = {}
-
-  setConfig(config: any) {
-    this.config = config
+  private constructor() {
+    this.initializeDemoData()
   }
 
-  /**
-   * Bugünkü yüksek etkili ekonomik olayları getir
-   */
+  static getInstance(): EconomicCalendarService {
+    if (!EconomicCalendarService.instance) {
+      EconomicCalendarService.instance = new EconomicCalendarService()
+    }
+    return EconomicCalendarService.instance
+  }
+
+  private initializeDemoData() {
+    // Demo ekonomik takvim verileri - gerçek entegrasyon için değiştirilecek
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    this.events = [
+      {
+        id: '1',
+        date: today.toISOString().split('T')[0],
+        time: '15:30',
+        olay: 'ABD İstihdam Dışı Tarım İstihdamı (NFP)',
+        currency: 'USD',
+        etki: 'Yüksek',
+        onceki: '150K',
+        beklenen: '180K',
+        gercek: ''
+      },
+      {
+        id: '2',
+        date: today.toISOString().split('T')[0],
+        time: '14:15',
+        olay: 'Avrupa Merkez Bankası Faiz Kararı',
+        currency: 'EUR',
+        etki: 'Yüksek',
+        onceki: '4.50%',
+        beklenen: '4.25%',
+        gercek: ''
+      },
+      {
+        id: '3',
+        date: tomorrow.toISOString().split('T')[0],
+        time: '16:00',
+        olay: 'ABD Tüketici Fiyat Endeksi (CPI)',
+        currency: 'USD',
+        etki: 'Yüksek',
+        onceki: '3.2%',
+        beklenen: '3.1%',
+        gercek: ''
+      },
+      {
+        id: '4',
+        date: tomorrow.toISOString().split('T')[0],
+        time: '13:45',
+        olay: 'İngiltere GSYİH (QoQ)',
+        currency: 'GBP',
+        etki: 'Yüksek',
+        onceki: '0.6%',
+        beklenen: '0.4%',
+        gercek: ''
+      }
+    ]
+  }
+
   async getTodayHighImpactEvents(): Promise<EconomicEvent[]> {
-    const today = new Date().toLocaleDateString('tr-TR')
-    return this.mockEvents.filter(event => 
+    const today = new Date().toISOString().split('T')[0]
+    return this.events.filter(event => 
       event.date === today && event.etki === 'Yüksek'
     )
   }
 
-  /**
-   * Gelecek 24 saatteki yüksek etkili olayları getir
-   */
   async getUpcomingHighImpactEvents(): Promise<EconomicEvent[]> {
     const now = new Date()
-    const tomorrow = new Date(now.getTime() + 24*60*60*1000)
-    
-    return this.mockEvents.filter(event => {
-      const eventDate = new Date(event.date.split('.').reverse().join('-'))
-      return eventDate >= now && eventDate <= tomorrow && event.etki === 'Yüksek'
+    const next24Hours = new Date(now)
+    next24Hours.setHours(next24Hours.getHours() + 24)
+
+    return this.events.filter(event => {
+      const eventDate = new Date(`${event.date}T${event.time}:00`)
+      return eventDate >= now && eventDate <= next24Hours && event.etki === 'Yüksek'
+    }).sort((a, b) => {
+      const dateA = new Date(`${a.date}T${a.time}:00`)
+      const dateB = new Date(`${b.date}T${b.time}:00`)
+      return dateA.getTime() - dateB.getTime()
     })
   }
 
-  /**
-   * Tüm ekonomik olayları getir (haftalık)
-   */
-  async getWeeklyEvents(): Promise<EconomicEvent[]> {
-    // Gerçek implementasyonda bu bir API çağrısı olacak
-    return this.mockEvents
+  async getAllEvents(): Promise<EconomicEvent[]> {
+    return [...this.events].sort((a, b) => {
+      const dateA = new Date(`${a.date}T${a.time}:00`)
+      const dateB = new Date(`${b.date}T${b.time}:00`)
+      return dateA.getTime() - dateB.getTime()
+    })
   }
 
-  /**
-   * Belirli bir para biriminin olaylarını getir
-   */
+  async getEventsByDate(date: string): Promise<EconomicEvent[]> {
+    return this.events.filter(event => event.date === date)
+  }
+
   async getEventsByCurrency(currency: string): Promise<EconomicEvent[]> {
-    return this.mockEvents.filter(event => 
-      event.currency.toUpperCase() === currency.toUpperCase()
-    )
+    return this.events.filter(event => event.currency === currency)
   }
 
-  /**
-   * Olay etkisine göre filtrele
-   */
-  async getEventsByImpact(impact: 'Düşük' | 'Orta' | 'Yüksek'): Promise<EconomicEvent[]> {
-    return this.mockEvents.filter(event => event.etki === impact)
+  async addEvent(event: Omit<EconomicEvent, 'id'>): Promise<EconomicEvent> {
+    const newEvent: EconomicEvent = {
+      ...event,
+      id: Date.now().toString()
+    }
+    this.events.push(newEvent)
+    return newEvent
   }
 
-  /**
-   * API compatible event fetcher - for EconomicCalendar component
-   */
-  async fetchEvents(): Promise<EconomicEventAPI[]> {
-    // Convert Turkish events to API format
-    return this.mockEvents.map(event => ({
-      id: event.id,
-      date: event.date,
-      time: event.time,
-      currency: event.currency,
-      event: event.olay,
-      impact: event.etki === 'Yüksek' ? 'high' : event.etki === 'Orta' ? 'medium' : 'low',
-      forecast: event.beklenen,
-      previous: event.onceki,
-      actual: event.gercek,
-      country: event.currency === 'USD' ? 'US' : event.currency === 'EUR' ? 'EU' : 'TR',
-      category: 'monetary-policy'
-    }))
+  async updateEvent(id: string, updates: Partial<EconomicEvent>): Promise<EconomicEvent | null> {
+    const index = this.events.findIndex(event => event.id === id)
+    if (index === -1) return null
+
+    this.events[index] = { ...this.events[index], ...updates }
+    return this.events[index]
+  }
+
+  async deleteEvent(id: string): Promise<boolean> {
+    const index = this.events.findIndex(event => event.id === id)
+    if (index === -1) return false
+
+    this.events.splice(index, 1)
+    return true
+  }
+
+  // Gerçek API entegrasyonu için placeholder metodlar
+  async fetchFromExternalAPI(): Promise<EconomicEvent[]> {
+    // Burada gerçek ekonomik takvim API'ından veri çekilecek
+    // Örnek: ForexFactory, Investing.com, Financial Modeling Prep vs.
+    console.log('Economic calendar: External API integration not implemented yet')
+    return this.events
+  }
+
+  async refreshData(): Promise<void> {
+    try {
+      // Gerçek implementasyonda burada external API'dan yeni veriler çekilecek
+      const freshData = await this.fetchFromExternalAPI()
+      this.events = freshData
+      console.log('Economic calendar data refreshed')
+    } catch (error) {
+      console.error('Failed to refresh economic calendar data:', error)
+    }
   }
 }
 
-export const economicCalendarService = new EconomicCalendarService()
+export const economicCalendarService = EconomicCalendarService.getInstance()

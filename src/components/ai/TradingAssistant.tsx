@@ -657,13 +657,13 @@ Kullanıcı mesajı: ${userMessage.content}`
               </div>
             </div>
           </DialogContent>
-        </Dialog>
-        
-        <Badge variant="secondary" className="text-xs">
-          {apiSettings?.openai?.enabled ? 'OpenAI' : apiSettings?.anthropic?.enabled ? 'Claude' : 'Spark LLM'}
-        </Badge>
+          </Dialog>
+          
+          <Badge variant="secondary" className="text-xs">
+            {apiSettings?.openai?.enabled ? 'OpenAI' : apiSettings?.anthropic?.enabled ? 'Claude' : 'Spark LLM'}
+          </Badge>
+        </div>
       </div>
-    </div>
 
       {/* Mesaj Listesi */}
       <ScrollArea className="flex-1 p-2">
