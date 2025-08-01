@@ -195,13 +195,12 @@ export function TradingAssistant() {
 
   return (
     <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Header - Sabit üst bar */}
-      <div className="flex items-center justify-between p-3 border-b bg-muted/50">
-        <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-primary" />
-          <h3 className="text-sm font-semibold">AI Trading Yöneticisi</h3>
+      {/* Header - Sabit üst bar (sticky) */}
+      <div className="sticky top-0 z-20 bg-background px-3 py-2 border-b flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <Brain className="w-4 h-4 text-primary" />
+          <span>AI Trading Yöneticisi</span>
         </div>
-        
         <div className="flex items-center gap-1">
           <Badge variant="outline" className="text-xs px-2 py-1">
             {getActiveModel()}
@@ -212,9 +211,9 @@ export function TradingAssistant() {
               variant="ghost" 
               size="sm"
               onClick={() => setShowSettings(true)}
-              className="h-7 w-7 p-0"
+              className="h-6 w-6 p-0"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-3 h-3" />
             </Button>
             
             <DialogContent className="sm:max-w-md">
