@@ -138,12 +138,12 @@ export function Dashboard() {
 
   return (
     <div className="relative p-2 space-y-2">
-      {/* Tüm Portföy Metrikleri - Tek satırda, menü ile bildirim arasında */}
-      <div className="absolute top-3 left-[60px] right-[140px] z-40 px-2 flex items-center gap-2 justify-start max-w-[calc(100vw-220px)] overflow-hidden">
+      {/* Tüm Portföy Metrikleri - Tek satırda, %50 küçültülmüş, menü ile bildirim arasında */}
+      <div className="absolute top-3 left-[55px] right-[160px] z-40 flex items-center flex-nowrap gap-1 overflow-hidden">
         {allMetrics.map((metric, index) => (
-          <div key={index} className="bg-muted rounded-md px-3 py-2 text-center shadow-sm min-w-[120px] flex-shrink-0">
-            <p className="text-[11px] text-muted-foreground truncate leading-tight">{metric.label}</p>
-            <p className={`text-sm font-semibold ${metric.color} leading-tight`}>
+          <div key={index} className="rounded-md bg-muted text-muted-foreground px-2 py-1 text-center shadow-sm w-[110px] h-[32px] flex-shrink-0 flex flex-col items-center justify-center">
+            <p className="text-xs text-muted-foreground truncate leading-none">{metric.label}</p>
+            <p className={`text-xs font-semibold ${metric.color} leading-none mt-0.5`}>
               {metric.value}
             </p>
           </div>
