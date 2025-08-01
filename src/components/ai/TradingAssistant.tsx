@@ -214,8 +214,7 @@ Kullanıcı mesajı: ${userMessage.content}`
         
         // Bildirim merkezi bildirimi gönder
         addNotification({
-          title: 'Strateji Başlatıldı',
-          message: 'Grid Bot stratejisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.',
+          message: 'Grid Bot stratujisi AI tarafından başarıyla başlatıldı ve çalışmaya başladı.',
           type: 'success'
         })
         
@@ -228,7 +227,6 @@ Kullanıcı mesajı: ${userMessage.content}`
       } catch (error) {
         addActivity('Grid Bot stratejisi başlatılamadı', 'error')
         addNotification({
-          title: 'Strateji Hatası',
           message: 'Grid Bot stratejisi başlatılamadı. Lütfen ayarları kontrol edin.',
           type: 'error'
         })
@@ -243,7 +241,6 @@ Kullanıcı mesajı: ${userMessage.content}`
         
         // Bildirim merkezi bildirimi gönder
         addNotification({
-          title: 'Strateji Durduruldu',
           message: 'Aktif stratejiler AI tarafından güvenlik sebebiyle durduruldu.',
           type: 'warning'
         })
@@ -257,7 +254,6 @@ Kullanıcı mesajı: ${userMessage.content}`
       } catch (error) {
         addActivity('Strateji durdurulamadı', 'error')
         addNotification({
-          title: 'Strateji Hatası',
           message: 'Strateji durdurma işlemi başarısız oldu.',
           type: 'error'
         })

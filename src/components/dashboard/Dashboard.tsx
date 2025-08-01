@@ -7,7 +7,6 @@ import { TrendingUp, TrendingDown, BarChart } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
 import { NotificationCenter, addNotification } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
-import { activityMonitor } from '../../services/activityMonitor'
 
 interface PortfolioMetrics {
   totalValue: number
@@ -39,20 +38,6 @@ export function Dashboard() {
   
   // Otomatik bildirim sistemi - gerçek piyasa olaylarını simüle eder
   useEffect(() => {
-    // Activity monitor'ı addActivity ile bağla ve notification center'a da gönder
-    const handleActivityNotification = (message: string, type: 'success' | 'info' | 'warning' | 'error') => {
-      addActivity(message, type)
-      
-      // NotificationCenter'a da bildirim gönder
-      addNotification({
-        message: message,
-        type: type
-      })
-    }
-
-    activityMonitor.addListener(handleActivityNotification)
-    activityMonitor.startMarketSimulation()
-
     // Demo bildirimler gönder
     setTimeout(() => {
       addNotification({
@@ -61,9 +46,21 @@ export function Dashboard() {
       })
     }, 1000)
 
+    // Periyodik demo bildirimler
+    const interval = setInterval(() => {
+      const demoNotifications = [
+        { message: 'BTCUSDT için güçlü trend sinyali tespit edildi.', type: 'info' as const },
+        { message: 'Grid Bot stratejisi pozisyon güncelledi.', type: 'success' as const },
+        { message: 'Volatilite artışı tespit edildi.', type: 'warning' as const },
+        { message: 'ETHUSDT için alım sinyali oluştu.', type: 'info' as const }
+      ]
+      
+      const randomNotification = demoNotifications[Math.floor(Math.random() * demoNotifications.length)]
+      addNotification(randomNotification)
+    }, 30000) // Her 30 saniyede bir
+
     return () => {
-      activityMonitor.removeListener(handleActivityNotification)
-      activityMonitor.stopMarketSimulation()
+      clearInterval(interval)
     }
   }, [addActivity])
   
