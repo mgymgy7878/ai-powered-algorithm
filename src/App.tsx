@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Sidebar } from './components/layout/Sidebar'
-import { Dashboard } from './components/dashboard/Dashboard'
+import { SimpleDashboard } from './components/dashboard/SimpleDashboard'
 import { Toaster } from './components/ui/sonner'
 import { ActivityProvider } from './contexts/ActivityContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -19,11 +19,11 @@ import { PortfolioView } from './components/portfolio/PortfolioView'
 import { MarketAnalysis } from './components/analysis/MarketAnalysis'
 import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import APISettings from './components/settings/APISettings'
-import ProjectAnalysis from './pages/ProjectAnalysis'
-import TestPage from './pages/TestPage'
+import ProjectStatusPage from './pages/Summary'
+import SimpleTestPage from './pages/SimpleTestPage'
 
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis' | 'test'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -133,7 +133,7 @@ function App() {
 
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard />
+        return <SimpleDashboard />
       case 'strategies':
         return <StrategiesPage />
       case 'backtest':
@@ -148,12 +148,12 @@ function App() {
         return <EconomicCalendar />
       case 'settings':
         return <APISettings />
-      case 'project-analysis':
-        return <ProjectAnalysis />
+      case 'project-status':
+        return <ProjectStatusPage />
       case 'test':
-        return <TestPage />
+        return <SimpleTestPage />
       default:
-        return <Dashboard />
+        return <SimpleDashboard />
     }
   }
 
