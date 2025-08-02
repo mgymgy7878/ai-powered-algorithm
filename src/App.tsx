@@ -20,9 +20,9 @@ const MarketAnalysis = lazy(() => import('./components/analysis/MarketAnalysis')
 const EconomicCalendar = lazy(() => import('./components/economic/EconomicCalendar').then(m => ({ default: m.EconomicCalendar })))
 const APISettings = lazy(() => import('./components/settings/APISettings').then(m => ({ default: m.APISettings })))
 const ProjectAnalysis = lazy(() => import('./pages/ProjectAnalysis'))
-const TestDragDrop = lazy(() => import('./pages/TestDragDrop'))
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis' | 'test-drag-drop'
+
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -185,12 +185,6 @@ function App() {
         return (
           <Suspense fallback={<LoadingFallback />}>
             <ProjectAnalysis />
-          </Suspense>
-        )
-      case 'test-drag-drop':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <TestDragDrop />
           </Suspense>
         )
       default:

@@ -15,8 +15,7 @@ import {
   List,
   X,
   Calendar,
-  ClipboardCheck,
-  Move
+  ClipboardCheck
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -51,7 +50,6 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'portfolio', label: 'Portföy', icon: PieChart },
       { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
       { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
-      { id: 'test-drag-drop', label: 'Sürükle & Bırak Test', icon: Move },
       { id: 'project-analysis', label: 'Proje Durumu', icon: ClipboardCheck },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
