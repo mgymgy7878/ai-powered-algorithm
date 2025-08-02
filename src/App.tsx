@@ -45,6 +45,9 @@ function App() {
 
   // Initialize AI service with stored settings
   useEffect(() => {
+    // Test sayfasını otomatik aç - geliştirme amaçlı
+    setCurrentView('test')
+    
     if (apiSettings) {
       try {
         aiService.setSettings(apiSettings)
