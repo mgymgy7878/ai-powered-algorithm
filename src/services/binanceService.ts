@@ -189,6 +189,22 @@ class BinanceService {
     }
   }
 
+  // Tek sembol fiyatını getir
+  async getSymbolPrice(symbol: string): Promise<SymbolPrice | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/fapi/v1/ticker/24hr?symbol=${symbol.toUpperCase()}`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error(`${symbol} fiyatı alınırken hata:`, error)
+      return null
+    }
+  }
+
   // Kline verilerini getir (candlestick data)
   async getKlineData(
     symbol: string, 

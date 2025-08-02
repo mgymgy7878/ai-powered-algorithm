@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { aiService } from '../../../services/aiService'
-import { binanceService } from '../../../services/binanceService'
+import { aiService } from './aiService'
+import { binanceService } from './binanceService'
 
 export interface MarketData {
   symbol: string
