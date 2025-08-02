@@ -3,8 +3,10 @@ import { CompactModule } from './CompactModule';
 import { TradingChart } from '../charts/TradingChart';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { TradingAssistant } from '../ai/TradingAssistant';
+import { DraggableDashboard } from './DraggableDashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useKV } from '@github/spark/hooks';
 import { 
   TrendingUp, 
@@ -18,7 +20,9 @@ import {
   Target,
   PieChart,
   History,
-  Zap
+  Zap,
+  LayoutGrid, 
+  Maximize2
 } from 'lucide-react';
 
 interface DetailPanelProps {
@@ -50,6 +54,7 @@ export const Dashboard: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   const [chartSymbol, setChartSymbol] = useState('BINANCE:BTCUSDT');
+  const [viewMode, setViewMode] = useState<'classic' | 'draggable'>('draggable');
   
   const [portfolioData] = useKV('portfolio-data', {
     totalValue: 50000,
@@ -63,7 +68,7 @@ export const Dashboard: React.FC = () => {
   const getDetailPosition = () => {
     return {
       position: 'absolute' as const,
-      top: '70px',
+      top: '84px',
       right: '20px',
       zIndex: 40
     };
