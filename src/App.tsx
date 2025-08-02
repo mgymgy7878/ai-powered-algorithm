@@ -107,6 +107,9 @@ function App() {
     console.log('🎬🎬🎬 Current view in renderView:', currentView)
     console.log('🎬🎬🎬 Timestamp:', new Date().toLocaleTimeString())
     console.log('🎪 Available pages: dashboard, strategies, backtest, live, portfolio, analysis, economic, summary, settings, project-analysis, test')
+    console.log('🔍 Checking imports - Test:', typeof Test)
+    console.log('🔍 Checking imports - Summary:', typeof Summary)
+    console.log('🔍 Checking imports - ProjectAnalysis:', typeof ProjectAnalysis)
     
     try {
       switch (currentView) {
@@ -132,26 +135,28 @@ function App() {
           console.log('📅 Rendering EconomicCalendar')
           return <EconomicCalendar />
         case 'summary':
-          console.log('📊 Rendering Summary page')
+          console.log('📊📊📊 Rendering Summary page - Component type:', typeof Summary)
           return <Summary />
         case 'settings':
           console.log('⚙️ Rendering APISettings page')
           return <APISettings />
         case 'project-analysis':
-          console.log('📋 Rendering ProjectAnalysis page')
+          console.log('📋📋📋 Rendering ProjectAnalysis page - Component type:', typeof ProjectAnalysis)
           return <ProjectAnalysis />
         case 'test':
-          console.log('🧪🧪🧪 Rendering Test page - SUCCESS!')
+          console.log('🧪🧪🧪 Rendering Test page - Component type:', typeof Test)
           return <Test />
         default:
-          console.log('🏠 Rendering default Dashboard')
+          console.log('🏠 Rendering default Dashboard - Unknown view:', currentView)
           return <Dashboard />
       }
     } catch (error) {
       console.error('❌❌❌ Error rendering view:', currentView, error)
+      console.error('❌❌❌ Error stack:', error.stack)
       return <div className="p-6">
         <h1 className="text-2xl font-bold text-red-600">Sayfa Yükleme Hatası</h1>
         <p className="text-muted-foreground">Sayfa "{currentView}" yüklenirken hata oluştu: {String(error)}</p>
+        <pre className="mt-4 p-4 bg-muted rounded text-xs">{error.stack}</pre>
       </div>
     }
   }
@@ -161,13 +166,25 @@ function App() {
       <div className="min-h-screen bg-background text-foreground">
         {/* Debug Test Butonları - Geçici */}
         <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-[200] flex gap-2 bg-red-500 p-2 rounded">
-          <Button size="sm" onClick={() => setCurrentView('test')} className="bg-green-600 hover:bg-green-700 text-white text-xs">
+          <Button size="sm" onClick={() => {
+            console.log('🧪 Debug buton - Test tıklandı')
+            setCurrentView('test')
+            console.log('🧪 Debug buton - Test view set edildi')
+          }} className="bg-green-600 hover:bg-green-700 text-white text-xs">
             🧪 Test Sayfası
           </Button>
-          <Button size="sm" onClick={() => setCurrentView('summary')} className="bg-blue-600 hover:bg-blue-700 text-white text-xs">
+          <Button size="sm" onClick={() => {
+            console.log('📊 Debug buton - Summary tıklandı')
+            setCurrentView('summary')
+            console.log('📊 Debug buton - Summary view set edildi')
+          }} className="bg-blue-600 hover:bg-blue-700 text-white text-xs">
             📊 Özet Sayfası  
           </Button>
-          <Button size="sm" onClick={() => setCurrentView('project-analysis')} className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
+          <Button size="sm" onClick={() => {
+            console.log('📋 Debug buton - Project analysis tıklandı')
+            setCurrentView('project-analysis')
+            console.log('📋 Debug buton - Project analysis view set edildi')
+          }} className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
             📋 Proje Durumu
           </Button>
           <span className="text-white text-xs flex items-center">Aktif: {currentView}</span>
