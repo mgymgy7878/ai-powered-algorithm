@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CompactModule } from './CompactModule';
-import { TradingChart } from '../chart/TradingChart';
+import TradingViewWidget from '../chart/TradingViewWidget';
+import ChartModal from '../chart/ChartModal';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { TradingAssistant } from '../ai/TradingAssistant';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,6 +49,9 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ title, children, onClose }) =
 
 export const Dashboard: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
+  const [chartSymbol, setChartSymbol] = useState('BINANCE:BTCUSDT');
+  
   const [portfolioData] = useKV('portfolio-data', {
     totalValue: 50000,
     dailyPnl: 1250.50,
@@ -67,6 +71,14 @@ export const Dashboard: React.FC = () => {
   };
 
   const closeDetailPanel = () => setSelectedModule(null);
+
+  const handleChartFullscreen = () => {
+    setIsChartFullscreen(true);
+  };
+
+  const handleChartClose = () => {
+    setIsChartFullscreen(false);
+  };
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -204,11 +216,22 @@ export const Dashboard: React.FC = () => {
           />
         </div>
 
-        {/* Grafik paneli */}
+        {/* Gelişmiş Grafik Paneli */}
         <div className="mb-6">
-          <TradingChart compact={false} />
+          <TradingViewWidget
+            symbol={chartSymbol}
+            height={280}
+            onFullscreenToggle={handleChartFullscreen}
+          />
         </div>
       </div>
+
+      {/* Tam Ekran Grafik Modal */}
+      <ChartModal
+        isOpen={isChartFullscreen}
+        onClose={handleChartClose}
+        symbol={chartSymbol}
+      />
 
       {/* Detay panelleri */}
       {selectedModule && (
