@@ -7,21 +7,15 @@ import { debugLog } from '../../utils/debugUtils'
 import { 
   BarChart, 
   Cpu, 
-  Play, 
   PieChart,
   Search,
   Home,
   Settings,
   Rocket,
-  Brain,
   List,
   X,
   Calendar,
-  ClipboardCheck,
-  FileText,
-  TestTube,
-  Wifi,
-  Circle
+  ClipboardCheck
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -56,12 +50,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'portfolio', label: 'Portföy', icon: PieChart },
       { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
       { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
-      { id: 'summary', label: 'Özet', icon: FileText },
       { id: 'project-analysis', label: 'Proje Durumu', icon: ClipboardCheck },
-      { id: 'test', label: 'Test Sayfası', icon: TestTube },
-      { id: 'websocket-test', label: 'WebSocket Test', icon: Wifi },
-      { id: 'a-page', label: 'A Sayfası', icon: Circle },
-      { id: 'debug', label: '🔴 DEBUG', icon: Settings },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
     

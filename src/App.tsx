@@ -19,13 +19,8 @@ const MarketAnalysis = lazy(() => import('./components/analysis/MarketAnalysis')
 const EconomicCalendar = lazy(() => import('./components/economic/EconomicCalendar').then(m => ({ default: m.EconomicCalendar })))
 const APISettings = lazy(() => import('./components/settings/APISettings').then(m => ({ default: m.APISettings })))
 const ProjectAnalysis = lazy(() => import('./pages/ProjectAnalysis'))
-const Summary = lazy(() => import('./pages/Summary'))
-const Test = lazy(() => import('./pages/Test'))
-const WebSocketTest = lazy(() => import('./pages/WebSocketTest'))
-const APage = lazy(() => import('./pages/APage'))
-const DebugPage = lazy(() => import('./pages/DebugPage'))
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'summary' | 'settings' | 'project-analysis' | 'test' | 'websocket-test' | 'a-page' | 'debug'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -178,12 +173,6 @@ function App() {
             <EconomicCalendar />
           </Suspense>
         )
-      case 'summary':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <Summary />
-          </Suspense>
-        )
       case 'settings':
         return (
           <Suspense fallback={<LoadingFallback />}>
@@ -194,30 +183,6 @@ function App() {
         return (
           <Suspense fallback={<LoadingFallback />}>
             <ProjectAnalysis />
-          </Suspense>
-        )
-      case 'test':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <Test />
-          </Suspense>
-        )
-      case 'websocket-test':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <WebSocketTest />
-          </Suspense>
-        )
-      case 'a-page':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <APage />
-          </Suspense>
-        )
-      case 'debug':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <DebugPage currentView={currentView} onViewChange={handleViewChange} />
           </Suspense>
         )
       default:
