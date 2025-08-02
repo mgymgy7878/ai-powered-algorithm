@@ -88,13 +88,13 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Menüyü Gizle/Göster butonu - biraz sola kaydırıldı */}
+      {/* Toggle Button - Menüyü Gizle/Göster butonu - AI Trader yazısının yanında */}
       <Button
         onClick={handleToggle}
         variant="ghost"
         size="icon"
-        className={`fixed top-2 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
-          isSidebarOpen ? 'left-[210px]' : 'left-2'
+        className={`fixed top-4 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
+          isSidebarOpen ? 'left-[180px]' : 'left-2'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}

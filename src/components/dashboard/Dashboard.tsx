@@ -193,6 +193,26 @@ export const Dashboard: React.FC = () => {
             onClick={() => setSelectedModule('recent-trades')}
             className="w-full h-[56px] text-xs p-2"
           />
+
+          <CompactModule
+            title="En İyi Performans"
+            value="Grid Bot"
+            subtitle="+34.5% bu ay"
+            icon={<Zap className="w-3 h-3" />}
+            variant="success"
+            onClick={() => setSelectedModule('best-strategy')}
+            className="w-full h-[56px] text-xs p-2"
+          />
+
+          <CompactModule
+            title="Portföy Performansı"
+            value="+21.2%"
+            subtitle="ROI (3 ay)"
+            icon={<PieChart className="w-3 h-3" />}
+            variant="success"
+            onClick={() => setSelectedModule('portfolio-performance')}
+            className="w-full h-[56px] text-xs p-2"
+          />
         </div>
 
         {/* Orta kısım: Trading Grafiği - Doğru en/boy oranında */}
@@ -300,6 +320,8 @@ export const Dashboard: React.FC = () => {
                 {selectedModule === 'recent-trades' && 'Son İşlemler'}
                 {selectedModule === 'quick-actions' && 'Hızlı Eylemler'}
                 {selectedModule === 'strategy-performance' && 'Strateji Performansı'}
+                {selectedModule === 'best-strategy' && 'En İyi Performans Gösteren Stratejiler'}
+                {selectedModule === 'portfolio-performance' && 'Portföy Performansı'}
                 {selectedModule === 'portfolio' && 'Portföy Özeti'}
                 {selectedModule === 'daily-pnl' && 'Günlük K/Z'}
                 {selectedModule === 'total-pnl' && 'Toplam K/Z'}
@@ -630,6 +652,64 @@ export const Dashboard: React.FC = () => {
                     🟢 Tüm sistemler normal çalışıyor<br/>
                     ⚡ Uptime: 4d 12h 25m<br/>
                     📡 Son güncelleme: 2 saniye önce
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'best-strategy' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Grid Bot (BTCUSDT)</div>
+                      <div className="text-xs text-muted-foreground">Son 30 gün</div>
+                    </div>
+                    <span className="text-green-600 font-semibold">+34.5%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Scalper (ETHUSDT)</div>
+                      <div className="text-xs text-muted-foreground">Son 30 gün</div>
+                    </div>
+                    <span className="text-green-600 font-semibold">+28.2%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">RSI Bot (BNBUSDT)</div>
+                      <div className="text-xs text-muted-foreground">Son 30 gün</div>
+                    </div>
+                    <span className="text-green-600 font-semibold">+15.7%</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-green-50 p-2 rounded">
+                    🏆 Grid Bot bu ay en yüksek performansı gösterdi<br/>
+                    📊 Ortalama günlük kazanç: $287<br/>
+                    ⚡ Toplam işlem: 1,247 (89% başarılı)
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'portfolio-performance' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Son 7 Gün</span>
+                    <span className="text-green-600 font-medium">+8.4%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Son 30 Gün</span>
+                    <span className="text-green-600 font-medium">+21.2%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Son 90 Gün</span>
+                    <span className="text-green-600 font-medium">+47.8%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Bu Yıl (YTD)</span>
+                    <span className="text-green-600 font-medium">+156.3%</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
+                    📈 Sharpe Oranı: 2.34 (Mükemmel)<br/>
+                    📉 Max Drawdown: -8.2%<br/>
+                    💎 En iyi ay: Kasım (+34.1%)<br/>
+                    🔥 Kazanç sırası: 12 gün üst üste
                   </div>
                 </div>
               )}
