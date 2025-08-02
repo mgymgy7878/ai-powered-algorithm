@@ -88,21 +88,21 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Kompakt pozisyon */}
+      {/* Toggle Button - AI Trader yazısının hizasında sola kaydırılmış */}
       <Button
         onClick={handleToggle}
         variant="ghost"
         size="icon"
-        className={`fixed top-3 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
-          isSidebarOpen ? 'left-[268px]' : 'left-3'
+        className={`fixed top-4 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
+          isSidebarOpen ? 'left-[220px]' : 'left-3'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
         {isSidebarOpen ? (
-          <ChevronLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">‹</span>
         ) : (
-          <ChevronRight className="w-4 h-4" />
+          <span className="text-sm font-medium">›</span>
         )}
       </Button>
 

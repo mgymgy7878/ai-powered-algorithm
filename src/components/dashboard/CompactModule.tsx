@@ -46,32 +46,32 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
   return (
     <Card 
       className={cn(
-        'px-1 py-1 transition-all duration-200 cursor-pointer select-none border shadow-sm overflow-hidden flex',
+        'px-2 py-1.5 transition-all duration-200 cursor-pointer select-none border shadow-sm overflow-hidden flex',
         variantStyles[variant],
         isClickable && 'hover:shadow-md hover:scale-[1.02] hover:z-10',
-        // Daha küçük varsayılan boyut
-        !className?.includes('h-') && 'h-[44px]',
-        !className?.includes('w-') && 'min-w-[120px]',
+        // Daha esnek varsayılan boyut
+        !className?.includes('h-') && 'h-[50px]',
+        !className?.includes('w-') && 'min-w-[140px]',
         className
       )}
       onClick={onClick}
     >
       <div className="flex flex-col h-full justify-between w-full">
         {/* Üst kısım: Başlık ve ikon */}
-        <div className="flex items-center justify-between gap-1 mb-0.5">
+        <div className="flex items-center justify-between gap-1 mb-1">
           <div className="flex items-center gap-1 min-w-0 flex-1">
             {icon && (
-              <div className="flex-shrink-0 w-2 h-2">
+              <div className="flex-shrink-0">
                 {icon}
               </div>
             )}
-            <h3 className="text-[8px] font-semibold leading-tight truncate" title={title}>
+            <h3 className="text-[9px] font-semibold leading-tight truncate text-left" title={title}>
               {title}
             </h3>
           </div>
           
           {badge && (
-            <Badge variant="outline" className="text-[6px] h-2 px-1 py-0 leading-none bg-white/90 border-current">
+            <Badge variant="outline" className="text-[7px] h-3 px-1 py-0 leading-none bg-white/90 border-current">
               {badge}
             </Badge>
           )}
@@ -81,8 +81,8 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         <div className="flex-1 flex items-center justify-center">
           <span 
             className={cn(
-              // Kompakt yazı boyutları
-              className?.includes('text-[10px]') ? 'text-[10px]' : 
+              // Dinamik yazı boyutları - yüksekliğe göre adapte edilir
+              className?.includes('h-[31px]') ? 'text-xs' : 
               className?.includes('h-[22px]') ? 'text-[10px]' : 'text-sm',
               'font-bold leading-none text-center',
               valueVariantStyles[variant]
@@ -93,10 +93,15 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
           </span>
         </div>
         
-        {/* Alt kısım: Alt başlık */}
+        {/* Alt kısım: Alt başlık - sadece yeterli alan varsa */}
         {subtitle && (
-          <div className="mt-0.5">
-            <p className="text-[7px] text-muted-foreground/70 leading-tight truncate text-center" title={subtitle}>
+          <div className="mt-1">
+            <p className={cn(
+              // Kutu yüksekliğine göre alt başlık boyutu
+              className?.includes('h-[31px]') ? 'text-[8px]' : 
+              className?.includes('h-[22px]') ? 'text-[7px]' : 'text-xs',
+              'text-muted-foreground/70 leading-tight truncate text-center'
+            )} title={subtitle}>
               {subtitle}
             </p>
           </div>

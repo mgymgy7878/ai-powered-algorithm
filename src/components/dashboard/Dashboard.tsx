@@ -62,157 +62,158 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Üst sıra: Yatay hizalanmış önemli göstergeler */}
+      <div className="flex items-center gap-2 p-2 border-b border-border">
+        <CompactModule
+          title="Portföy Değeri"
+          value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
+          icon={<DollarSign className="w-3 h-3" />}
+          variant="info"
+          onClick={() => setSelectedModule('portfolio')}
+          className="w-[180px] h-[31px] text-[11px]"
+        />
+
+        <CompactModule
+          title="Günlük K/Z"
+          value={`+$${(portfolioData?.dailyPnl ?? 0).toLocaleString()}`}
+          icon={<TrendingUp className="w-3 h-3" />}
+          variant="success"
+          onClick={() => setSelectedModule('daily-pnl')}
+          className="w-[180px] h-[31px] text-[11px]"
+        />
+
+        <CompactModule
+          title="Toplam K/Z"
+          value={`+$${(portfolioData?.totalPnl ?? 0).toLocaleString()}`}
+          icon={<TrendingUp className="w-3 h-3" />}
+          variant="success" 
+          onClick={() => setSelectedModule('total-pnl')}
+          className="w-[180px] h-[31px] text-[11px]"
+        />
+
+        <CompactModule
+          title="Başarı Oranı"
+          value={`${(portfolioData?.winRate ?? 0)}%`}
+          icon={<Target className="w-3 h-3" />}
+          variant="info"
+          onClick={() => setSelectedModule('win-rate')}
+          className="w-[180px] h-[31px] text-[11px]"
+        />
+
+        <CompactModule
+          title="Aktif Stratejiler"
+          value={portfolioData?.activeStrategies ?? 0}
+          icon={<Bot className="w-3 h-3" />}
+          variant="default"
+          onClick={() => setSelectedModule('active-strategies')}
+          className="w-[180px] h-[31px] text-[11px]"
+        />
+
+        <CompactModule
+          title="Sistem Durumu"
+          value="Aktif"
+          icon={<Activity className="w-3 h-3" />}
+          variant="success"
+          onClick={() => setSelectedModule('system-status')}
+          className="w-[180px] h-[31px] text-[11px]"
+        />
+      </div>
+
       {/* Ana İçerik - Sol tarafta kutular alt alta, sağda AI asistanı */}
       <div className="flex">
-        {/* Sol taraf: Tüm modüller alt alta - %50 küçültülmüş */}
-        <div className="w-[150px] p-2 space-y-1">
+        {/* Sol taraf: Diğer modüller alt alta - Yükseklik %40 artırılmış */}
+        <div className="w-[200px] p-2 space-y-1">
 
-          {/* Portföy Göstergeleri */}
-          <CompactModule
-            title="Portföy Değeri"
-            value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
-            icon={<DollarSign className="w-2 h-2" />}
-            variant="info"
-            onClick={() => setSelectedModule('portfolio')}
-            className="w-full h-[22px] text-[10px]"
-          />
-
-          <CompactModule
-            title="Günlük K/Z"
-            value={`+$${(portfolioData?.dailyPnl ?? 0).toLocaleString()}`}
-            icon={<TrendingUp className="w-2 h-2" />}
-            variant="success"
-            onClick={() => setSelectedModule('daily-pnl')}
-            className="w-full h-[22px] text-[10px]"
-          />
-
-          <CompactModule
-            title="Toplam K/Z"
-            value={`+$${(portfolioData?.totalPnl ?? 0).toLocaleString()}`}
-            icon={<TrendingUp className="w-2 h-2" />}
-            variant="success" 
-            onClick={() => setSelectedModule('total-pnl')}
-            className="w-full h-[22px] text-[10px]"
-          />
-
-          <CompactModule
-            title="Başarı Oranı"
-            value={`${(portfolioData?.winRate ?? 0)}%`}
-            icon={<Target className="w-2 h-2" />}
-            variant="info"
-            onClick={() => setSelectedModule('win-rate')}
-            className="w-full h-[22px] text-[10px]"
-          />
-
-          <CompactModule
-            title="Aktif Stratejiler"
-            value={portfolioData?.activeStrategies ?? 0}
-            icon={<Bot className="w-2 h-2" />}
-            variant="default"
-            onClick={() => setSelectedModule('active-strategies')}
-            className="w-full h-[22px] text-[10px]"
-          />
-
-          {/* AI ve Analiz Modülleri */}
+          {/* AI ve Analiz Modülleri - Yükseklik %40 artırıldı */}
           <CompactModule
             title="AI Tahmin"
             value="▲ %76"
             subtitle="BTCUSDT Güçlü Yükseliş"
-            icon={<Bot className="w-2 h-2" />}
+            icon={<Bot className="w-3 h-3" />}
             variant="success"
             badge="Güçlü"
             onClick={() => setSelectedModule('ai-prediction')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Risk Uyarısı"
             value="Orta"
             subtitle="3 pozisyon izleniyor"
-            icon={<AlertTriangle className="w-2 h-2" />}
+            icon={<AlertTriangle className="w-3 h-3" />}
             variant="warning"
             onClick={() => setSelectedModule('risk-alerts')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Teknik Sinyal"
             value="Doji"
             subtitle="ETH 4H - Dönüş"
-            icon={<Activity className="w-2 h-2" />}
+            icon={<Activity className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('technical-signals')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
-            title="Canlı Haberler"
+            title="Canlı Haberler"  
             value="Fed Kararı"
             subtitle="2 saat önce"
-            icon={<Newspaper className="w-2 h-2" />}
+            icon={<Newspaper className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('news-feed')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Ekonomik Takvim"
             value="CPI Verisi"
             subtitle="Yarın 16:30"
-            icon={<Calendar className="w-2 h-2" />}
+            icon={<Calendar className="w-3 h-3" />}
             variant="danger"
             onClick={() => setSelectedModule('economic-calendar')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Performans"
             value="+12.3%"
             subtitle="Hafta kazancı"
-            icon={<TrendingUp className="w-2 h-2" />}
+            icon={<TrendingUp className="w-3 h-3" />}
             variant="success"
             onClick={() => setSelectedModule('strategy-performance')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Portföy Dağılımı"
             value="65% USDT"
             subtitle="Stabil coin ağırlığı"
-            icon={<PieChart className="w-2 h-2" />}
+            icon={<PieChart className="w-3 h-3" />}
             variant="default"
             onClick={() => setSelectedModule('portfolio-distribution')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Son İşlemler"
             value="12"
             subtitle="Bugün"
-            icon={<History className="w-2 h-2" />}
+            icon={<History className="w-3 h-3" />}
             variant="default"
             onClick={() => setSelectedModule('recent-trades')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
           <CompactModule
             title="Hızlı Eylemler"
             value="Bot Başlat"
             subtitle="Yeni yapılandır"
-            icon={<Zap className="w-2 h-2" />}
+            icon={<Zap className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('quick-actions')}
-            className="w-full h-[22px] text-[10px]"
-          />
-
-          <CompactModule
-            title="Sistem Durumu"
-            value="Aktif"
-            subtitle="Tüm botlar OK"
-            icon={<Activity className="w-2 h-2" />}
-            variant="success"
-            onClick={() => setSelectedModule('system-status')}
-            className="w-full h-[22px] text-[10px]"
+            className="w-full h-[31px] text-[11px]"
           />
 
         </div>

@@ -197,16 +197,16 @@ export function TradingAssistant() {
   }
 
   return (
-    <Card className="w-full h-[calc(100vh-100px)] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Header ultra kompakt - başlık, model seçici ve ayarlar yan yana */}
-      <div className="sticky top-0 z-50 bg-background border-b">
-        <div className="flex items-center justify-between px-2 py-1">
-          <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground">
-            <Brain className="w-3 h-3" />
-            <span>AI Yöneticisi</span>
+    <Card className="w-full h-[calc(100vh-150px)] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
+      {/* Header ultra kompakt - üst kutularla çakışmasın diye margin ekledik */}
+      <div className="sticky top-0 z-50 bg-background border-b mt-2">
+        <div className="flex items-center justify-between px-3 py-2">
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <Brain className="w-4 h-4" />
+            <span>AI Trading Yöneticisi</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Badge variant="outline" className="text-[8px] px-1 py-0 h-3">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[9px] px-2 py-0.5 h-4">
               {getActiveModel()}
             </Badge>
             
@@ -215,9 +215,9 @@ export function TradingAssistant() {
                 variant="ghost" 
                 size="icon"
                 onClick={() => setShowSettings(true)}
-                className="h-4 w-4 p-0"
+                className="h-6 w-6 p-0"
               >
-                <Settings className="w-3 h-3" />
+                <Settings className="w-4 h-4" />
               </Button>
                 
               <DialogContent className="sm:max-w-md">
