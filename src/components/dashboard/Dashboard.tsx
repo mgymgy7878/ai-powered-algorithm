@@ -73,14 +73,14 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Üst sıra: Tüm temel göstergeler - sola hizalı, küçük, yatay */}
-      <div className="flex items-center gap-1 px-2 py-2 ml-[70px] border-b border-border bg-card/50 flex-shrink-0">
+      <div className="flex items-center gap-1 px-2 py-2 ml-[50px] border-b border-border bg-card/50 flex-shrink-0">
         <CompactModule
           title="Portföy Değeri"
           value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
           icon={<DollarSign className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('portfolio')}
-          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
+          className="w-[80px] h-[40px] text-[10px] p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
           icon={<TrendingUp className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('daily-pnl')}
-          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
+          className="w-[80px] h-[40px] text-[10px] p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -98,7 +98,7 @@ export const Dashboard: React.FC = () => {
           icon={<TrendingUp className="w-3 h-3" />}
           variant="success" 
           onClick={() => setSelectedModule('total-pnl')}
-          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
+          className="w-[80px] h-[40px] text-[10px] p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -107,7 +107,7 @@ export const Dashboard: React.FC = () => {
           icon={<Target className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('win-rate')}
-          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
+          className="w-[80px] h-[40px] text-[10px] p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -116,7 +116,7 @@ export const Dashboard: React.FC = () => {
           icon={<Bot className="w-3 h-3" />}
           variant="default"
           onClick={() => setSelectedModule('active-strategies')}
-          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
+          className="w-[80px] h-[40px] text-[10px] p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -125,14 +125,14 @@ export const Dashboard: React.FC = () => {
           icon={<Activity className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('system-status')}
-          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
+          className="w-[80px] h-[40px] text-[10px] p-1 flex-shrink-0"
         />
       </div>
 
       {/* Ana İçerik Alanı - Üst kutular görünür şekilde altında */}
       <div className="flex flex-1 overflow-hidden pt-2">
         {/* Sol taraf: Diğer modüller alt alta - üsttekilerle aynı boyut */}
-        <div className="w-[140px] p-1 space-y-1 overflow-y-auto">
+        <div className="w-[120px] p-1 space-y-1 overflow-y-auto">
           <CompactModule
             title="AI Tahmin"
             value="▲ %76"
@@ -141,7 +141,7 @@ export const Dashboard: React.FC = () => {
             variant="success"
             badge="Güçlü"
             onClick={() => setSelectedModule('ai-prediction')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -151,7 +151,7 @@ export const Dashboard: React.FC = () => {
             icon={<AlertTriangle className="w-3 h-3" />}
             variant="warning"
             onClick={() => setSelectedModule('risk-alerts')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -161,7 +161,7 @@ export const Dashboard: React.FC = () => {
             icon={<Activity className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('technical-signals')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -171,7 +171,7 @@ export const Dashboard: React.FC = () => {
             icon={<Newspaper className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('news-feed')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -181,7 +181,7 @@ export const Dashboard: React.FC = () => {
             icon={<Calendar className="w-3 h-3" />}
             variant="danger"
             onClick={() => setSelectedModule('economic-calendar')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -191,7 +191,7 @@ export const Dashboard: React.FC = () => {
             icon={<History className="w-3 h-3" />}
             variant="default"
             onClick={() => setSelectedModule('recent-trades')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -201,7 +201,7 @@ export const Dashboard: React.FC = () => {
             icon={<Zap className="w-3 h-3" />}
             variant="success"
             onClick={() => setSelectedModule('best-strategy')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
 
           <CompactModule
@@ -211,7 +211,7 @@ export const Dashboard: React.FC = () => {
             icon={<PieChart className="w-3 h-3" />}
             variant="success"
             onClick={() => setSelectedModule('portfolio-performance')}
-            className="w-full h-[58px] text-xs p-1"
+            className="w-full h-[50px] text-[10px] p-1"
           />
         </div>
 
@@ -256,29 +256,29 @@ export const Dashboard: React.FC = () => {
         {/* Sağ taraf: AI Trading Yöneticisi - 280px genişlik */}
         <div className="w-[280px] flex flex-col p-1">
           {/* AI Trading Yöneticisi - Uzatıldı */}
-          <div className="flex-1 mb-1 h-[calc(100vh-180px)]">
+          <div className="flex-1 mb-1 h-[calc(100vh-120px)]">
             <TradingAssistant />
           </div>
           
-          {/* Kalıcı Bildirim Kutusu - Kompakt */}
-          <Card className="mb-1 h-[100px]">
+          {/* Kalıcı Bildirim Kutusu - %20 küçültülmüş */}
+          <Card className="mb-1 h-[80px]">
             <CardHeader className="pb-0 px-1 py-0.5">
               <div className="flex items-center gap-1">
                 <Bell className="w-2 h-2" />
-                <CardTitle className="text-[9px] font-medium">Bildirimler</CardTitle>
+                <CardTitle className="text-[8px] font-medium">Bildirimler</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-1 pt-0.5">
-              <ScrollArea className="h-[75px]">
+              <ScrollArea className="h-[60px]">
                 <div className="space-y-0.5">
                   {notifications.slice(0, 3).map((notification) => (
                     <div 
                       key={notification.id}
-                      className="text-[8px] p-0.5 rounded-md bg-muted/50 border"
+                      className="text-[7px] p-0.5 rounded-md bg-muted/50 border"
                     >
                       <div className="flex justify-between items-start">
                         <span className="flex-1 pr-0.5 leading-3">{notification.message}</span>
-                        <span className="text-muted-foreground whitespace-nowrap text-[7px]">{notification.time}</span>
+                        <span className="text-muted-foreground whitespace-nowrap text-[6px]">{notification.time}</span>
                       </div>
                     </div>
                   ))}
@@ -288,11 +288,11 @@ export const Dashboard: React.FC = () => {
                       {notifications.slice(3).map((notification) => (
                         <div 
                           key={notification.id}
-                          className="text-[8px] p-0.5 rounded-md bg-muted/30 border opacity-80"
+                          className="text-[7px] p-0.5 rounded-md bg-muted/30 border opacity-80"
                         >
                           <div className="flex justify-between items-start">
                             <span className="flex-1 pr-0.5 leading-3">{notification.message}</span>
-                            <span className="text-muted-foreground whitespace-nowrap text-[7px]">{notification.time}</span>
+                            <span className="text-muted-foreground whitespace-nowrap text-[6px]">{notification.time}</span>
                           </div>
                         </div>
                       ))}

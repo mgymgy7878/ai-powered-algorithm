@@ -106,7 +106,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 bg-card border-r border-border h-screen flex flex-col shadow-lg ${isSidebarOpen ? 'overflow-visible' : 'overflow-hidden'}`}>
         <div className="p-6 border-b border-border relative">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1 pr-2">
               <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
               <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
             </div>
@@ -115,7 +115,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
               onClick={handleToggle}
               variant="ghost"
               size="icon"
-              className="bg-transparent hover:bg-muted transition-colors ml-2"
+              className="bg-transparent hover:bg-muted transition-colors flex-shrink-0"
               title="Menüyü Gizle"
               aria-label="Menüyü Gizle"
             >

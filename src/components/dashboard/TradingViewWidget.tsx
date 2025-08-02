@@ -55,10 +55,26 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
     }
 
     const initWidget = async () => {
-      const isLoaded = await loadTradingViewScript()
-      
-      if (isLoaded && (window as any).TradingView && containerRef.current) {
-        try {
+      try {
+        // Loading göster
+        if (containerRef.current) {
+          containerRef.current.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-muted rounded-md">
+              <div class="text-center p-4">
+                <div class="text-lg font-semibold text-primary mb-2">${symbol}</div>
+                <div class="text-sm text-muted-foreground mb-4">Grafik yükleniyor...</div>
+                <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto"></div>
+              </div>
+            </div>
+          `
+        }
+
+        const isLoaded = await loadTradingViewScript()
+        
+        if (isLoaded && (window as any).TradingView && containerRef.current) {
+          // Container'ı temizle
+          containerRef.current.innerHTML = ''
+          
           // Benzersiz container ID oluştur
           const uniqueId = `${container_id}-${Math.random().toString(36).substr(2, 9)}`
           containerRef.current.id = uniqueId
@@ -76,6 +92,10 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
             enable_publishing: enable_publishing,
             allow_symbol_change: allow_symbol_change,
             container_id: uniqueId,
+            // Widget yüklendiğinde callback
+            onChartReady: () => {
+              console.log('TradingView widget loaded successfully')
+            },
             // Ek özellikler
             studies: [
               "Volume@tv-basicstudies"
@@ -84,19 +104,33 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
             popup_width: "1000",
             popup_height: "650"
           })
-        } catch (error) {
-          console.error('TradingView widget initialization error:', error)
+        } else {
           // Fallback içerik göster
           if (containerRef.current) {
             containerRef.current.innerHTML = `
               <div class="flex items-center justify-center h-full bg-muted rounded-md">
-                <div class="text-center">
-                  <div class="text-sm font-semibold">${symbol}</div>
-                  <div class="text-xs text-muted-foreground">Grafik yüklenemiyor</div>
+                <div class="text-center p-4">
+                  <div class="text-lg font-semibold text-primary mb-2">${symbol}</div>
+                  <div class="text-sm text-muted-foreground mb-2">TradingView yüklenemedi</div>
+                  <div class="text-xs text-muted-foreground">Lütfen sayfayı yenileyin</div>
                 </div>
               </div>
             `
           }
+        }
+      } catch (error) {
+        console.error('TradingView widget initialization error:', error)
+        // Fallback içerik göster
+        if (containerRef.current) {
+          containerRef.current.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-muted rounded-md">
+              <div class="text-center p-4">
+                <div class="text-lg font-semibold text-primary mb-2">${symbol}</div>
+                <div class="text-sm text-muted-foreground mb-2">Grafik yüklenirken hata oluştu</div>
+                <div class="text-xs text-muted-foreground">Lütfen sayfayı yenileyin</div>
+              </div>
+            </div>
+          `
         }
       }
     }
