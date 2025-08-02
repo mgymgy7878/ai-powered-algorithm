@@ -13,7 +13,8 @@ import {
   Settings,
   Rocket,
   List,
-  X,
+  ChevronLeft,
+  ChevronRight,
   Calendar,
   ClipboardCheck
 } from 'lucide-react'
@@ -92,14 +93,13 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
         onClick={handleToggle}
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all"
+        className={`fixed top-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all ${
+          isSidebarOpen ? 'left-[240px]' : 'left-4'
+        }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
-        {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
-        <span className="absolute top-full left-0 mt-1 text-xs bg-red-500 text-white px-1 rounded">
-          {isSidebarOpen ? 'AÇIK' : 'KAPALI'}
-        </span>
+        {isSidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
       </Button>
 
       {/* Sidebar */}
