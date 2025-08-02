@@ -18,6 +18,7 @@ import { ActivityProvider } from './contexts/ActivityContext'
 import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
+import { Button } from './components/ui/button'
 
 export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'summary' | 'settings' | 'project-analysis' | 'test'
 
@@ -26,7 +27,8 @@ function App() {
   
   // Debug için currentView değişikliklerini izle
   useEffect(() => {
-    console.log('🎯 currentView changed to:', currentView)
+    console.log('🎯🎯🎯 APP.TSX - currentView changed to:', currentView)
+    console.log('🎯🎯🎯 APP.TSX - timestamp:', new Date().toLocaleTimeString())
   }, [currentView])
   
   const [strategies] = useKV<any[]>('trading-strategies', [])
@@ -101,23 +103,33 @@ function App() {
   }, [apiSettings])
 
   const renderView = () => {
-    console.log('🎬 Current view in renderView:', currentView) // Debug için
-    console.log('🎪 Available pages: dashboard, strategies, backtest, live, portfolio, analysis, economic, summary, settings, project-analysis, test') // Debug için
+    console.log('🎬🎬🎬 RENDER VIEW FUNCTION CALLED')
+    console.log('🎬🎬🎬 Current view in renderView:', currentView)
+    console.log('🎬🎬🎬 Timestamp:', new Date().toLocaleTimeString())
+    console.log('🎪 Available pages: dashboard, strategies, backtest, live, portfolio, analysis, economic, summary, settings, project-analysis, test')
+    
     try {
       switch (currentView) {
         case 'dashboard':
+          console.log('🏠 Rendering Dashboard')
           return <Dashboard />
         case 'strategies':
+          console.log('⚙️ Rendering StrategiesPage')
           return <StrategiesPage />
         case 'backtest':
+          console.log('📊 Rendering BacktestEngine')
           return <BacktestEngine />
         case 'live':
+          console.log('🚀 Rendering LiveTrading')
           return <LiveTrading />
         case 'portfolio':
+          console.log('💼 Rendering PortfolioView')
           return <PortfolioView />
         case 'analysis':
+          console.log('🔍 Rendering MarketAnalysis')
           return <MarketAnalysis />
         case 'economic':
+          console.log('📅 Rendering EconomicCalendar')
           return <EconomicCalendar />
         case 'summary':
           console.log('📊 Rendering Summary page')
@@ -129,14 +141,14 @@ function App() {
           console.log('📋 Rendering ProjectAnalysis page')
           return <ProjectAnalysis />
         case 'test':
-          console.log('🧪 Rendering Test page')
+          console.log('🧪🧪🧪 Rendering Test page - SUCCESS!')
           return <Test />
         default:
-          console.log('Rendering default Dashboard')
+          console.log('🏠 Rendering default Dashboard')
           return <Dashboard />
       }
     } catch (error) {
-      console.error('Error rendering view:', currentView, error)
+      console.error('❌❌❌ Error rendering view:', currentView, error)
       return <div className="p-6">
         <h1 className="text-2xl font-bold text-red-600">Sayfa Yükleme Hatası</h1>
         <p className="text-muted-foreground">Sayfa "{currentView}" yüklenirken hata oluştu: {String(error)}</p>
@@ -147,15 +159,40 @@ function App() {
   return (
     <ActivityProvider>
       <div className="min-h-screen bg-background text-foreground">
+        {/* Debug Test Butonları - Geçici */}
+        <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-[200] flex gap-2 bg-red-500 p-2 rounded">
+          <Button size="sm" onClick={() => setCurrentView('test')} className="bg-green-600 hover:bg-green-700 text-white text-xs">
+            🧪 Test Sayfası
+          </Button>
+          <Button size="sm" onClick={() => setCurrentView('summary')} className="bg-blue-600 hover:bg-blue-700 text-white text-xs">
+            📊 Özet Sayfası  
+          </Button>
+          <Button size="sm" onClick={() => setCurrentView('project-analysis')} className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
+            📋 Proje Durumu
+          </Button>
+          <span className="text-white text-xs flex items-center">Aktif: {currentView}</span>
+        </div>
+        
         <div className="flex">
           <Sidebar 
             currentView={currentView} 
-            onViewChange={setCurrentView}
+            onViewChange={(newView) => {
+              console.log('🔄🔄🔄 SIDEBAR CALLBACK - Old view:', currentView)
+              console.log('🔄🔄🔄 SIDEBAR CALLBACK - New view:', newView)
+              console.log('🔄🔄🔄 SIDEBAR CALLBACK - Calling setCurrentView')
+              setCurrentView(newView)
+              console.log('🔄🔄🔄 SIDEBAR CALLBACK - setCurrentView called')
+            }}
             strategyCount={strategies?.length ?? 0}
             runningStrategiesCount={liveStrategies?.length ?? 0}
           />
           <main className="flex-1 overflow-hidden">
-            {renderView()}
+            {(() => {
+              console.log('🎭🎭🎭 MAIN RENDER - About to call renderView()')
+              const result = renderView()
+              console.log('🎭🎭🎭 MAIN RENDER - renderView() completed')
+              return result
+            })()}
           </main>
         </div>
         <Toaster />
