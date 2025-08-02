@@ -94,7 +94,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
         variant="ghost"
         size="icon"
         className={`fixed top-4 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
-          isSidebarOpen ? 'left-[220px]' : 'left-2'
+          isSidebarOpen ? 'left-[240px]' : 'left-2'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}

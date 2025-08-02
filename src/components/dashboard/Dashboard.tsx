@@ -73,14 +73,14 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Üst sıra: Tüm temel göstergeler - sola hizalı, küçük, yatay */}
-      <div className="flex items-center gap-1 px-2 py-2 ml-[260px] border-b border-border bg-card/50 flex-shrink-0">
+      <div className="flex items-center gap-1 px-2 py-2 ml-[70px] border-b border-border bg-card/50 flex-shrink-0">
         <CompactModule
           title="Portföy Değeri"
           value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
           icon={<DollarSign className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('portfolio')}
-          className="w-[110px] h-[56px] text-xs p-2 flex-shrink-0"
+          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
           icon={<TrendingUp className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('daily-pnl')}
-          className="w-[110px] h-[56px] text-xs p-2 flex-shrink-0"
+          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -98,7 +98,7 @@ export const Dashboard: React.FC = () => {
           icon={<TrendingUp className="w-3 h-3" />}
           variant="success" 
           onClick={() => setSelectedModule('total-pnl')}
-          className="w-[110px] h-[56px] text-xs p-2 flex-shrink-0"
+          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -107,7 +107,7 @@ export const Dashboard: React.FC = () => {
           icon={<Target className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('win-rate')}
-          className="w-[110px] h-[56px] text-xs p-2 flex-shrink-0"
+          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -116,7 +116,7 @@ export const Dashboard: React.FC = () => {
           icon={<Bot className="w-3 h-3" />}
           variant="default"
           onClick={() => setSelectedModule('active-strategies')}
-          className="w-[110px] h-[56px] text-xs p-2 flex-shrink-0"
+          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
         />
 
         <CompactModule
@@ -125,14 +125,14 @@ export const Dashboard: React.FC = () => {
           icon={<Activity className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('system-status')}
-          className="w-[110px] h-[56px] text-xs p-2 flex-shrink-0"
+          className="w-[95px] h-[48px] text-xs p-1 flex-shrink-0"
         />
       </div>
 
       {/* Ana İçerik Alanı - Üst kutular görünür şekilde altında */}
-      <div className="flex flex-1 overflow-hidden pt-4">
+      <div className="flex flex-1 overflow-hidden pt-2">
         {/* Sol taraf: Diğer modüller alt alta - üsttekilerle aynı boyut */}
-        <div className="w-[180px] p-2 space-y-2 overflow-y-auto">
+        <div className="w-[140px] p-1 space-y-1 overflow-y-auto">
           <CompactModule
             title="AI Tahmin"
             value="▲ %76"
@@ -141,7 +141,7 @@ export const Dashboard: React.FC = () => {
             variant="success"
             badge="Güçlü"
             onClick={() => setSelectedModule('ai-prediction')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -151,7 +151,7 @@ export const Dashboard: React.FC = () => {
             icon={<AlertTriangle className="w-3 h-3" />}
             variant="warning"
             onClick={() => setSelectedModule('risk-alerts')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -161,7 +161,7 @@ export const Dashboard: React.FC = () => {
             icon={<Activity className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('technical-signals')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -171,7 +171,7 @@ export const Dashboard: React.FC = () => {
             icon={<Newspaper className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('news-feed')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -181,7 +181,7 @@ export const Dashboard: React.FC = () => {
             icon={<Calendar className="w-3 h-3" />}
             variant="danger"
             onClick={() => setSelectedModule('economic-calendar')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -191,7 +191,7 @@ export const Dashboard: React.FC = () => {
             icon={<History className="w-3 h-3" />}
             variant="default"
             onClick={() => setSelectedModule('recent-trades')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -201,7 +201,7 @@ export const Dashboard: React.FC = () => {
             icon={<Zap className="w-3 h-3" />}
             variant="success"
             onClick={() => setSelectedModule('best-strategy')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
 
           <CompactModule
@@ -211,23 +211,23 @@ export const Dashboard: React.FC = () => {
             icon={<PieChart className="w-3 h-3" />}
             variant="success"
             onClick={() => setSelectedModule('portfolio-performance')}
-            className="w-full h-[56px] text-xs p-2"
+            className="w-full h-[58px] text-xs p-1"
           />
         </div>
 
         {/* Orta kısım: Trading Grafiği - Doğru en/boy oranında */}
-        <div className="flex-1 p-2">
+        <div className="flex-1 p-1">
           <Card className="h-full bg-white">
-            <CardHeader className="pb-2 px-3 py-2">
+            <CardHeader className="pb-1 px-2 py-1">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-semibold">Trading Grafiği</CardTitle>
-                <div className="flex items-center gap-2">
-                  <select className="text-xs border rounded px-2 py-1 bg-background">
+                <CardTitle className="text-xs font-semibold">Trading Grafiği</CardTitle>
+                <div className="flex items-center gap-1">
+                  <select className="text-[10px] border rounded px-1 py-0.5 bg-background">
                     <option value="BINANCE:BTCUSDT">BTCUSDT</option>
                     <option value="BINANCE:ETHUSDT">ETHUSDT</option>
                     <option value="BINANCE:BNBUSDT">BNBUSDT</option>
                   </select>
-                  <select className="text-xs border rounded px-2 py-1 bg-background">
+                  <select className="text-[10px] border rounded px-1 py-0.5 bg-background">
                     <option value="1m">1m</option>
                     <option value="5m">5m</option>
                     <option value="15m">15m</option>
@@ -235,14 +235,14 @@ export const Dashboard: React.FC = () => {
                     <option value="4h">4h</option>
                     <option value="1d">1d</option>
                   </select>
-                  <button className="p-1 hover:bg-gray-100 rounded">
-                    <Maximize2 className="w-4 h-4" />
+                  <button className="p-0.5 hover:bg-gray-100 rounded">
+                    <Maximize2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-2 pt-0">
-              <div className="w-full h-[calc(100vh-180px)] min-h-[400px] bg-muted/20 rounded-md overflow-hidden">
+            <CardContent className="p-1 pt-0">
+              <div className="w-full h-[calc(100vh-140px)] min-h-[400px] bg-muted/20 rounded-md overflow-hidden">
                 <TradingViewWidget 
                   symbol="BINANCE:BTCUSDT" 
                   width="100%" 
@@ -254,45 +254,45 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Sağ taraf: AI Trading Yöneticisi - 280px genişlik */}
-        <div className="w-[280px] flex flex-col p-2">
+        <div className="w-[280px] flex flex-col p-1">
           {/* AI Trading Yöneticisi - Uzatıldı */}
-          <div className="flex-1 mb-2 h-[calc(100vh-220px)]">
+          <div className="flex-1 mb-1 h-[calc(100vh-180px)]">
             <TradingAssistant />
           </div>
           
           {/* Kalıcı Bildirim Kutusu - Kompakt */}
-          <Card className="mb-2 h-[120px]">
-            <CardHeader className="pb-0 px-2 py-1">
+          <Card className="mb-1 h-[100px]">
+            <CardHeader className="pb-0 px-1 py-0.5">
               <div className="flex items-center gap-1">
-                <Bell className="w-3 h-3" />
-                <CardTitle className="text-[10px] font-medium">Bildirimler</CardTitle>
+                <Bell className="w-2 h-2" />
+                <CardTitle className="text-[9px] font-medium">Bildirimler</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-2 pt-1">
-              <ScrollArea className="h-[90px]">
-                <div className="space-y-1">
+            <CardContent className="p-1 pt-0.5">
+              <ScrollArea className="h-[75px]">
+                <div className="space-y-0.5">
                   {notifications.slice(0, 3).map((notification) => (
                     <div 
                       key={notification.id}
-                      className="text-[9px] p-1 rounded-md bg-muted/50 border"
+                      className="text-[8px] p-0.5 rounded-md bg-muted/50 border"
                     >
                       <div className="flex justify-between items-start">
-                        <span className="flex-1 pr-1 leading-3">{notification.message}</span>
-                        <span className="text-muted-foreground whitespace-nowrap text-[8px]">{notification.time}</span>
+                        <span className="flex-1 pr-0.5 leading-3">{notification.message}</span>
+                        <span className="text-muted-foreground whitespace-nowrap text-[7px]">{notification.time}</span>
                       </div>
                     </div>
                   ))}
                   
                   {notifications.length > 3 && (
-                    <div className="space-y-1 pt-1 border-t border-border">
+                    <div className="space-y-0.5 pt-0.5 border-t border-border">
                       {notifications.slice(3).map((notification) => (
                         <div 
                           key={notification.id}
-                          className="text-[9px] p-1 rounded-md bg-muted/30 border opacity-80"
+                          className="text-[8px] p-0.5 rounded-md bg-muted/30 border opacity-80"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="flex-1 pr-1 leading-3">{notification.message}</span>
-                            <span className="text-muted-foreground whitespace-nowrap text-[8px]">{notification.time}</span>
+                            <span className="flex-1 pr-0.5 leading-3">{notification.message}</span>
+                            <span className="text-muted-foreground whitespace-nowrap text-[7px]">{notification.time}</span>
                           </div>
                         </div>
                       ))}
