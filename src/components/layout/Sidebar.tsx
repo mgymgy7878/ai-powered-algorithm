@@ -88,13 +88,13 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Her zaman görünür */}
+      {/* Toggle Button - Her zaman görünür, sağ konumda */}
       <Button
         onClick={handleToggle}
         variant="ghost"
         size="icon"
-        className={`fixed top-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all ${
-          isSidebarOpen ? 'left-[256px]' : 'left-4'
+        className={`fixed top-5 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all ${
+          isSidebarOpen ? 'left-[268px]' : 'left-4'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}

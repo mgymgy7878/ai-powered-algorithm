@@ -65,56 +65,56 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Layout Bölgesi 1: Üst Metrik Kartları */}
-      <div className="h-16 flex items-center px-4 border-b border-border">
+      <div className="h-20 flex items-center px-4 border-b border-border bg-muted/20">
         {/* Sol boşluk menü butonu için */}
-        <div className="w-16 flex-shrink-0"></div>
+        <div className="w-14 flex-shrink-0"></div>
         
         {/* Metrik kartları - menü butonunun sağından başlar */}
-        <div className="flex items-center gap-3 overflow-x-auto flex-1">
+        <div className="flex items-center gap-2 overflow-x-auto flex-1 py-2">
           <CompactModule
             title="Portföy"
             value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
-            icon={<DollarSign className="w-4 h-4" />}
+            icon={<DollarSign className="w-3.5 h-3.5" />}
             variant="info"
             onClick={() => setSelectedModule('portfolio')}
-            className="min-w-[120px]"
+            className="min-w-[130px] max-w-[130px]"
           />
           <CompactModule
             title="Günlük K/Z"
             value={`$${(portfolioData?.dailyPnl ?? 0).toLocaleString()}`}
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon={<TrendingUp className="w-3.5 h-3.5" />}
             variant="success"
             onClick={() => setSelectedModule('daily-pnl')}
-            className="min-w-[120px]"
+            className="min-w-[130px] max-w-[130px]"
           />
           <CompactModule
             title="Toplam K/Z"
             value={`$${(portfolioData?.totalPnl ?? 0).toLocaleString()}`}
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon={<TrendingUp className="w-3.5 h-3.5" />}
             variant="success"
             onClick={() => setSelectedModule('total-pnl')}
-            className="min-w-[120px]"
+            className="min-w-[130px] max-w-[130px]"
           />
           <CompactModule
-            title="Başarı"
-            value={`${portfolioData.winRate}%`}
-            icon={<Target className="w-4 h-4" />}
+            title="Başarı Oranı"
+            value={`${(portfolioData?.winRate ?? 0)}%`}
+            icon={<Target className="w-3.5 h-3.5" />}
             variant="info"
             onClick={() => setSelectedModule('win-rate')}
-            className="min-w-[100px]"
+            className="min-w-[120px] max-w-[120px]"
           />
           <CompactModule
             title="Stratejiler"
-            value={portfolioData.activeStrategies}
-            icon={<Bot className="w-4 h-4" />}
+            value={portfolioData?.activeStrategies ?? 0}
+            icon={<Bot className="w-3.5 h-3.5" />}
             variant="default"
             onClick={() => setSelectedModule('active-strategies')}
-            className="min-w-[120px]"
+            className="min-w-[110px] max-w-[110px]"
           />
         </div>
 
-        {/* Bildirim paneli - daraltılmış genişlik */}
-        <div className="w-[350px] flex-shrink-0 ml-4">
+        {/* Bildirim paneli - Stratejiler kutusunun yanına kadar uzayacak */}
+        <div className="flex-1 max-w-[400px] ml-2">
           <NotificationCenter />
         </div>
       </div>
@@ -123,17 +123,17 @@ export const Dashboard: React.FC = () => {
       <div className="flex">
         {/* Sol taraf: Modüller */}
         <div className="flex-1 p-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
             {/* AI Tahmin Paneli */}
             <CompactModule
               title="AI Tahmin"
               value="▲ %76"
               subtitle="BTCUSDT"
-              icon={<Bot className="w-4 h-4" />}
+              icon={<Bot className="w-3.5 h-3.5" />}
               variant="success"
               badge="Güçlü"
               onClick={() => setSelectedModule('ai-prediction')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Risk Uyarı Kartları */}
@@ -141,10 +141,10 @@ export const Dashboard: React.FC = () => {
               title="Risk Uyarısı"
               value="Orta"
               subtitle="3 pozisyon"
-              icon={<AlertTriangle className="w-4 h-4" />}
+              icon={<AlertTriangle className="w-3.5 h-3.5" />}
               variant="danger"
               onClick={() => setSelectedModule('risk-alerts')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Canlı Haber Akışı */}
@@ -152,10 +152,10 @@ export const Dashboard: React.FC = () => {
               title="Son Haber"
               value="Fed Kararı"
               subtitle="2 saat önce"
-              icon={<Newspaper className="w-4 h-4" />}
+              icon={<Newspaper className="w-3.5 h-3.5" />}
               variant="info"
               onClick={() => setSelectedModule('news-feed')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Ekonomik Takvim */}
@@ -163,10 +163,10 @@ export const Dashboard: React.FC = () => {
               title="Ekonomik"
               value="CPI Verisi"
               subtitle="Yarın 16:30"
-              icon={<Calendar className="w-4 h-4" />}
+              icon={<Calendar className="w-3.5 h-3.5" />}
               variant="danger"
               onClick={() => setSelectedModule('economic-calendar')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Grafik Formasyon & Teknik Sinyal */}
@@ -174,10 +174,10 @@ export const Dashboard: React.FC = () => {
               title="Teknik"
               value="Doji"
               subtitle="ETH 4H"
-              icon={<Activity className="w-4 h-4" />}
+              icon={<Activity className="w-3.5 h-3.5" />}
               variant="info"
               onClick={() => setSelectedModule('technical-signals')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Strateji Performansı */}
@@ -185,10 +185,10 @@ export const Dashboard: React.FC = () => {
               title="Performans"
               value="+12.3%"
               subtitle="Bu hafta"
-              icon={<TrendingUp className="w-4 h-4" />}
+              icon={<TrendingUp className="w-3.5 h-3.5" />}
               variant="success"
               onClick={() => setSelectedModule('strategy-performance')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Portföy Dağılımı */}
@@ -196,10 +196,10 @@ export const Dashboard: React.FC = () => {
               title="Dağılım"
               value="65% USDT"
               subtitle="35% Kripto"
-              icon={<PieChart className="w-4 h-4" />}
+              icon={<PieChart className="w-3.5 h-3.5" />}
               variant="default"
               onClick={() => setSelectedModule('portfolio-distribution')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
 
             {/* Son İşlemler */}
@@ -207,10 +207,10 @@ export const Dashboard: React.FC = () => {
               title="İşlemler"
               value="12"
               subtitle="Bugün"
-              icon={<History className="w-4 h-4" />}
+              icon={<History className="w-3.5 h-3.5" />}
               variant="default"
               onClick={() => setSelectedModule('recent-trades')}
-              className="min-h-[80px]"
+              className="min-h-[85px] max-h-[85px]"
             />
           </div>
 
