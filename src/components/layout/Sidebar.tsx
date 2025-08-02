@@ -3,6 +3,7 @@ import React from 'react'
 import { AppView } from '../../App'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
+import { debugLog } from '../../utils/debugUtils'
 import { 
   BarChart, 
   Cpu, 
@@ -64,13 +65,13 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
     
-    console.log('🔍 Navigation Items:', items.map(item => `${item.id} -> ${item.label}`))
+    debugLog('SIDEBAR_NAV', 'Navigation items created', items.map(item => `${item.id} -> ${item.label}`))
     return items
   }, [strategyCount, runningStrategiesCount])
   
   // Debug: Sidebar durumunu logla
   useEffect(() => {
-    console.log('🔍 Sidebar Debug:', {
+    debugLog('SIDEBAR', 'Sidebar state updated', {
       isOpen: isSidebarOpen,
       currentView,
       navigationItems: navigation.length
@@ -158,9 +159,9 @@ const NavigationButton = React.memo<{
   const Icon = item.icon
   
   const handleClick = useCallback(() => {
-    console.log(`🔗 Navigation clicked: ${item.id} -> ${item.label}`)
+    debugLog('SIDEBAR_CLICK', `Navigation clicked: ${item.id} -> ${item.label}`)
     onClick(item.id)
-  }, [item.id, onClick])
+  }, [item.id, item.label, onClick])
   
   return (
     <Button

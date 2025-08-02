@@ -14,17 +14,19 @@ export function Dashboard() {
   useEffect(() => {
     // Demo bildirimleri global pushNotification ile gönder
     const sendInitialNotification = () => {
-      if ((window as any).pushNotification) {
+      if (typeof (window as any).pushNotification === 'function') {
         (window as any).pushNotification('AI Trading Platformu başarıyla başlatıldı. Tüm sistemler aktif.', 'success')
+      } else {
+        console.warn('pushNotification fonksiyonu henüz hazır değil')
       }
     }
 
-    // 2 saniye sonra başlat
-    setTimeout(sendInitialNotification, 2000)
+    // 3 saniye sonra başlat
+    setTimeout(sendInitialNotification, 3000)
 
     // Periyodik demo bildirimler
     const interval = setInterval(() => {
-      if ((window as any).pushNotification) {
+      if (typeof (window as any).pushNotification === 'function') {
         const demoNotifications = [
           { message: 'BTCUSDT için güçlü trend sinyali tespit edildi.', type: 'info' },
           { message: 'Grid Bot stratejisi pozisyon güncelledi.', type: 'success' },

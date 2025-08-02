@@ -8,6 +8,7 @@ import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 import { useNavigationPerformance } from './hooks/useNavigationPerformance'
+import { debugLog, safePushNotification, waitForFunction, initDebugMode } from './utils/debugUtils'
 
 // Lazy load components for better performance
 const StrategiesPage = lazy(() => import('./components/strategy/StrategiesPage').then(m => ({ default: m.StrategiesPage })))
@@ -28,6 +29,12 @@ export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfo
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
+  
+  // Initialize debug mode
+  useEffect(() => {
+    initDebugMode()
+    debugLog('APP_INIT', 'App component initialized')
+  }, [])
   
   // Performance monitoring
   useNavigationPerformance(currentView)
@@ -55,7 +62,7 @@ function App() {
 
   // Optimized view change handler
   const handleViewChange = useCallback((newView: AppView) => {
-    console.log(`🔄 View change: ${currentView} -> ${newView}`)
+    debugLog('VIEW_CHANGE', `${currentView} -> ${newView}`)
     if (currentView !== newView) {
       setCurrentView(newView)
     }
@@ -82,22 +89,34 @@ function App() {
       }
     }
 
-    // Demo bildirimler için test fonksiyonu - 3 saniye sonra başlat
-    const notificationTimer = setTimeout(() => {
-      if ((window as any).pushNotification) {
-        ;(window as any).pushNotification('🚀 AI Trading Platformu aktif! Tüm sistemler çalışıyor.', 'success')
+    // Wait for pushNotification to be available, then send demo notifications
+    const initNotifications = async () => {
+      debugLog('NOTIFICATION_INIT', 'Waiting for pushNotification function...')
+      
+      const isAvailable = await waitForFunction('pushNotification', 10000)
+      
+      if (isAvailable) {
+        debugLog('NOTIFICATION_INIT', 'pushNotification is available, sending demo notifications')
         
-        // İkinci bildirim 10 saniye sonra
+        // Initial notification
         setTimeout(() => {
-          ;(window as any).pushNotification('📊 BTCUSDT için güçlü alım sinyali tespit edildi.', 'info')
-        }, 10000)
+          safePushNotification('🚀 AI Trading Platformu aktif! Tüm sistemler çalışıyor.', 'success')
+        }, 1000)
         
-        // Üçüncü bildirim 20 saniye sonra
+        // Subsequent notifications
         setTimeout(() => {
-          ;(window as any).pushNotification('⚠️ Yüksek volatilite bekleniyor - pozisyonları gözden geçirin.', 'warning')
-        }, 20000)
+          safePushNotification('📊 BTCUSDT için güçlü alım sinyali tespit edildi.', 'info')
+        }, 8000)
+        
+        setTimeout(() => {
+          safePushNotification('⚠️ Yüksek volatilite bekleniyor - pozisyonları gözden geçirin.', 'warning')
+        }, 15000)
+      } else {
+        debugLog('NOTIFICATION_INIT', 'pushNotification function not available after waiting')
       }
-    }, 3000)
+    }
+    
+    initNotifications()
 
     // Listen for navigation events from components
     const handleNavigateToSettings = () => {
@@ -107,13 +126,12 @@ function App() {
     window.addEventListener('navigate-to-settings', handleNavigateToSettings)
     
     return () => {
-      clearTimeout(notificationTimer)
       window.removeEventListener('navigate-to-settings', handleNavigateToSettings)
     }
   }, [apiSettings])
 
   const renderView = () => {
-    console.log(`🎯 Rendering view: ${currentView}`)
+    debugLog('RENDER_VIEW', `Rendering view: ${currentView}`)
     
     const LoadingFallback = () => (
       <div className="flex items-center justify-center h-screen">
@@ -199,7 +217,7 @@ function App() {
       case 'debug':
         return (
           <Suspense fallback={<LoadingFallback />}>
-            <DebugPage />
+            <DebugPage currentView={currentView} onViewChange={handleViewChange} />
           </Suspense>
         )
       default:
