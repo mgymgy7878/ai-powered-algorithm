@@ -129,8 +129,46 @@ export const Dashboard: React.FC = () => {
         />
       </div>
 
+      {/* Grafik Paneli - Üst kutuların hemen altında */}
+      <div className="p-2 border-b border-border">
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm">Trading Grafiği</CardTitle>
+              <div className="flex items-center gap-2">
+                <select className="text-xs border rounded px-2 py-1">
+                  <option value="BINANCE:BTCUSDT">BTCUSDT</option>
+                  <option value="BINANCE:ETHUSDT">ETHUSDT</option>
+                  <option value="BINANCE:BNBUSDT">BNBUSDT</option>
+                </select>
+                <select className="text-xs border rounded px-2 py-1">
+                  <option value="1m">1m</option>
+                  <option value="5m">5m</option>
+                  <option value="15m">15m</option>
+                  <option value="1h">1h</option>
+                  <option value="4h">4h</option>
+                  <option value="1d">1d</option>
+                </select>
+                <button className="p-1 hover:bg-gray-100 rounded">
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="h-64">
+              <TradingViewWidget 
+                symbol="BINANCE:BTCUSDT" 
+                width="100%" 
+                height="100%" 
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Ana İçerik Alanı */}
-      <div className="flex h-[calc(100vh-80px)]">
+      <div className="flex h-[calc(100vh-320px)]">
         {/* Sol taraf: Diğer modüller alt alta - Yükseklik %20 artırılmış */}
         <div className="w-[220px] p-2 space-y-2">
           <CompactModule
@@ -225,83 +263,52 @@ export const Dashboard: React.FC = () => {
           />
         </div>
 
-        {/* Orta kısım: Grafik Paneli */}
+        {/* Orta kısım: Boş alan veya ek içerik */}
         <div className="flex-1 p-2">
-          <Card className="h-full">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">Trading Grafiği</CardTitle>
-                <div className="flex items-center gap-2">
-                  <select className="text-xs border rounded px-2 py-1">
-                    <option value="BINANCE:BTCUSDT">BTCUSDT</option>
-                    <option value="BINANCE:ETHUSDT">ETHUSDT</option>
-                    <option value="BINANCE:BNBUSDT">BNBUSDT</option>
-                  </select>
-                  <select className="text-xs border rounded px-2 py-1">
-                    <option value="1m">1m</option>
-                    <option value="5m">5m</option>
-                    <option value="15m">15m</option>
-                    <option value="1h">1h</option>
-                    <option value="4h">4h</option>
-                    <option value="1d">1d</option>
-                  </select>
-                  <button className="p-1 hover:bg-gray-100 rounded">
-                    <Maximize2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="h-[calc(100%-80px)]">
-                <TradingViewWidget 
-                  symbol="BINANCE:BTCUSDT" 
-                  width="100%" 
-                  height="100%" 
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <div className="h-full bg-muted/20 rounded-lg flex items-center justify-center text-sm text-muted-foreground">
+            Bu alan gelecekteki genişletmeler için ayrılmıştır
+          </div>
         </div>
 
-        {/* Sağ taraf: AI Trading Yöneticisi - 280px genişlik */}
-        <div className="w-[280px] flex flex-col">
-          {/* AI Trading Yöneticisi */}
-          <div className="flex-1">
+        {/* Sağ taraf: AI Trading Yöneticisi - 320px genişlik (uzatıldı) */}
+        <div className="w-[320px] flex flex-col">
+          {/* AI Trading Yöneticisi - Uzatıldı */}
+          <div className="flex-1 mb-2">
             <TradingAssistant />
           </div>
           
-          {/* Kalıcı Bildirim Kutusu */}
-          <Card className="mt-2 mx-2 mb-2">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4" />
-                <CardTitle className="text-xs">Bildirimlerin</CardTitle>
+          {/* Kalıcı Bildirim Kutusu - %20 küçültüldü */}
+          <Card className="mx-2 mb-2">
+            <CardHeader className="pb-1 px-2 py-1">
+              <div className="flex items-center gap-1">
+                <Bell className="w-3 h-3" />
+                <CardTitle className="text-[10px]">Bildirimler</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-2">
-              <ScrollArea className="h-32">
-                <div className="space-y-2">
+              <ScrollArea className="h-24">
+                <div className="space-y-1">
                   {notifications.slice(0, 3).map((notification) => (
                     <div 
                       key={notification.id}
-                      className="text-xs p-2 rounded-md bg-muted/50 border"
+                      className="text-[10px] p-1 rounded-md bg-muted/50 border"
                     >
                       <div className="flex justify-between items-start">
-                        <span className="flex-1 pr-2">{notification.message}</span>
+                        <span className="flex-1 pr-1">{notification.message}</span>
                         <span className="text-muted-foreground whitespace-nowrap">{notification.time}</span>
                       </div>
                     </div>
                   ))}
                   
                   {notifications.length > 3 && (
-                    <div className="space-y-2 pt-2 border-t border-border">
+                    <div className="space-y-1 pt-1 border-t border-border">
                       {notifications.slice(3).map((notification) => (
                         <div 
                           key={notification.id}
-                          className="text-xs p-2 rounded-md bg-muted/30 border opacity-80"
+                          className="text-[10px] p-1 rounded-md bg-muted/30 border opacity-80"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="flex-1 pr-2">{notification.message}</span>
+                            <span className="flex-1 pr-1">{notification.message}</span>
                             <span className="text-muted-foreground whitespace-nowrap">{notification.time}</span>
                           </div>
                         </div>
