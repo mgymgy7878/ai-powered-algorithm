@@ -11,6 +11,7 @@ import { TradingAssistant } from './components/ai/TradingAssistant'
 import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import { APISettings } from './components/settings/APISettings'
 import ProjectAnalysis from './pages/ProjectAnalysis'
+import Summary from './pages/Summary'
 import Test from './pages/Test'
 import { Toaster } from './components/ui/sonner'
 import { ActivityProvider } from './contexts/ActivityContext'
@@ -18,7 +19,7 @@ import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis' | 'test'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'summary' | 'settings' | 'project-analysis' | 'test'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -45,9 +46,6 @@ function App() {
 
   // Initialize AI service with stored settings
   useEffect(() => {
-    // Test sayfasını otomatik aç - geliştirme amaçlı
-    setCurrentView('test')
-    
     if (apiSettings) {
       try {
         aiService.setSettings(apiSettings)
@@ -112,6 +110,8 @@ function App() {
         return <MarketAnalysis />
       case 'economic':
         return <EconomicCalendar />
+      case 'summary':
+        return <Summary />
       case 'settings':
         return <APISettings />
       case 'project-analysis':
