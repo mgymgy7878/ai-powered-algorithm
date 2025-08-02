@@ -95,6 +95,7 @@ function App() {
   }, [apiSettings])
 
   const renderView = () => {
+    console.log('Current view:', currentView) // Debug için
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />
