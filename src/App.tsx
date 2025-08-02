@@ -24,9 +24,10 @@ import SimpleTestPage from './pages/SimpleTestPage'
 import Proje from './pages/Proje'
 import A from './pages/A'
 import DebugPage from './pages/DebugPage'
+import TestDisplay from './pages/TestDisplay'
 
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test' | 'proje' | 'a' | 'debug'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test' | 'proje' | 'a' | 'debug' | 'test-display'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -161,6 +162,8 @@ function App() {
         return <A />
       case 'debug':
         return <DebugPage />
+      case 'test-display':
+        return <TestDisplay />
       default:
         return <SimpleDashboard />
     }

@@ -59,6 +59,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'test', label: 'Test', icon: TestTube },
       { id: 'proje', label: 'Proje', icon: FileText },
       { id: 'a', label: 'A Sayfası', icon: Zap },
+      { id: 'test-display', label: 'Test Display', icon: TestTube },
       { id: 'debug', label: 'Debug', icon: Bug },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
@@ -75,6 +76,19 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       navigationItems: navigation.length
     })
   }, [isSidebarOpen, currentView, navigation])
+  
+  // Sidebar toggle event listener
+  useEffect(() => {
+    const handleSidebarToggle = () => {
+      setIsSidebarOpen(prev => !prev)
+    }
+
+    window.addEventListener('sidebar-toggle', handleSidebarToggle)
+    
+    return () => {
+      window.removeEventListener('sidebar-toggle', handleSidebarToggle)
+    }
+  }, [])
   
   // Memoize the toggle handler
   const handleToggle = useCallback(() => {
@@ -106,7 +120,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
           title="Menüyü Göster"
           aria-label="Menüyü Göster"
         >
-          <span className="text-sm font-bold">&gt;</span>
+          <ChevronRight className="w-4 h-4" />
         </Button>
       )}
 
@@ -127,7 +141,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
               title="Menüyü Gizle"
               aria-label="Menüyü Gizle"
             >
-              <span className="text-sm font-bold">&lt;</span>
+              <ChevronLeft className="w-4 h-4" />
             </Button>
           </div>
         </div>
