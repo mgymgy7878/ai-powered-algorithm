@@ -65,7 +65,7 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
                 {icon}
               </div>
             )}
-            <h3 className="text-[9px] font-semibold leading-tight truncate text-left" title={title}>
+            <h3 className="text-[10px] font-semibold leading-tight truncate text-left" title={title}>
               {title}
             </h3>
           </div>
@@ -81,12 +81,8 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         <div className="flex-1 flex items-center justify-center">
           <span 
             className={cn(
-              // Dinamik yazı boyutları - yüksekliğe göre adapte edilir
-              className?.includes('h-[37px]') ? 'text-sm' :
-              className?.includes('h-[45px]') ? 'text-base' :
-              className?.includes('h-[31px]') ? 'text-xs' : 
-              className?.includes('h-[22px]') ? 'text-[10px]' : 'text-sm',
-              'font-bold leading-none text-center',
+              // Sabit yazı boyutu - tüm kutular için aynı
+              'text-sm font-bold leading-none text-center',
               valueVariantStyles[variant]
             )}
             title={String(value)}
@@ -99,12 +95,8 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         {subtitle && (
           <div className="mt-1">
             <p className={cn(
-              // Kutu yüksekliğine göre alt başlık boyutu
-              className?.includes('h-[37px]') ? 'text-[9px]' :
-              className?.includes('h-[45px]') ? 'text-xs' :
-              className?.includes('h-[31px]') ? 'text-[8px]' : 
-              className?.includes('h-[22px]') ? 'text-[7px]' : 'text-xs',
-              'text-muted-foreground/70 leading-tight truncate text-center'
+              // Sabit alt başlık boyutu - tüm kutular için aynı
+              'text-[9px] text-muted-foreground/70 leading-tight truncate text-center'
             )} title={subtitle}>
               {subtitle}
             </p>
