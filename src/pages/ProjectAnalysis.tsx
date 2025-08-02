@@ -3,168 +3,177 @@ import ReactMarkdown from 'react-markdown'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, FileText, RefreshCw } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FileText, Loader2, AlertCircle } from 'lucide-react'
 
 export default function ProjectAnalysis() {
   const [markdown, setMarkdown] = useState<string>('')
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string>('')
-  const [lastUpdated, setLastUpdated] = useState<string>('')
-
-  const loadMarkdown = async () => {
-    setLoading(true)
-    setError('')
-    
-    try {
-      const response = await fetch('/docs/ProjectAnalysis.md')
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const text = await response.text()
-      setMarkdown(text)
-      setLastUpdated(new Date().toLocaleString('tr-TR'))
-    } catch (err) {
-      console.error('Markdown dosyası yüklenirken hata:', err)
-      setError(err instanceof Error ? err.message : 'Dosya yüklenemedi')
-      setMarkdown(`# ❌ Dosya Yüklenemedi\n\nProje analizi dosyası bulunamadı veya erişilemedi.\n\n**Hata:** ${err instanceof Error ? err.message : 'Bilinmeyen hata'}`)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    loadMarkdown()
+    const loadProjectAnalysis = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/docs/ProjectAnalysis.md')
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+        
+        const content = await response.text()
+        setMarkdown(content)
+        setError(null)
+      } catch (err) {
+        console.error('Proje analizi yüklenirken hata:', err)
+        setError(err instanceof Error ? err.message : 'Bilinmeyen hata')
+        setMarkdown(`# ⚠️ Dosya Yüklenemedi\n\nProje analizi dosyası yüklenirken bir hata oluştu.\n\n**Hata:** ${err instanceof Error ? err.message : 'Bilinmeyen hata'}\n\nLütfen \`/public/docs/ProjectAnalysis.md\` dosyasının mevcut olduğundan emin olun.`)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProjectAnalysis()
   }, [])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Proje analizi yükleniyor...</p>
-        </div>
+      <div className="p-6 max-w-7xl mx-auto">
+        <Card>
+          <CardContent className="flex items-center justify-center py-12">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>Proje analizi yükleniyor...</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <FileText className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold">Proje Durumu & Analizi</h1>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="border-b pb-4">
+        <div className="flex items-center gap-3 mb-2">
+          <FileText className="w-8 h-8 text-primary" />
+          <h1 className="text-3xl font-bold">Proje Durumu & Analizi</h1>
         </div>
-        
-        <div className="flex items-center gap-3">
-          {lastUpdated && (
-            <Badge variant="outline" className="text-xs">
-              Son Güncelleme: {lastUpdated}
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-xs">
+            v0.3.0
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            Aktif Geliştirme
+          </Badge>
+          {error && (
+            <Badge variant="destructive" className="text-xs">
+              <AlertCircle className="w-3 h-3 mr-1" />
+              Yükleme Hatası
             </Badge>
           )}
-          <Button
-            onClick={loadMarkdown}
-            variant="outline"
-            size="sm"
-            disabled={loading}
-          >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Yenile
-          </Button>
         </div>
+        <p className="text-muted-foreground mt-2">
+          AI Trading Platform'unun mevcut durumu, özellikleri ve gelecek planları
+        </p>
       </div>
 
-      {error && (
-        <Card className="mb-6 border-destructive/50 bg-destructive/5">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-destructive">
-              <FileText className="w-5 h-5" />
-              <span className="font-medium">Dosya Yükleme Hatası:</span>
-              <span>{error}</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardContent className="p-0">
-          <ScrollArea className="h-[calc(100vh-200px)] p-6">
-            <div className="prose dark:prose-invert max-w-none">
+      {/* Content */}
+      <Card className="min-h-[600px]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            Detaylı Analiz Raporu
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+            <div className="prose prose-sm dark:prose-invert max-w-none">
               <ReactMarkdown
                 components={{
+                  // Başlıkları özelleştir
                   h1: ({ children }) => (
-                    <h1 className="text-3xl font-bold mb-4 text-foreground border-b pb-2">
+                    <h1 className="text-2xl font-bold border-b pb-2 mb-4 text-primary">
                       {children}
                     </h1>
                   ),
                   h2: ({ children }) => (
-                    <h2 className="text-2xl font-semibold mt-8 mb-4 text-foreground">
+                    <h2 className="text-xl font-semibold mt-8 mb-4 text-foreground">
                       {children}
                     </h2>
                   ),
                   h3: ({ children }) => (
-                    <h3 className="text-xl font-medium mt-6 mb-3 text-foreground">
+                    <h3 className="text-lg font-medium mt-6 mb-3 text-foreground">
                       {children}
                     </h3>
                   ),
-                  p: ({ children }) => (
-                    <p className="mb-4 text-foreground leading-relaxed">
+                  // Kod blokları
+                  code: ({ children, className }) => (
+                    <code className={`${className} bg-muted px-1 py-0.5 rounded text-sm font-mono`}>
                       {children}
-                    </p>
+                    </code>
                   ),
+                  pre: ({ children }) => (
+                    <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm font-mono">
+                      {children}
+                    </pre>
+                  ),
+                  // Liste öğeleri
                   ul: ({ children }) => (
-                    <ul className="mb-4 ml-6 space-y-2 text-foreground">
+                    <ul className="list-disc pl-6 space-y-2 my-4">
                       {children}
                     </ul>
                   ),
                   ol: ({ children }) => (
-                    <ol className="mb-4 ml-6 space-y-2 text-foreground">
+                    <ol className="list-decimal pl-6 space-y-2 my-4">
                       {children}
                     </ol>
                   ),
                   li: ({ children }) => (
-                    <li className="text-foreground">{children}</li>
-                  ),
-                  code: ({ children, className }) => {
-                    const isInline = !className
-                    return isInline ? (
-                      <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
-                        {children}
-                      </code>
-                    ) : (
-                      <code className="block bg-muted p-4 rounded-md text-sm font-mono overflow-x-auto">
-                        {children}
-                      </code>
-                    )
-                  },
-                  pre: ({ children }) => (
-                    <pre className="bg-muted p-4 rounded-md overflow-x-auto mb-4">
+                    <li className="text-foreground">
                       {children}
-                    </pre>
+                    </li>
                   ),
+                  // Blok quote
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground mb-4">
+                    <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4">
                       {children}
                     </blockquote>
                   ),
+                  // Tablo
                   table: ({ children }) => (
-                    <div className="overflow-x-auto mb-4">
+                    <div className="overflow-x-auto my-4">
                       <table className="w-full border-collapse border border-border">
                         {children}
                       </table>
                     </div>
                   ),
                   th: ({ children }) => (
-                    <th className="border border-border p-2 bg-muted font-semibold text-left">
+                    <th className="border border-border px-4 py-2 bg-muted text-left font-semibold">
                       {children}
                     </th>
                   ),
                   td: ({ children }) => (
-                    <td className="border border-border p-2">{children}</td>
+                    <td className="border border-border px-4 py-2">
+                      {children}
+                    </td>
                   ),
-                  hr: () => <hr className="my-8 border-border" />
+                  // Paragraf
+                  p: ({ children }) => (
+                    <p className="text-foreground leading-relaxed mb-4">
+                      {children}
+                    </p>
+                  ),
+                  // Bağlantılar
+                  a: ({ children, href }) => (
+                    <a 
+                      href={href} 
+                      className="text-primary hover:text-primary/80 underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {children}
+                    </a>
+                  ),
                 }}
               >
                 {markdown}
