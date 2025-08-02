@@ -93,7 +93,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
         onClick={handleToggle}
         variant="ghost"
         size="icon"
-        className={`fixed top-5 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all ${
+        className={`fixed top-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all ${
           isSidebarOpen ? 'left-[268px]' : 'left-4'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
