@@ -82,6 +82,8 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
           <span 
             className={cn(
               // Dinamik yazı boyutları - yüksekliğe göre adapte edilir
+              className?.includes('h-[37px]') ? 'text-sm' :
+              className?.includes('h-[45px]') ? 'text-base' :
               className?.includes('h-[31px]') ? 'text-xs' : 
               className?.includes('h-[22px]') ? 'text-[10px]' : 'text-sm',
               'font-bold leading-none text-center',
@@ -98,6 +100,8 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
           <div className="mt-1">
             <p className={cn(
               // Kutu yüksekliğine göre alt başlık boyutu
+              className?.includes('h-[37px]') ? 'text-[9px]' :
+              className?.includes('h-[45px]') ? 'text-xs' :
               className?.includes('h-[31px]') ? 'text-[8px]' : 
               className?.includes('h-[22px]') ? 'text-[7px]' : 'text-xs',
               'text-muted-foreground/70 leading-tight truncate text-center'

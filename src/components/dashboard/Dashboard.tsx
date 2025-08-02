@@ -3,8 +3,10 @@ import { CompactModule } from './CompactModule';
 import { TradingChart } from '../charts/TradingChart';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { TradingAssistant } from '../ai/TradingAssistant';
+import { TradingViewWidget } from './TradingViewWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useKV } from '@github/spark/hooks';
 import { 
   TrendingUp, 
@@ -19,7 +21,8 @@ import {
   PieChart,
   History,
   Zap,
-  Maximize2
+  Maximize2,
+  Bell
 } from 'lucide-react';
 
 interface DetailPanelProps {
@@ -49,6 +52,13 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ title, children, onClose }) =
 
 export const Dashboard: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [notifications] = useKV('dashboard-notifications', [
+    { id: '1', message: '🚀 Grid Bot başarıyla çalıştırıldı', time: '14:25', type: 'success' },
+    { id: '2', message: '📊 BTCUSDT güçlü alım sinyali', time: '13:45', type: 'info' },
+    { id: '3', message: '⚠️ Yüksek volatilite tespit edildi', time: '12:30', type: 'warning' },
+    { id: '4', message: '💰 Scalper bot +$125 kazanç', time: '11:15', type: 'success' },
+    { id: '5', message: '📰 Fed faiz kararı açıklandı', time: '10:00', type: 'info' }
+  ]);
   
   const [portfolioData] = useKV('portfolio-data', {
     totalValue: 50000,
@@ -70,7 +80,7 @@ export const Dashboard: React.FC = () => {
           icon={<DollarSign className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('portfolio')}
-          className="w-[180px] h-[31px] text-[11px]"
+          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
         />
 
         <CompactModule
@@ -79,7 +89,7 @@ export const Dashboard: React.FC = () => {
           icon={<TrendingUp className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('daily-pnl')}
-          className="w-[180px] h-[31px] text-[11px]"
+          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
         />
 
         <CompactModule
@@ -88,7 +98,7 @@ export const Dashboard: React.FC = () => {
           icon={<TrendingUp className="w-3 h-3" />}
           variant="success" 
           onClick={() => setSelectedModule('total-pnl')}
-          className="w-[180px] h-[31px] text-[11px]"
+          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
         />
 
         <CompactModule
@@ -97,7 +107,7 @@ export const Dashboard: React.FC = () => {
           icon={<Target className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('win-rate')}
-          className="w-[180px] h-[31px] text-[11px]"
+          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
         />
 
         <CompactModule
@@ -106,7 +116,7 @@ export const Dashboard: React.FC = () => {
           icon={<Bot className="w-3 h-3" />}
           variant="default"
           onClick={() => setSelectedModule('active-strategies')}
-          className="w-[180px] h-[31px] text-[11px]"
+          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
         />
 
         <CompactModule
@@ -115,112 +125,193 @@ export const Dashboard: React.FC = () => {
           icon={<Activity className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('system-status')}
-          className="w-[180px] h-[31px] text-[11px]"
+          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
         />
       </div>
 
-      {/* Ana İçerik - Sol tarafta kutular alt alta, sağda AI asistanı */}
-      <div className="flex">
-        {/* Sol taraf: Diğer modüller alt alta - Yükseklik %40 artırılmış */}
-        <div className="w-[200px] p-2 space-y-1">
-
-          {/* AI ve Analiz Modülleri - Yükseklik %40 artırıldı */}
+      {/* Ana İçerik Alanı */}
+      <div className="flex h-[calc(100vh-80px)]">
+        {/* Sol taraf: Diğer modüller alt alta - Yükseklik %20 artırılmış */}
+        <div className="w-[220px] p-2 space-y-2">
           <CompactModule
             title="AI Tahmin"
             value="▲ %76"
             subtitle="BTCUSDT Güçlü Yükseliş"
-            icon={<Bot className="w-3 h-3" />}
+            icon={<Bot className="w-4 h-4" />}
             variant="success"
             badge="Güçlü"
             onClick={() => setSelectedModule('ai-prediction')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Risk Uyarısı"
             value="Orta"
             subtitle="3 pozisyon izleniyor"
-            icon={<AlertTriangle className="w-3 h-3" />}
+            icon={<AlertTriangle className="w-4 h-4" />}
             variant="warning"
             onClick={() => setSelectedModule('risk-alerts')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Teknik Sinyal"
             value="Doji"
             subtitle="ETH 4H - Dönüş"
-            icon={<Activity className="w-3 h-3" />}
+            icon={<Activity className="w-4 h-4" />}
             variant="info"
             onClick={() => setSelectedModule('technical-signals')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Canlı Haberler"  
             value="Fed Kararı"
             subtitle="2 saat önce"
-            icon={<Newspaper className="w-3 h-3" />}
+            icon={<Newspaper className="w-4 h-4" />}
             variant="info"
             onClick={() => setSelectedModule('news-feed')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Ekonomik Takvim"
             value="CPI Verisi"
             subtitle="Yarın 16:30"
-            icon={<Calendar className="w-3 h-3" />}
+            icon={<Calendar className="w-4 h-4" />}
             variant="danger"
             onClick={() => setSelectedModule('economic-calendar')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Performans"
             value="+12.3%"
             subtitle="Hafta kazancı"
-            icon={<TrendingUp className="w-3 h-3" />}
+            icon={<TrendingUp className="w-4 h-4" />}
             variant="success"
             onClick={() => setSelectedModule('strategy-performance')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Portföy Dağılımı"
             value="65% USDT"
             subtitle="Stabil coin ağırlığı"
-            icon={<PieChart className="w-3 h-3" />}
+            icon={<PieChart className="w-4 h-4" />}
             variant="default"
             onClick={() => setSelectedModule('portfolio-distribution')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Son İşlemler"
             value="12"
             subtitle="Bugün"
-            icon={<History className="w-3 h-3" />}
+            icon={<History className="w-4 h-4" />}
             variant="default"
             onClick={() => setSelectedModule('recent-trades')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
 
           <CompactModule
             title="Hızlı Eylemler"
             value="Bot Başlat"
             subtitle="Yeni yapılandır"
-            icon={<Zap className="w-3 h-3" />}
+            icon={<Zap className="w-4 h-4" />}
             variant="info"
             onClick={() => setSelectedModule('quick-actions')}
-            className="w-full h-[31px] text-[11px]"
+            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
           />
-
         </div>
 
-        {/* Sağ taraf: AI Trading Yöneticisi - Geniş alan */}
-        <div className="flex-1 border-l border-border">
-          <TradingAssistant />
+        {/* Orta kısım: Grafik Paneli */}
+        <div className="flex-1 p-2">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm">Trading Grafiği</CardTitle>
+                <div className="flex items-center gap-2">
+                  <select className="text-xs border rounded px-2 py-1">
+                    <option value="BINANCE:BTCUSDT">BTCUSDT</option>
+                    <option value="BINANCE:ETHUSDT">ETHUSDT</option>
+                    <option value="BINANCE:BNBUSDT">BNBUSDT</option>
+                  </select>
+                  <select className="text-xs border rounded px-2 py-1">
+                    <option value="1m">1m</option>
+                    <option value="5m">5m</option>
+                    <option value="15m">15m</option>
+                    <option value="1h">1h</option>
+                    <option value="4h">4h</option>
+                    <option value="1d">1d</option>
+                  </select>
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <Maximize2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="h-[calc(100%-80px)]">
+                <TradingViewWidget 
+                  symbol="BINANCE:BTCUSDT" 
+                  width="100%" 
+                  height="100%" 
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sağ taraf: AI Trading Yöneticisi - 280px genişlik */}
+        <div className="w-[280px] flex flex-col">
+          {/* AI Trading Yöneticisi */}
+          <div className="flex-1">
+            <TradingAssistant />
+          </div>
+          
+          {/* Kalıcı Bildirim Kutusu */}
+          <Card className="mt-2 mx-2 mb-2">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4" />
+                <CardTitle className="text-xs">Bildirimlerin</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-2">
+              <ScrollArea className="h-32">
+                <div className="space-y-2">
+                  {notifications.slice(0, 3).map((notification) => (
+                    <div 
+                      key={notification.id}
+                      className="text-xs p-2 rounded-md bg-muted/50 border"
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="flex-1 pr-2">{notification.message}</span>
+                        <span className="text-muted-foreground whitespace-nowrap">{notification.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {notifications.length > 3 && (
+                    <div className="space-y-2 pt-2 border-t border-border">
+                      {notifications.slice(3).map((notification) => (
+                        <div 
+                          key={notification.id}
+                          className="text-xs p-2 rounded-md bg-muted/30 border opacity-80"
+                        >
+                          <div className="flex justify-between items-start">
+                            <span className="flex-1 pr-2">{notification.message}</span>
+                            <span className="text-muted-foreground whitespace-nowrap">{notification.time}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
