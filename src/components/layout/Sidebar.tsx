@@ -51,7 +51,8 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Sol üstte sabit */}
+      {/* Toggle Button - Geçici olarak gizli */}
+      {/*
       <Button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         variant="ghost"
@@ -61,9 +62,10 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       >
         {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
       </Button>
+      */}
 
-      {/* Sidebar - Animasyonlu genişlik */}
-      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-card border-r border-border h-screen flex flex-col`}>
+      {/* Sidebar - Debug: Her zaman görünür */}
+      <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
           <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
@@ -79,7 +81,10 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
                 key={item.id}
                 variant={isActive ? "default" : "ghost"}
                 className="w-full justify-start h-auto py-3 px-4"
-                onClick={() => onViewChange(item.id as AppView)}
+                onClick={() => {
+                  console.log('Navigating to:', item.id) // Debug log
+                  onViewChange(item.id as AppView)
+                }}
               >
                 <Icon className="h-5 w-5 mr-3" />
                 <span className="flex-1 text-left">{item.label}</span>
