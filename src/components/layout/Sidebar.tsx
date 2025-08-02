@@ -88,29 +88,40 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Menüyü Gizle/Göster butonu - AI Trader yazısının yanında, sola kaydırıldı */}
-      <Button
-        onClick={handleToggle}
-        variant="ghost"
-        size="icon"
-        className={`fixed top-4 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
-          isSidebarOpen ? 'left-[240px]' : 'left-2'
-        }`}
-        title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
-        aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
-      >
-        {isSidebarOpen ? (
-          <span className="text-sm font-bold">&lt;</span>
-        ) : (
+      {/* Menüyü gizle butonu - kapalı durumda sol üstte */}
+      {!isSidebarOpen && (
+        <Button
+          onClick={handleToggle}
+          variant="ghost"
+          size="icon"
+          className="fixed top-4 left-2 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all"
+          title="Menüyü Göster"
+          aria-label="Menüyü Göster"
+        >
           <span className="text-sm font-bold">&gt;</span>
-        )}
-      </Button>
+        </Button>
+      )}
 
       {/* Sidebar */}
       <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 bg-card border-r border-border h-screen flex flex-col shadow-lg ${isSidebarOpen ? 'overflow-visible' : 'overflow-hidden'}`}>
-        <div className="p-6 border-b border-border">
-          <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
-          <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
+        <div className="p-6 border-b border-border relative">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
+              <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
+            </div>
+            {/* Menüyü gizle butonu - AI Trader yazısının sağında */}
+            <Button
+              onClick={handleToggle}
+              variant="ghost"
+              size="icon"
+              className="bg-transparent hover:bg-muted transition-colors ml-2"
+              title="Menüyü Gizle"
+              aria-label="Menüyü Gizle"
+            >
+              <span className="text-sm font-bold">&lt;</span>
+            </Button>
+          </div>
         </div>
         
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Ana navigasyon">
