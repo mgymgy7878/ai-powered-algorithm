@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import React from 'react'
 import { AppView } from '../../App'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
@@ -27,18 +28,18 @@ interface SidebarProps {
   runningStrategiesCount?: number
 }
 
+interface NavigationItem {
+  id: AppView
+  label: string
+  icon: any
+  badge?: number
+}
+
 export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningStrategiesCount = 0 }: SidebarProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true) // Her zaman açık başlasın
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   
-  console.log('Sidebar - Current view:', currentView) // Debug için
-  console.log('Sidebar - Is open:', isSidebarOpen) // Debug için
-  
-  // Sidebar durumunu window'a yayınla ki Dashboard bunu kullanabilsin
-  useEffect(() => {
-    window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { isOpen: isSidebarOpen } }))
-  }, [isSidebarOpen])
-  
-  const navigation = [
+  // Memoize navigation items to prevent unnecessary re-renders
+  const navigation = useMemo<NavigationItem[]>(() => [
     { id: 'dashboard', label: 'Anasayfa', icon: Home },
     { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount || 0 },
     { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount || 0 },
@@ -46,26 +47,40 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
     { id: 'portfolio', label: 'Portföy', icon: PieChart },
     { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
     { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
-    { id: 'summary', label: '📊 Özet', icon: FileText }, // Emoji eklendi
-    { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck }, // Emoji eklendi  
-    { id: 'test', label: '🧪 Test', icon: TestTube }, // Emoji eklendi
+    { id: 'summary', label: '📊 Özet', icon: FileText },
+    { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck },
+    { id: 'test', label: '🧪 Test', icon: TestTube },
     { id: 'settings', label: 'API Ayarları', icon: Settings },
-  ] as const
+  ], [strategyCount, runningStrategiesCount])
   
-  console.log('Navigation items:', navigation.map(item => item.id)) // Debug için
+  // Memoize the toggle handler
+  const handleToggle = useCallback(() => {
+    setIsSidebarOpen(prev => !prev)
+  }, [])
+  
+  // Optimized sidebar state event dispatch
+  useEffect(() => {
+    const event = new CustomEvent('sidebar-toggle', { detail: { isOpen: isSidebarOpen } })
+    window.dispatchEvent(event)
+  }, [isSidebarOpen])
+
+  // Memoize the navigation click handler
+  const handleNavigation = useCallback((viewId: AppView) => {
+    if (currentView !== viewId) {
+      onViewChange(viewId)
+    }
+  }, [currentView, onViewChange])
 
   return (
     <>
       {/* Toggle Button - Her zaman görünür */}
       <Button
-        onClick={() => {
-          console.log('Toggle clicked, current state:', isSidebarOpen)
-          setIsSidebarOpen(!isSidebarOpen)
-        }}
+        onClick={handleToggle}
         variant="ghost"
         size="icon"
         className="fixed top-4 left-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all"
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
+        aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
         {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
       </Button>
@@ -77,34 +92,18 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
           <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2" role="navigation" aria-label="Ana navigasyon">
           {navigation.map((item) => {
             const Icon = item.icon
             const isActive = currentView === item.id
             
-            console.log(`🎯 Menu item: ${item.id}, isActive: ${isActive}, currentView: ${currentView}`) // Debug log
-            
             return (
-              <Button
+              <NavigationButton
                 key={item.id}
-                variant={isActive ? "default" : "ghost"}
-                className="w-full justify-start h-auto py-3 px-4"
-                onClick={() => {
-                  console.log('🔄 Navigating to:', item.id) // Debug log
-                  console.log('📍 Previous view:', currentView) // Debug log
-                  console.log('🎯 Calling onViewChange with:', item.id) // Debug log
-                  onViewChange(item.id as AppView)
-                  console.log('✅ Navigation callback completed for:', item.id) // Debug log
-                }}
-              >
-                <Icon className="h-5 w-5 mr-3" />
-                <span className="flex-1 text-left">{item.label}</span>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {item.badge}
-                  </Badge>
-                )}
-              </Button>
+                item={item}
+                isActive={isActive}
+                onClick={handleNavigation}
+              />
             )
           })}
         </nav>
@@ -113,7 +112,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
           <div className="bg-muted rounded-lg p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Sistem Durumu</span>
-              <div className="h-2 w-2 bg-accent rounded-full animate-pulse"></div>
+              <div className="h-2 w-2 bg-accent rounded-full animate-pulse" aria-label="Aktif durum göstergesi"></div>
             </div>
             <p className="text-xs text-muted-foreground mt-1">AI Motor Aktif</p>
           </div>
@@ -121,4 +120,36 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       </div>
     </>
   )
+}
+
+// Memoized Navigation Button Component for better performance
+const NavigationButton = React.memo<{
+  item: NavigationItem
+  isActive: boolean
+  onClick: (viewId: AppView) => void
+}>(({ item, isActive, onClick }) => {
+  const Icon = item.icon
+  
+  const handleClick = useCallback(() => {
+    onClick(item.id)
+  }, [item.id, onClick])
+  
+  return (
+    <Button
+      variant={isActive ? "default" : "ghost"}
+      className="w-full justify-start h-auto py-3 px-4"
+      onClick={handleClick}
+      aria-current={isActive ? 'page' : undefined}
+      title={item.label}
+    >
+      <Icon className="h-5 w-5 mr-3" aria-hidden="true" />
+      <span className="flex-1 text-left">{item.label}</span>
+      {item.badge !== undefined && item.badge > 0 && (
+        <Badge variant="secondary" className="ml-2" aria-label={`${item.badge} adet`}>
+          {item.badge}
+        </Badge>
+      )}
+    </Button>
+  )
+})
 }
