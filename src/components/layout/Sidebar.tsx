@@ -51,8 +51,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Geçici olarak gizli */}
-      {/*
+      {/* Toggle Button */}
       <Button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         variant="ghost"
@@ -62,10 +61,9 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       >
         {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
       </Button>
-      */}
 
-      {/* Sidebar - Debug: Her zaman görünür */}
-      <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
+      {/* Sidebar */}
+      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-card border-r border-border h-screen flex flex-col`}
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
           <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
