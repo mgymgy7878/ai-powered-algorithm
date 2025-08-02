@@ -1,285 +1,254 @@
 import React, { useState, useCallback } from 'react'
-import { Responsive, WidthProvider, Layout } from 'react-grid-layout'
+import GridLayout, { Layout } from 'react-grid-layout'
 import { useKV } from '@github/spark/hooks'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Settings, 
-  Lock, 
-  Unlock, 
-  RotateCcw, 
-  DollarSign, 
-  TrendingUp, 
-  Bot, 
-  AlertTriangle,
-  Activity,
-  Calendar,
-  Newspaper,
-  PieChart
-} from 'lucide-react'
-
+import { TrendingUp, TrendingDown, AlertTriangle, DollarSign, Activity, RotateCcw } from 'lucide-react'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import '../components/dashboard/dashboard-grid.css'
 
-const ResponsiveGridLayout = WidthProvider(Responsive)
+// Varsayılan layout tanımı
+const defaultLayout: Layout[] = [
+  { i: 'ai-prediction', x: 0, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
+  { i: 'portfolio', x: 4, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
+  { i: 'risk-alerts', x: 8, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
+  { i: 'market-signals', x: 0, y: 3, w: 6, h: 3, minW: 4, minH: 2 },
+  { i: 'news-feed', x: 6, y: 3, w: 6, h: 3, minW: 4, minH: 2 },
+  { i: 'trading-chart', x: 0, y: 6, w: 12, h: 4, minW: 8, minH: 3 }
+]
 
-// Test için basit layout yapılandırması
-const testLayout = {
-  lg: [
-    { i: 'portfolio', x: 0, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
-    { i: 'ai-prediction', x: 4, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
-    { i: 'risk-alerts', x: 8, y: 0, w: 4, h: 3, minW: 3, minH: 2 },
-    { i: 'market-signals', x: 0, y: 3, w: 6, h: 4, minW: 4, minH: 3 },
-    { i: 'news-feed', x: 6, y: 3, w: 6, h: 4, minW: 4, minH: 3 },
-    { i: 'trading-chart', x: 0, y: 7, w: 12, h: 6, minW: 8, minH: 4 }
-  ]
+interface DashboardWidgetProps {
+  title: string
+  children: React.ReactNode
+  className?: string
 }
 
-export default function TestDragDrop() {
-  const [layouts, setLayouts] = useKV('test-dashboard-layouts', testLayout)
-  const [isEditMode, setIsEditMode] = useState(true) // Test için başlangıçta açık
+const DashboardWidget: React.FC<DashboardWidgetProps> = ({ title, children, className = '' }) => (
+  <Card className={`h-full ${className}`}>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-sm font-medium">{title}</CardTitle>
+    </CardHeader>
+    <CardContent className="pb-2">
+      {children}
+    </CardContent>
+  </Card>
+)
+
+// AI Tahmin Widget'ı
+const AIPredictionWidget = () => (
+  <DashboardWidget title="📈 AI Tahmin Paneli">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">BTCUSDT</span>
+        <Badge variant="outline" className="text-green-600">
+          <TrendingUp className="w-3 h-3 mr-1" />
+          Yükseliş %78
+        </Badge>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">ETHUSDT</span>
+        <Badge variant="outline" className="text-red-600">
+          <TrendingDown className="w-3 h-3 mr-1" />
+          Düşüş %65
+        </Badge>
+      </div>
+      <p className="text-xs text-muted-foreground mt-2">
+        Piyasa volatilitesi artıyor. Grid botlar için uygun zaman.
+      </p>
+    </div>
+  </DashboardWidget>
+)
+
+// Portföy Widget'ı
+const PortfolioWidget = () => (
+  <DashboardWidget title="💰 Portföy Özeti">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs">Toplam Değer</span>
+        <span className="font-semibold">$50,125.80</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs">Günlük K/Z</span>
+        <span className="text-green-600 font-semibold">+$1,250.50</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-xs">Başarı Oranı</span>
+        <span className="font-semibold">68.5%</span>
+      </div>
+    </div>
+  </DashboardWidget>
+)
+
+// Risk Uyarıları Widget'ı
+const RiskAlertsWidget = () => (
+  <DashboardWidget title="⚠️ Risk Uyarıları">
+    <div className="space-y-2">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5" />
+        <div>
+          <p className="text-xs font-medium">Yüksek Volatilite</p>
+          <p className="text-xs text-muted-foreground">BTC'de %15 dalgalanma bekleniyor</p>
+        </div>
+      </div>
+      <div className="flex items-start gap-2">
+        <DollarSign className="w-4 h-4 text-red-500 mt-0.5" />
+        <div>
+          <p className="text-xs font-medium">Marj Kullanımı</p>
+          <p className="text-xs text-muted-foreground">%85 marj kullanımı - dikkat!</p>
+        </div>
+      </div>
+    </div>
+  </DashboardWidget>
+)
+
+// Piyasa Sinyalleri Widget'ı
+const MarketSignalsWidget = () => (
+  <DashboardWidget title="📊 Piyasa Sinyalleri">
+    <div className="grid grid-cols-2 gap-2">
+      <div className="text-center p-2 bg-green-50 rounded">
+        <Activity className="w-4 h-4 mx-auto text-green-600" />
+        <p className="text-xs font-medium">RSI Oversold</p>
+        <p className="text-xs text-muted-foreground">ETHUSDT</p>
+      </div>
+      <div className="text-center p-2 bg-blue-50 rounded">
+        <TrendingUp className="w-4 h-4 mx-auto text-blue-600" />
+        <p className="text-xs font-medium">MACD Cross</p>
+        <p className="text-xs text-muted-foreground">BTCUSDT</p>
+      </div>
+    </div>
+  </DashboardWidget>
+)
+
+// Haber Akışı Widget'ı
+const NewsFeedWidget = () => (
+  <DashboardWidget title="📰 Canlı Haber Akışı">
+    <div className="space-y-2">
+      <div className="border-l-2 border-green-500 pl-2">
+        <p className="text-xs font-medium">Bitcoin ETF onayı yaklaşıyor</p>
+        <p className="text-xs text-muted-foreground">2 saat önce • CoinDesk</p>
+      </div>
+      <div className="border-l-2 border-blue-500 pl-2">
+        <p className="text-xs font-medium">Ethereum güncelleme tarihi açıklandı</p>
+        <p className="text-xs text-muted-foreground">4 saat önce • CoinTelegraph</p>
+      </div>
+    </div>
+  </DashboardWidget>
+)
+
+// Trading Chart Widget'ı
+const TradingChartWidget = () => (
+  <DashboardWidget title="📈 Trading Grafiği">
+    <div className="flex items-center justify-center h-full bg-gray-50 rounded">
+      <div className="text-center">
+        <Activity className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+        <p className="text-sm text-muted-foreground">TradingView Grafik Alanı</p>
+        <p className="text-xs text-muted-foreground">Bu alanda canlı grafik gösterilecek</p>
+      </div>
+    </div>
+  </DashboardWidget>
+)
+
+const TestDragDrop: React.FC = () => {
+  // Layout'u KV store'da saklıyoruz
+  const [layout, setLayout] = useKV<Layout[]>('dashboard-layout', defaultLayout)
   const [isDragging, setIsDragging] = useState(false)
 
-  const handleLayoutChange = useCallback((layout: Layout[], allLayouts: any) => {
-    if (isEditMode) {
-      setLayouts(allLayouts)
-    }
-  }, [isEditMode, setLayouts])
+  // Layout değişikliklerini kaydet
+  const handleLayoutChange = useCallback((newLayout: Layout[]) => {
+    setLayout(newLayout)
+  }, [setLayout])
 
-  const resetLayout = useCallback(() => {
-    setLayouts(testLayout)
-  }, [setLayouts])
+  // Layout'u varsayılana sıfırla
+  const resetLayout = () => {
+    setLayout(defaultLayout)
+  }
 
+  // Widget render fonksiyonu
   const renderWidget = (key: string) => {
-    const commonClass = "h-full w-full"
-    
     switch (key) {
-      case 'portfolio':
-        return (
-          <Card className={commonClass}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Portföy Metrikleri
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="text-center">
-                  <div className="font-semibold text-blue-600">$50,000</div>
-                  <div className="text-muted-foreground">Toplam</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-green-600">+$1,250</div>
-                  <div className="text-muted-foreground">Günlük</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )
-
       case 'ai-prediction':
-        return (
-          <Card className={commonClass}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Bot className="w-4 h-4" />
-                AI Tahminleri
-                <Badge variant="outline" className="text-xs">GPT-4</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <div className="flex justify-between">
-                <span>BTC/USDT:</span>
-                <span className="text-green-600 font-semibold">▲ %76</span>
-              </div>
-              <div className="flex justify-between">
-                <span>ETH/USDT:</span>
-                <span className="text-red-600 font-semibold">▼ %34</span>
-              </div>
-            </CardContent>
-          </Card>
-        )
-
+        return <AIPredictionWidget />
+      case 'portfolio':
+        return <PortfolioWidget />
       case 'risk-alerts':
-        return (
-          <Card className={commonClass}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Risk Uyarıları
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-xs">
-              <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded">
-                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                <span>Yüksek volatilite</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 bg-red-50 rounded">
-                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                <span>Margin %85</span>
-              </div>
-            </CardContent>
-          </Card>
-        )
-
+        return <RiskAlertsWidget />
       case 'market-signals':
-        return (
-          <Card className={commonClass}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Activity className="w-4 h-4" />
-                Piyasa Sinyalleri
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-xs">
-              <div className="flex justify-between items-center">
-                <span>RSI(14) - BTC:</span>
-                <Badge variant="outline" className="text-green-600">Alım 72</Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>MACD - ETH:</span>
-                <Badge variant="outline" className="text-red-600">Satım</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        )
-
+        return <MarketSignalsWidget />
       case 'news-feed':
-        return (
-          <Card className={commonClass}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Newspaper className="w-4 h-4" />
-                Canlı Haberler
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-xs">
-              <div className="p-2 border-l-2 border-green-500 bg-green-50">
-                <div className="font-semibold">Bitcoin ETF Onayı</div>
-                <div className="text-muted-foreground">5 dk önce</div>
-              </div>
-              <div className="p-2 border-l-2 border-blue-500 bg-blue-50">
-                <div className="font-semibold">Fed Faiz Kararı</div>
-                <div className="text-muted-foreground">1 saat önce</div>
-              </div>
-            </CardContent>
-          </Card>
-        )
-
+        return <NewsFeedWidget />
       case 'trading-chart':
-        return (
-          <Card className={commonClass}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <PieChart className="w-4 h-4" />
-                Trading Grafiği (Demo)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center h-full">
-              <div className="text-center text-muted-foreground">
-                <div className="text-lg font-semibold">📈</div>
-                <div className="text-sm">Grafik burada görünecek</div>
-                <div className="text-xs">Sürükle & boyutlandır</div>
-              </div>
-            </CardContent>
-          </Card>
-        )
-
+        return <TradingChartWidget />
       default:
-        return (
-          <Card className={commonClass}>
-            <CardContent className="flex items-center justify-center h-full">
-              <span className="text-muted-foreground">Widget: {key}</span>
-            </CardContent>
-          </Card>
-        )
+        return <div>Bilinmeyen widget</div>
     }
   }
 
   return (
-    <div className="w-full h-full p-4">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">🔥 Sürükle & Bırak Test Sayfası</h1>
-        <p className="text-muted-foreground">
-          Bu sayfada dashboard bileşenlerini sürükleyip boyutlandırma özelliğini test edebilirsiniz.
-        </p>
-      </div>
-
-      {/* Düzenleme kontrol çubuğu */}
-      <div className="flex items-center justify-between mb-4 p-3 bg-muted rounded-lg">
-        <div className="flex items-center gap-3">
-          <Button
-            variant={isEditMode ? "default" : "outline"}
-            size="sm"
-            onClick={() => setIsEditMode(!isEditMode)}
-            className="flex items-center gap-2"
-          >
-            {isEditMode ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-            {isEditMode ? 'Düzenleme Aktif' : 'Düzenleme Kapalı'}
-          </Button>
-          
-          {isEditMode && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetLayout}
-              className="flex items-center gap-2"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Layout'u Sıfırla
-            </Button>
-          )}
-
-          <div className="text-sm text-muted-foreground">
-            {isDragging ? '🔥 Sürükleniyor...' : 
-             isEditMode ? '✨ Kutuları fareyle sürükleyin ve köşelerden boyutlandırın' : 
-             '🔒 Düzenle butonuna basarak sürükleme moduna geçin'}
-          </div>
+    <div className="p-4 h-screen bg-background">
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">🎛️ Dashboard Düzenleyici</h1>
+          <p className="text-sm text-muted-foreground">
+            Widget'ları sürükleyip yeniden boyutlandırın. Layout otomatik kaydedilir.
+          </p>
         </div>
+        <Button 
+          onClick={resetLayout}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Varsayılana Sıfırla
+        </Button>
       </div>
 
-      {/* Test Talimatları */}
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="text-sm text-blue-800">
-          <strong>Test Adımları:</strong>
-          <ol className="list-decimal list-inside mt-2 space-y-1">
-            <li>Düzenleme modu aktif (yukarıdaki buton yeşil olmalı)</li>
-            <li>Herhangi bir kutuyu fareyle tıklayıp sürükleyin</li>
-            <li>Kutuların sağ-alt köşesindeki tutamaktan boyutlandırın</li>
-            <li>Layout otomatik olarak kaydedilir (sayfa yenilense bile kalır)</li>
-            <li>"Layout'u Sıfırla" ile varsayılan düzene dönebilirsiniz</li>
-          </ol>
+      {/* Status */}
+      {isDragging && (
+        <div className="mb-2">
+          <Badge variant="secondary">Sürükleniyor...</Badge>
         </div>
-      </div>
+      )}
 
-      {/* Sürüklenebilir grid layout */}
-      <ResponsiveGridLayout
-        className={`layout dashboard-grid ${isEditMode ? 'edit-mode' : ''}`}
-        layouts={layouts}
-        onLayoutChange={handleLayoutChange}
-        onDragStart={() => setIsDragging(true)}
-        onDragStop={() => setIsDragging(false)}
-        breakpoints={{ lg: 1200, md: 996, sm: 768 }}
-        cols={{ lg: 12, md: 8, sm: 6 }}
-        rowHeight={60}
-        isDraggable={isEditMode}
-        isResizable={isEditMode}
-        compactType="vertical"
-        preventCollision={false}
-        margin={[8, 8]}
-        containerPadding={[0, 0]}
-      >
-        {testLayout.lg.map((item) => {
-          return (
-            <div key={item.i} className="bg-background rounded-lg shadow-sm border">
+      {/* Grid Layout */}
+      <div className="relative">
+        <GridLayout
+          className="layout"
+          layout={layout || defaultLayout}
+          cols={12}
+          rowHeight={60}
+          width={1200}
+          isResizable={true}
+          isDraggable={true}
+          onLayoutChange={handleLayoutChange}
+          onDragStart={() => setIsDragging(true)}
+          onDragStop={() => setIsDragging(false)}
+          margin={[8, 8]}
+          containerPadding={[0, 0]}
+          useCSSTransforms={true}
+        >
+          {(layout || defaultLayout).map((item) => (
+            <div key={item.i} className="cursor-move">
               {renderWidget(item.i)}
             </div>
-          )
-        })}
-      </ResponsiveGridLayout>
+          ))}
+        </GridLayout>
+      </div>
+
+      {/* Instructions */}
+      <div className="mt-4 p-3 bg-muted rounded-lg">
+        <h3 className="text-sm font-medium mb-2">Kullanım Talimatları:</h3>
+        <ul className="text-xs text-muted-foreground space-y-1">
+          <li>• Widget'ları fare ile sürükleyerek konumunu değiştirin</li>
+          <li>• Widget'ların sağ alt köşesinden sürükleyerek boyutunu değiştirin</li>
+          <li>• Tüm değişiklikler otomatik olarak kaydedilir</li>
+          <li>• "Varsayılana Sıfırla" butonu ile orijinal düzene dönebilirsiniz</li>
+        </ul>
+      </div>
     </div>
   )
 }
+
+export default TestDragDrop
