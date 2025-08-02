@@ -1,111 +1,95 @@
-import { useState } from 'react'
-import { Card } from '../ui/card'
-import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
-import { ChevronRight, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface CompactModuleProps {
-  title: string
-  value: string | number
-  subtitle?: string
-  status?: 'positive' | 'negative' | 'neutral' | 'warning'
-  badge?: string
-  icon?: React.ReactNode
-  onClick?: () => void
-  loading?: boolean
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
+  onClick?: () => void;
+  className?: string;
+  badge?: string;
 }
 
-export function CompactModule({
+const variantStyles = {
+  default: 'bg-muted/50 hover:bg-muted/70 border-border',
+  success: 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700',
+  warning: 'bg-yellow-50 hover:bg-yellow-100 border-yellow-200 text-yellow-700',
+  danger: 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700',
+  info: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700'
+};
+
+const valueVariantStyles = {
+  default: 'text-foreground',
+  success: 'text-green-800',
+  warning: 'text-yellow-800',
+  danger: 'text-red-800',
+  info: 'text-blue-800'
+};
+
+export const CompactModule: React.FC<CompactModuleProps> = ({
   title,
   value,
   subtitle,
-  status = 'neutral',
-  badge,
   icon,
+  variant = 'default',
   onClick,
-  loading = false
-}: CompactModuleProps) {
-  const [isHovered, setIsHovered] = useState(false)
-
-  const getStatusColor = () => {
-    switch (status) {
-      case 'positive':
-        return 'text-green-600 border-green-200 bg-green-50/50'
-      case 'negative':
-        return 'text-red-600 border-red-200 bg-red-50/50'
-      case 'warning':
-        return 'text-yellow-600 border-yellow-200 bg-yellow-50/50'
-      default:
-        return 'text-primary border-border bg-muted/30'
-    }
-  }
-
-  const getStatusIcon = () => {
-    switch (status) {
-      case 'positive':
-        return <TrendingUp className="w-3 h-3" />
-      case 'negative':
-        return <TrendingDown className="w-3 h-3" />
-      case 'warning':
-        return <AlertTriangle className="w-3 h-3" />
-      default:
-        return icon
-    }
-  }
+  className,
+  badge
+}) => {
+  const isClickable = !!onClick;
 
   return (
-    <Card
+    <Card 
       className={cn(
-        "h-[56px] max-w-[280px] p-2 cursor-pointer transition-all duration-200 border hover:shadow-sm",
-        getStatusColor(),
-        isHovered && "scale-[1.01]"
+        'p-3 h-[60px] transition-all duration-200 cursor-pointer select-none',
+        variantStyles[variant],
+        isClickable && 'hover:shadow-sm',
+        className
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
     >
       <div className="flex items-center justify-between h-full">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          {/* İkon */}
-          <div className="flex-shrink-0">
-            {loading ? (
-              <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
-            ) : (
-              getStatusIcon()
-            )}
-          </div>
-
-          {/* İçerik */}
+          {icon && (
+            <div className="flex-shrink-0 w-4 h-4 text-muted-foreground">
+              {icon}
+            </div>
+          )}
+          
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1">
-              <h4 className="text-[10px] font-medium text-muted-foreground truncate">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xs font-medium text-muted-foreground truncate">
                 {title}
-              </h4>
+              </h3>
               {badge && (
-                <Badge variant="secondary" className="text-[8px] px-1 py-0 h-3">
+                <Badge variant="outline" className="text-[10px] h-4 px-1">
                   {badge}
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-1 mt-0.5">
-              <span className="text-xs font-semibold truncate">
-                {loading ? '...' : value}
-              </span>
-              {subtitle && (
-                <span className="text-[9px] text-muted-foreground truncate">
-                  {subtitle}
-                </span>
-              )}
-            </div>
+            
+            {subtitle && (
+              <p className="text-xs text-muted-foreground/70 truncate">
+                {subtitle}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Sağ ok */}
-        {onClick && (
-          <ChevronRight className="w-3 h-3 text-muted-foreground flex-shrink-0 ml-1" />
-        )}
+        <div className="flex-shrink-0 text-right">
+          <span className={cn(
+            'text-sm font-semibold',
+            valueVariantStyles[variant]
+          )}>
+            {value}
+          </span>
+        </div>
       </div>
     </Card>
-  )
-}
+  );
+};
