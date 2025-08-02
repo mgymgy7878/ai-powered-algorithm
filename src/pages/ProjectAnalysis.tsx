@@ -4,7 +4,9 @@ import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Progress } from '../components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
-import { CheckCircle, Clock, AlertCircle, Target, Code, Settings, Zap, TrendingUp, Brain, Database } from 'lucide-react'
+import { Textarea } from '../components/ui/textarea'
+import { CheckCircle, Clock, AlertCircle, Target, Code, Settings, Zap, TrendingUp, Brain, Database, Copy, MessageSquare } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface FeatureItem {
   name: string
@@ -108,6 +110,69 @@ const ProjectAnalysis: React.FC = () => {
   const totalCount = completedCount + inProgressCount + plannedCount
   const completionPercentage = Math.round((completedCount / totalCount) * 100)
 
+  // ChatGPT Prompt Generator
+  const generatePrompt = () => {
+    const prompt = `# AI Trading Platform - Proje Durumu ve İyileştirme Talebi
+
+## 🎯 Projenin Genel Durumu
+- **Proje Türü:** React + TypeScript tabanlı AI destekli algorithmic trading platform
+- **Tamamlanan Özellikler:** ${completedCount} adet
+- **Devam Eden Özellikler:** ${inProgressCount} adet  
+- **Planlanan Özellikler:** ${plannedCount} adet
+- **Genel Tamamlanma:** %${completionPercentage}
+- **Son Güncelleme:** ${lastUpdated}
+
+## ✅ Tamamlanan Özellikler
+${currentFeatures.map(f => `- **${f.name}** (${f.priority} öncelik): ${f.description}`).join('\n')}
+
+## 🔄 Devam Eden Özellikler
+${inProgressFeatures.map(f => `- **${f.name}** (%${f.progress || 0} tamamlandı, ${f.priority} öncelik): ${f.description}`).join('\n')}
+
+## 📋 Planlanan Özellikler
+${plannedFeatures.map(f => `- **${f.name}** (${f.priority} öncelik): ${f.description}`).join('\n')}
+
+## 🛠️ Teknik Borç ve İyileştirmeler
+${technicalDebt.map(f => `- **${f.name}** (${f.priority} öncelik): ${f.description}`).join('\n')}
+
+## 🏗️ Teknoloji Stack
+**Frontend:** React 18 + TypeScript, Tailwind CSS, Shadcn/ui, Vite, Lucide Icons
+**AI & APIs:** OpenAI GPT-4, Anthropic Claude, Binance Futures API, WebSocket Streams
+**Data & Storage:** Spark KV Storage, Local State Management, Real-time Data Streaming
+
+## 📂 Proje Dosya Yapısı
+- \`src/App.tsx\` - Ana uygulama bileşeni
+- \`src/components/\` - UI bileşenleri (dashboard, AI, strategy, backtest, etc.)  
+- \`src/services/\` - API servisleri (aiService, binanceService)
+- \`src/pages/\` - Sayfa bileşenleri
+- \`src/types/\` - TypeScript tip tanımları
+
+## 🎯 Öncelikli İstekler
+1. **Backtest Motoru Tamamlama** - Geçmiş veri analizi ve performans metrikleri
+2. **Binance API Entegrasyonu** - Canlı veri akışı ve order placement  
+3. **Risk Yönetimi** - Stop-loss, take-profit, pozisyon boyutlandırma
+
+## 💬 Sizden İstediğim
+Lütfen bu proje durumuna göre şunları yapın:
+- [ ] Eksik olan özellikler için kod örnekleri verin
+- [ ] Teknik borçlar için çözüm önerileri sunun  
+- [ ] Performance iyileştirmeleri önerin
+- [ ] Best practice önerilerinizi paylaşın
+- [ ] Gelecek geliştirmeler için yol haritası çizin
+
+**Not:** Kodlarınızı React + TypeScript + Tailwind CSS uyumlu olarak yazın.`
+
+    return prompt
+  }
+
+  const copyPromptToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(generatePrompt())
+      toast.success('Prompt panoya kopyalandı! 📋')
+    } catch (error) {
+      toast.error('Kopyalama başarısız oldu')
+    }
+  }
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
@@ -183,11 +248,12 @@ const ProjectAnalysis: React.FC = () => {
       </Card>
 
       <Tabs defaultValue="current" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="current">Mevcut Özellikler</TabsTrigger>
           <TabsTrigger value="progress">Devam Edenler</TabsTrigger>
           <TabsTrigger value="planned">Planlananlar</TabsTrigger>
           <TabsTrigger value="technical">Teknik Borç</TabsTrigger>
+          <TabsTrigger value="prompt">ChatGPT Prompt</TabsTrigger>
         </TabsList>
         
         <TabsContent value="current" className="space-y-4">
@@ -316,6 +382,50 @@ const ProjectAnalysis: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="prompt" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-purple-500" />
+                ChatGPT İçin Prompt Üretici
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Proje durumunu ChatGPT'ye gönderebilmek için otomatik prompt üretir
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Button onClick={copyPromptToClipboard} className="flex items-center gap-2">
+                    <Copy className="w-4 h-4" />
+                    Prompt'ı Kopyala
+                  </Button>
+                  <Badge variant="outline" className="text-xs">
+                    {generatePrompt().length} karakter
+                  </Badge>
+                </div>
+                
+                <Textarea
+                  value={generatePrompt()}
+                  readOnly
+                  className="min-h-[400px] font-mono text-xs resize-none"
+                  placeholder="Otomatik üretilen prompt burada görünecek..."
+                />
+                
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">💡 Kullanım Talimatları</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>1. "Prompt'ı Kopyala" butonuna tıklayın</li>
+                    <li>2. ChatGPT'ye gidin ve kopyalanan metni yapıştırın</li>
+                    <li>3. AI size projeniz hakkında detaylı öneriler verecek</li>
+                    <li>4. Kod örnekleri, iyileştirmeler ve yol haritası alabilirsiniz</li>
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>
