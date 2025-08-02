@@ -113,8 +113,8 @@ export const Dashboard: React.FC = () => {
           />
         </div>
 
-        {/* Bildirim paneli - genişletildi, stratejiler modülüne kadar uzanıyor */}
-        <div className="w-[320px] flex-shrink-0">
+        {/* Bildirim paneli - stratejiler modülüne kadar uzatılmış */}
+        <div className="w-[500px] flex-shrink-0">
           <NotificationCenter />
         </div>
       </div>

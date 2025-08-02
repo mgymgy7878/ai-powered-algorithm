@@ -107,7 +107,7 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
           </div>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[420px] max-w-[90vw] p-0" align="start" side="bottom">
+        <PopoverContent className="w-[480px] max-w-[90vw] p-0" align="start" side="bottom">
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <h3 className="text-sm font-semibold">Son Bildirimler</h3>
             <div className="flex items-center gap-2">
