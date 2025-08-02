@@ -263,10 +263,85 @@ export const Dashboard: React.FC = () => {
           />
         </div>
 
-        {/* Orta kısım: Boş alan veya ek içerik */}
+        {/* Orta kısım: Ek modüller ve bilgiler */}
         <div className="flex-1 p-2">
-          <div className="h-full bg-muted/20 rounded-lg flex items-center justify-center text-sm text-muted-foreground">
-            Bu alan gelecekteki genişletmeler için ayrılmıştır
+          <div className="h-full space-y-2">
+            {/* Piyasa Özeti */}
+            <Card className="p-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Piyasa Özeti</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span>BTC/USDT</span>
+                    <span className="text-green-600">+2.4%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ETH/USDT</span>
+                    <span className="text-red-600">-1.2%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>BNB/USDT</span>
+                    <span className="text-green-600">+0.8%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ADA/USDT</span>
+                    <span className="text-green-600">+3.1%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Günlük Özet */}
+            <Card className="p-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Günlük Özet</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span>Toplam İşlem</span>
+                    <Badge variant="outline">47</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Başarılı İşlem</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">32</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Ortalama Kar</span>
+                    <span className="text-green-600">$26.5</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>En Yüksek Kar</span>
+                    <span className="text-green-600">$125</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Aktif Pozisyonlar */}
+            <Card className="p-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Aktif Pozisyonlar</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span>BTC/USDT Long</span>
+                    <span className="text-green-600">+$340</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>ETH/USDT Short</span>
+                    <span className="text-red-600">-$125</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Grid Bot Pozisyonları</span>
+                    <span className="text-blue-600">12 açık</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
