@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  ClipboardCheck
+  ClipboardCheck,
+  TestTube
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -52,6 +53,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
       { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
       { id: 'project-analysis', label: 'Proje Durumu', icon: ClipboardCheck },
+      { id: 'test', label: 'Test', icon: TestTube },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
     

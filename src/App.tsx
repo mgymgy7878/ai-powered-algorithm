@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Suspense, lazy } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
@@ -11,18 +11,19 @@ import { APISettings as APISettingsType } from './types/api'
 import { useNavigationPerformance } from './hooks/useNavigationPerformance'
 import { debugLog, safePushNotification, waitForFunction, initDebugMode } from './utils/debugUtils'
 
-// Lazy load components for better performance
-const StrategiesPage = lazy(() => import('./components/strategy/StrategiesPage').then(m => ({ default: m.StrategiesPage })))
-const BacktestEngine = lazy(() => import('./components/backtest/BacktestEngine').then(m => ({ default: m.BacktestEngine })))
-const LiveTrading = lazy(() => import('./components/live/LiveTrading').then(m => ({ default: m.LiveTrading })))
-const PortfolioView = lazy(() => import('./components/portfolio/PortfolioView').then(m => ({ default: m.PortfolioView })))
-const MarketAnalysis = lazy(() => import('./components/analysis/MarketAnalysis').then(m => ({ default: m.MarketAnalysis })))
-const EconomicCalendar = lazy(() => import('./components/economic/EconomicCalendar').then(m => ({ default: m.EconomicCalendar })))
-const APISettings = lazy(() => import('./components/settings/APISettings').then(m => ({ default: m.APISettings })))
-const ProjectAnalysis = lazy(() => import('./pages/ProjectAnalysis'))
+// Direct imports to avoid loading issues
+import { StrategiesPage } from './components/strategy/StrategiesPage'
+import { BacktestEngine } from './components/backtest/BacktestEngine'
+import { LiveTrading } from './components/live/LiveTrading'
+import { PortfolioView } from './components/portfolio/PortfolioView'
+import { MarketAnalysis } from './components/analysis/MarketAnalysis'
+import { EconomicCalendar } from './components/economic/EconomicCalendar'
+import APISettings from './components/settings/APISettings'
+import ProjectAnalysis from './pages/ProjectAnalysis'
+import TestPage from './pages/TestPage'
 
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis' | 'test'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -129,64 +130,28 @@ function App() {
 
   const renderView = () => {
     debugLog('RENDER_VIEW', `Rendering view: ${currentView}`)
-    
-    const LoadingFallback = () => (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
 
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />
       case 'strategies':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <StrategiesPage />
-          </Suspense>
-        )
+        return <StrategiesPage />
       case 'backtest':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <BacktestEngine />
-          </Suspense>
-        )
+        return <BacktestEngine />
       case 'live':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <LiveTrading />
-          </Suspense>
-        )
+        return <LiveTrading />
       case 'portfolio':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <PortfolioView />
-          </Suspense>
-        )
+        return <PortfolioView />
       case 'analysis':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <MarketAnalysis />
-          </Suspense>
-        )
+        return <MarketAnalysis />
       case 'economic':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <EconomicCalendar />
-          </Suspense>
-        )
+        return <EconomicCalendar />
       case 'settings':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <APISettings />
-          </Suspense>
-        )
+        return <APISettings />
       case 'project-analysis':
-        return (
-          <Suspense fallback={<LoadingFallback />}>
-            <ProjectAnalysis />
-          </Suspense>
-        )
+        return <ProjectAnalysis />
+      case 'test':
+        return <TestPage />
       default:
         return <Dashboard />
     }
