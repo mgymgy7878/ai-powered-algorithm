@@ -10,13 +10,14 @@ import { MarketAnalysis } from './components/analysis/MarketAnalysis'
 import { TradingAssistant } from './components/ai/TradingAssistant'
 import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import { APISettings } from './components/settings/APISettings'
+import { ProjectAnalysis } from './components/analysis/ProjectAnalysis'
 import { Toaster } from './components/ui/sonner'
 import { ActivityProvider } from './contexts/ActivityContext'
 import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-analysis'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -109,6 +110,8 @@ function App() {
         return <EconomicCalendar />
       case 'settings':
         return <APISettings />
+      case 'project-analysis':
+        return <ProjectAnalysis />
       default:
         return <Dashboard />
     }
