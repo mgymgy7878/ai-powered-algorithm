@@ -28,7 +28,10 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningStrategiesCount = 0 }: SidebarProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true) // Her zaman açık başlasın
+  
+  console.log('Sidebar - Current view:', currentView) // Debug için
+  console.log('Sidebar - Is open:', isSidebarOpen) // Debug için
   
   // Sidebar durumunu window'a yayınla ki Dashboard bunu kullanabilsin
   useEffect(() => {
@@ -43,27 +46,32 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
     { id: 'portfolio', label: 'Portföy', icon: PieChart },
     { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
     { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
-    { id: 'summary', label: 'Özet', icon: FileText },
-    { id: 'project-analysis', label: 'Proje Durumu', icon: ClipboardCheck },
-    { id: 'test', label: 'Test', icon: TestTube },
+    { id: 'summary', label: '📊 Özet', icon: FileText }, // Emoji eklendi
+    { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck }, // Emoji eklendi  
+    { id: 'test', label: '🧪 Test', icon: TestTube }, // Emoji eklendi
     { id: 'settings', label: 'API Ayarları', icon: Settings },
   ] as const
+  
+  console.log('Navigation items:', navigation.map(item => item.id)) // Debug için
 
   return (
     <>
-      {/* Toggle Button */}
+      {/* Toggle Button - Her zaman görünür */}
       <Button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        onClick={() => {
+          console.log('Toggle clicked, current state:', isSidebarOpen)
+          setIsSidebarOpen(!isSidebarOpen)
+        }}
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 bg-card border border-border shadow-md hover:bg-muted"
+        className="fixed top-4 left-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all"
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
         {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
       </Button>
 
       {/* Sidebar */}
-      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-card border-r border-border h-screen flex flex-col`}
+      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-card border-r border-border h-screen flex flex-col`}>
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
           <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
@@ -81,7 +89,9 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
                 className="w-full justify-start h-auto py-3 px-4"
                 onClick={() => {
                   console.log('Navigating to:', item.id) // Debug log
+                  console.log('Previous view:', currentView) // Debug log
                   onViewChange(item.id as AppView)
+                  console.log('Navigation attempted to:', item.id) // Debug log
                 }}
               >
                 <Icon className="h-5 w-5 mr-3" />

@@ -96,31 +96,43 @@ function App() {
 
   const renderView = () => {
     console.log('Current view:', currentView) // Debug için
-    switch (currentView) {
-      case 'dashboard':
-        return <Dashboard />
-      case 'strategies':
-        return <StrategiesPage />
-      case 'backtest':
-        return <BacktestEngine />
-      case 'live':
-        return <LiveTrading />
-      case 'portfolio':
-        return <PortfolioView />
-      case 'analysis':
-        return <MarketAnalysis />
-      case 'economic':
-        return <EconomicCalendar />
-      case 'summary':
-        return <Summary />
-      case 'settings':
-        return <APISettings />
-      case 'project-analysis':
-        return <ProjectAnalysis />
-      case 'test':
-        return <Test />
-      default:
-        return <Dashboard />
+    try {
+      switch (currentView) {
+        case 'dashboard':
+          return <Dashboard />
+        case 'strategies':
+          return <StrategiesPage />
+        case 'backtest':
+          return <BacktestEngine />
+        case 'live':
+          return <LiveTrading />
+        case 'portfolio':
+          return <PortfolioView />
+        case 'analysis':
+          return <MarketAnalysis />
+        case 'economic':
+          return <EconomicCalendar />
+        case 'summary':
+          console.log('Rendering Summary page')
+          return <Summary />
+        case 'settings':
+          return <APISettings />
+        case 'project-analysis':
+          console.log('Rendering ProjectAnalysis page')
+          return <ProjectAnalysis />
+        case 'test':
+          console.log('Rendering Test page')
+          return <Test />
+        default:
+          console.log('Rendering default Dashboard')
+          return <Dashboard />
+      }
+    } catch (error) {
+      console.error('Error rendering view:', currentView, error)
+      return <div className="p-6">
+        <h1 className="text-2xl font-bold text-red-600">Sayfa Yükleme Hatası</h1>
+        <p className="text-muted-foreground">Sayfa "{currentView}" yüklenirken hata oluştu: {String(error)}</p>
+      </div>
     }
   }
 
