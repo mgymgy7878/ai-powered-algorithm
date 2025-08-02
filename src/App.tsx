@@ -32,6 +32,11 @@ export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfo
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
   
+  // Debug: currentView değişikliklerini logla
+  useEffect(() => {
+    console.log('🔄 CURRENT VIEW CHANGED TO:', currentView)
+  }, [currentView])
+  
   // Initialize debug mode
   useEffect(() => {
     initDebugMode()
@@ -64,9 +69,19 @@ function App() {
 
   // Optimized view change handler
   const handleViewChange = useCallback((newView: AppView) => {
+    console.log('🔄 APP VIEW CHANGE REQUESTED:', {
+      currentView,
+      newView,
+      willChange: currentView !== newView
+    })
+    
     debugLog('VIEW_CHANGE', `${currentView} -> ${newView}`)
+    
     if (currentView !== newView) {
+      console.log('✅ SETTING NEW VIEW:', newView)
       setCurrentView(newView)
+    } else {
+      console.log('⚠️ View already set to:', newView)
     }
   }, [currentView])
 
@@ -134,38 +149,59 @@ function App() {
 
   const renderView = () => {
     debugLog('RENDER_VIEW', `Rendering view: ${currentView}`)
+    console.log('🔍 CURRENT VIEW:', currentView) // Ek debug log
 
-    switch (currentView) {
-      case 'dashboard':
-        return <SimpleDashboard />
-      case 'strategies':
-        return <StrategiesPage />
-      case 'backtest':
-        return <BacktestEngine />
-      case 'live':
-        return <LiveTrading />
-      case 'portfolio':
-        return <PortfolioView />
-      case 'analysis':
-        return <MarketAnalysis />
-      case 'economic':
-        return <EconomicCalendar />
-      case 'settings':
-        return <APISettings />
-      case 'project-status':
-        return <ProjectStatusPage />
-      case 'test':
-        return <SimpleTestPage />
-      case 'proje':
-        return <Proje />
-      case 'a':
-        return <A />
-      case 'debug':
-        return <DebugPage />
-      case 'test-display':
-        return <TestDisplay />
-      default:
-        return <SimpleDashboard />
+    try {
+      switch (currentView) {
+        case 'dashboard':
+          console.log('✅ Rendering Dashboard')
+          return <SimpleDashboard />
+        case 'strategies':
+          console.log('✅ Rendering Strategies')
+          return <StrategiesPage />
+        case 'backtest':
+          console.log('✅ Rendering Backtest')
+          return <BacktestEngine />
+        case 'live':
+          console.log('✅ Rendering Live Trading')
+          return <LiveTrading />
+        case 'portfolio':
+          console.log('✅ Rendering Portfolio')
+          return <PortfolioView />
+        case 'analysis':
+          console.log('✅ Rendering Market Analysis')
+          return <MarketAnalysis />
+        case 'economic':
+          console.log('✅ Rendering Economic Calendar')
+          return <EconomicCalendar />
+        case 'settings':
+          console.log('✅ Rendering API Settings')
+          return <APISettings />
+        case 'project-status':
+          console.log('✅ Rendering Project Status')
+          return <ProjectStatusPage />
+        case 'test':
+          console.log('✅ Rendering Test Page')
+          return <SimpleTestPage />
+        case 'proje':
+          console.log('✅ Rendering Proje Page')
+          return <Proje />
+        case 'a':
+          console.log('✅ Rendering A Page')
+          return <A />
+        case 'debug':
+          console.log('✅ Rendering Debug Page')
+          return <DebugPage />
+        case 'test-display':
+          console.log('✅ Rendering Test Display')
+          return <TestDisplay />
+        default:
+          console.log('⚠️ Default view, rendering Dashboard')
+          return <SimpleDashboard />
+      }
+    } catch (error) {
+      console.error('❌ Error rendering view:', error)
+      return <div className="p-6 text-red-600">Sayfa yüklenirken hata oluştu: {error.message}</div>
     }
   }
 

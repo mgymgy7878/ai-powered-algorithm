@@ -103,8 +103,17 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   // Memoize the navigation click handler
   const handleNavigation = useCallback((viewId: AppView) => {
+    console.log('🔄 SIDEBAR NAVIGATION:', {
+      from: currentView,
+      to: viewId,
+      willChange: currentView !== viewId
+    })
+    
     if (currentView !== viewId) {
+      console.log('✅ CALLING onViewChange for:', viewId)
       onViewChange(viewId)
+    } else {
+      console.log('⚠️ Already on view:', viewId)
     }
   }, [currentView, onViewChange])
 
@@ -185,6 +194,7 @@ const NavigationButton = React.memo<{
   const Icon = item.icon
   
   const handleClick = useCallback(() => {
+    console.log('🖱️ BUTTON CLICKED:', item.id, '=', item.label)
     debugLog('SIDEBAR_CLICK', `Navigation clicked: ${item.id} -> ${item.label}`)
     onClick(item.id)
   }, [item.id, item.label, onClick])
