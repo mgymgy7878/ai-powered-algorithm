@@ -277,7 +277,7 @@ export function MarketData({ symbol = 'BTCUSDT' }: MarketDataProps) {
                   {(klineData || []).slice(-5).reverse().map((kline, index) => (
                     <div key={index} className="flex items-center justify-between p-2 rounded border">
                       <div className="text-sm">
-                        {new Date(kline.openTime).toLocaleString('tr-TR')}
+                        {kline.openTime ? new Date(kline.openTime).toLocaleString('tr-TR') : 'N/A'}
                       </div>
                       <div className="flex gap-4 text-sm">
                         <span>A: {parseFloat(kline.open).toFixed(2)}</span>

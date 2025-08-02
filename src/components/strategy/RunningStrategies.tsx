@@ -298,7 +298,7 @@ export function RunningStrategies() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">Başlatma:</span>
-                          <span className="text-sm">{new Date(selectedStrategyData.startTime).toLocaleString('tr-TR')}</span>
+                          <span className="text-sm">{selectedStrategyData.startTime ? new Date(selectedStrategyData.startTime).toLocaleString('tr-TR') : 'N/A'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">Çalışma Süresi:</span>
@@ -502,7 +502,7 @@ export function RunningStrategies() {
                             <div className="flex-1">
                               <p className="text-sm">{log.message}</p>
                               <p className="text-xs text-muted-foreground">
-                                {new Date(log.timestamp).toLocaleString('tr-TR')}
+                                {log.timestamp ? new Date(log.timestamp).toLocaleString('tr-TR') : 'N/A'}
                               </p>
                             </div>
                           </div>

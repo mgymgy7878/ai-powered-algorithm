@@ -537,7 +537,7 @@ export function WebSocketTester() {
                       <div>
                         <div className="font-medium">{symbol}</div>
                         <div className="text-sm text-muted-foreground">
-                          Vol: {parseFloat(data.volume).toLocaleString()}
+                          Vol: {data.volume ? parseFloat(data.volume).toLocaleString() : '0'}
                         </div>
                       </div>
                       <div className="text-right">

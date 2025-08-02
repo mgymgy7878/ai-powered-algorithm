@@ -74,21 +74,21 @@ export const Dashboard: React.FC = () => {
       <div className="absolute top-2 left-[60px] right-[300px] z-30 px-2 flex items-center gap-2 overflow-x-auto">
         <CompactModule
           title="Portföy Değeri"
-          value={`$${portfolioData.totalValue.toLocaleString()}`}
+          value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
           icon={<DollarSign className="w-4 h-4" />}
           variant="info"
           onClick={() => setSelectedModule('portfolio')}
         />
         <CompactModule
           title="Günlük K/Z"
-          value={`$${portfolioData.dailyPnl.toLocaleString()}`}
+          value={`$${(portfolioData?.dailyPnl ?? 0).toLocaleString()}`}
           icon={<TrendingUp className="w-4 h-4" />}
           variant="success"
           onClick={() => setSelectedModule('daily-pnl')}
         />
         <CompactModule
           title="Toplam K/Z"
-          value={`$${portfolioData.totalPnl.toLocaleString()}`}
+          value={`$${(portfolioData?.totalPnl ?? 0).toLocaleString()}`}
           icon={<TrendingUp className="w-4 h-4" />}
           variant="success"
           onClick={() => setSelectedModule('total-pnl')}

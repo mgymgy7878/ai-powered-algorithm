@@ -302,7 +302,7 @@ export const AdvancedTradingChart = memo(function AdvancedTradingChart({
         </div>
         
         <div className="flex items-center gap-2 text-xs">
-          <span className="font-mono">${currentPrice.toLocaleString()}</span>
+          <span className="font-mono">${(currentPrice || 0).toLocaleString()}</span>
           <span className={`flex items-center gap-1 ${priceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {priceChange >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
@@ -444,7 +444,7 @@ export const AdvancedTradingChart = memo(function AdvancedTradingChart({
           <div className="flex items-center gap-6">
             <div>
               <p className="text-xs text-muted-foreground">Fiyat</p>
-              <p className="text-xl font-mono font-bold">${currentPrice.toLocaleString()}</p>
+              <p className="text-xl font-mono font-bold">${(currentPrice || 0).toLocaleString()}</p>
             </div>
             
             <div>

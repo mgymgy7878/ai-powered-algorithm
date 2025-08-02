@@ -4,6 +4,7 @@ import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
 import { Toaster } from './components/ui/sonner'
 import { ActivityProvider } from './contexts/ActivityContext'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { aiService } from './services/aiService'
 import { binanceService } from './services/binanceService'
 import { APISettings as APISettingsType } from './types/api'
@@ -191,22 +192,24 @@ function App() {
   }
 
   return (
-    <ActivityProvider>
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="flex">
-          <Sidebar 
-            currentView={currentView} 
-            onViewChange={handleViewChange}
-            strategyCount={strategies?.length ?? 0}
-            runningStrategiesCount={liveStrategies?.length ?? 0}
-          />
-          <main className="flex-1 overflow-hidden">
-            {renderView()}
-          </main>
+    <ErrorBoundary>
+      <ActivityProvider>
+        <div className="min-h-screen bg-background text-foreground">
+          <div className="flex">
+            <Sidebar 
+              currentView={currentView} 
+              onViewChange={handleViewChange}
+              strategyCount={strategies?.length ?? 0}
+              runningStrategiesCount={liveStrategies?.length ?? 0}
+            />
+            <main className="flex-1 overflow-hidden">
+              {renderView()}
+            </main>
+          </div>
+          <Toaster />
         </div>
-        <Toaster />
-      </div>
-    </ActivityProvider>
+      </ActivityProvider>
+    </ErrorBoundary>
   )
 }
 
