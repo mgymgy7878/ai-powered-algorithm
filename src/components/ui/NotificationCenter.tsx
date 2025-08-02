@@ -74,30 +74,30 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <div className="w-full">
-            {/* Son bildirim gösterici kutu - Metriklerle uyumlu tasarım */}
-            <div className="flex items-center justify-between px-3 py-2 bg-muted/40 rounded-md text-xs shadow-sm cursor-pointer hover:bg-muted/60 transition-colors overflow-hidden border-2 border-border/40 h-[56px]">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
+            {/* Son bildirim gösterici kutu - Ultra kompakt tasarım */}
+            <div className="flex items-center justify-between px-2 py-1.5 bg-muted/40 rounded-md text-xs shadow-sm cursor-pointer hover:bg-muted/60 transition-colors overflow-hidden border border-border/40 h-[40px]">
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
                 <Bell className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                 {latestNotification ? (
                   <>
-                    <span className="text-xs flex-shrink-0">{getTypeIcon(latestNotification.type)}</span>
+                    <span className="text-[10px] flex-shrink-0">{getTypeIcon(latestNotification.type)}</span>
                     <span 
-                      className="truncate flex-1 text-[10px] font-semibold leading-tight"
+                      className="truncate flex-1 text-[9px] font-semibold leading-tight"
                       title={latestNotification.message}
                     >
                       {latestNotification.message}
                     </span>
                   </>
                 ) : (
-                  <span className="text-muted-foreground text-[10px] font-medium leading-tight">Henüz bildirim yok</span>
+                  <span className="text-muted-foreground text-[9px] font-medium leading-tight">Henüz bildirim yok</span>
                 )}
               </div>
               
               {latestNotification && (
-                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                  <span className="text-muted-foreground text-[9px] font-medium leading-tight">{latestNotification.time}</span>
+                <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
+                  <span className="text-muted-foreground text-[8px] font-medium leading-tight">{latestNotification.time}</span>
                   {notifications.length > 1 && (
-                    <Badge variant="secondary" className="text-[8px] px-1 py-0.5 h-4 min-w-[20px] flex items-center justify-center leading-none bg-primary/10 text-primary font-bold">
+                    <Badge variant="secondary" className="text-[7px] px-1 py-0 h-3 min-w-[16px] flex items-center justify-center leading-none bg-primary/10 text-primary font-bold">
                       +{notifications.length - 1}
                     </Badge>
                   )}

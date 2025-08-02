@@ -197,16 +197,16 @@ export function TradingAssistant() {
   }
 
   return (
-    <Card className="w-full h-[460px] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
-      {/* Header kompakt tek satır - başlık, model seçici ve ayarlar yan yana */}
+    <Card className="w-full h-[calc(100vh-100px)] flex flex-col bg-background border rounded-md shadow-md overflow-hidden">
+      {/* Header ultra kompakt - başlık, model seçici ve ayarlar yan yana */}
       <div className="sticky top-0 z-50 bg-background border-b">
-        <div className="flex items-center justify-between px-2 py-0.5">
-          <div className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
+        <div className="flex items-center justify-between px-2 py-1">
+          <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground">
             <Brain className="w-3 h-3" />
-            <span>AI Trading Yöneticisi</span>
+            <span>AI Yöneticisi</span>
           </div>
           <div className="flex items-center gap-1">
-            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">
+            <Badge variant="outline" className="text-[8px] px-1 py-0 h-3">
               {getActiveModel()}
             </Badge>
             
