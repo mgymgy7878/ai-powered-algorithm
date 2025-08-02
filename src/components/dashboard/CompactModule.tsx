@@ -46,11 +46,11 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
   return (
     <Card 
       className={cn(
-        'px-2 py-2 transition-all duration-200 cursor-pointer select-none border shadow-sm overflow-hidden flex',
+        'px-1 py-1 transition-all duration-200 cursor-pointer select-none border shadow-sm overflow-hidden flex',
         variantStyles[variant],
         isClickable && 'hover:shadow-md hover:scale-[1.02] hover:z-10',
         // Daha küçük varsayılan boyut
-        !className?.includes('h-') && 'h-[80px]',
+        !className?.includes('h-') && 'h-[44px]',
         !className?.includes('w-') && 'min-w-[120px]',
         className
       )}
@@ -61,17 +61,17 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         <div className="flex items-center justify-between gap-1 mb-0.5">
           <div className="flex items-center gap-1 min-w-0 flex-1">
             {icon && (
-              <div className="flex-shrink-0 w-3 h-3">
+              <div className="flex-shrink-0 w-2 h-2">
                 {icon}
               </div>
             )}
-            <h3 className="text-[10px] font-semibold leading-tight truncate" title={title}>
+            <h3 className="text-[8px] font-semibold leading-tight truncate" title={title}>
               {title}
             </h3>
           </div>
           
           {badge && (
-            <Badge variant="outline" className="text-[8px] h-3 px-1 py-0 leading-none bg-white/90 border-current">
+            <Badge variant="outline" className="text-[6px] h-2 px-1 py-0 leading-none bg-white/90 border-current">
               {badge}
             </Badge>
           )}
@@ -82,8 +82,8 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
           <span 
             className={cn(
               // Kompakt yazı boyutları
-              className?.includes('text-[10px]') ? 'text-xs' : 
-              className?.includes('h-[48px]') ? 'text-sm' : 'text-base',
+              className?.includes('text-[10px]') ? 'text-[10px]' : 
+              className?.includes('h-[22px]') ? 'text-[10px]' : 'text-sm',
               'font-bold leading-none text-center',
               valueVariantStyles[variant]
             )}
@@ -96,7 +96,7 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         {/* Alt kısım: Alt başlık */}
         {subtitle && (
           <div className="mt-0.5">
-            <p className="text-[9px] text-muted-foreground/70 leading-tight truncate text-center" title={subtitle}>
+            <p className="text-[7px] text-muted-foreground/70 leading-tight truncate text-center" title={subtitle}>
               {subtitle}
             </p>
           </div>
