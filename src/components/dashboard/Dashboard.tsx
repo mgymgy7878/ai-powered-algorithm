@@ -72,105 +72,67 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Üst sıra: Yatay hizalanmış önemli göstergeler */}
-      <div className="flex items-center gap-2 p-2 border-b border-border">
+      {/* Üst sıra: Yatay hizalanmış önemli göstergeler - Sidebar'dan uzağa yerleştirildi */}
+      <div className="flex items-center gap-2 p-3 pl-20 border-b border-border bg-card">
         <CompactModule
           title="Portföy Değeri"
           value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
-          icon={<DollarSign className="w-3 h-3" />}
+          icon={<DollarSign className="w-4 h-4" />}
           variant="info"
           onClick={() => setSelectedModule('portfolio')}
-          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
+          className="w-[160px] h-[50px] text-xs flex flex-col items-center justify-center p-2"
         />
 
         <CompactModule
           title="Günlük K/Z"
           value={`+$${(portfolioData?.dailyPnl ?? 0).toLocaleString()}`}
-          icon={<TrendingUp className="w-3 h-3" />}
+          icon={<TrendingUp className="w-4 h-4" />}
           variant="success"
           onClick={() => setSelectedModule('daily-pnl')}
-          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
+          className="w-[160px] h-[50px] text-xs flex flex-col items-center justify-center p-2"
         />
 
         <CompactModule
           title="Toplam K/Z"
           value={`+$${(portfolioData?.totalPnl ?? 0).toLocaleString()}`}
-          icon={<TrendingUp className="w-3 h-3" />}
+          icon={<TrendingUp className="w-4 h-4" />}
           variant="success" 
           onClick={() => setSelectedModule('total-pnl')}
-          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
+          className="w-[160px] h-[50px] text-xs flex flex-col items-center justify-center p-2"
         />
 
         <CompactModule
           title="Başarı Oranı"
           value={`${(portfolioData?.winRate ?? 0)}%`}
-          icon={<Target className="w-3 h-3" />}
+          icon={<Target className="w-4 h-4" />}
           variant="info"
           onClick={() => setSelectedModule('win-rate')}
-          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
+          className="w-[160px] h-[50px] text-xs flex flex-col items-center justify-center p-2"
         />
 
         <CompactModule
           title="Aktif Stratejiler"
           value={portfolioData?.activeStrategies ?? 0}
-          icon={<Bot className="w-3 h-3" />}
+          icon={<Bot className="w-4 h-4" />}
           variant="default"
           onClick={() => setSelectedModule('active-strategies')}
-          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
+          className="w-[160px] h-[50px] text-xs flex flex-col items-center justify-center p-2"
         />
 
         <CompactModule
           title="Sistem Durumu"
           value="Aktif"
-          icon={<Activity className="w-3 h-3" />}
+          icon={<Activity className="w-4 h-4" />}
           variant="success"
           onClick={() => setSelectedModule('system-status')}
-          className="w-[180px] h-[37px] text-[11px] flex items-center justify-center"
+          className="w-[160px] h-[50px] text-xs flex flex-col items-center justify-center p-2"
         />
       </div>
 
-      {/* Grafik Paneli - Üst kutuların hemen altında */}
-      <div className="p-2 border-b border-border">
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm">Trading Grafiği</CardTitle>
-              <div className="flex items-center gap-2">
-                <select className="text-xs border rounded px-2 py-1">
-                  <option value="BINANCE:BTCUSDT">BTCUSDT</option>
-                  <option value="BINANCE:ETHUSDT">ETHUSDT</option>
-                  <option value="BINANCE:BNBUSDT">BNBUSDT</option>
-                </select>
-                <select className="text-xs border rounded px-2 py-1">
-                  <option value="1m">1m</option>
-                  <option value="5m">5m</option>
-                  <option value="15m">15m</option>
-                  <option value="1h">1h</option>
-                  <option value="4h">4h</option>
-                  <option value="1d">1d</option>
-                </select>
-                <button className="p-1 hover:bg-gray-100 rounded">
-                  <Maximize2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-64">
-              <TradingViewWidget 
-                symbol="BINANCE:BTCUSDT" 
-                width="100%" 
-                height="100%" 
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Ana İçerik Alanı */}
-      <div className="flex h-[calc(100vh-320px)]">
-        {/* Sol taraf: Diğer modüller alt alta - Yükseklik %20 artırılmış */}
-        <div className="w-[220px] p-2 space-y-2">
+      <div className="flex h-[calc(100vh-120px)]">
+        {/* Sol taraf: Diğer modüller alt alta */}
+        <div className="w-[240px] p-3 space-y-2">
           <CompactModule
             title="AI Tahmin"
             value="▲ %76"
@@ -179,7 +141,7 @@ export const Dashboard: React.FC = () => {
             variant="success"
             badge="Güçlü"
             onClick={() => setSelectedModule('ai-prediction')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -189,7 +151,7 @@ export const Dashboard: React.FC = () => {
             icon={<AlertTriangle className="w-4 h-4" />}
             variant="warning"
             onClick={() => setSelectedModule('risk-alerts')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -199,7 +161,7 @@ export const Dashboard: React.FC = () => {
             icon={<Activity className="w-4 h-4" />}
             variant="info"
             onClick={() => setSelectedModule('technical-signals')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -209,7 +171,7 @@ export const Dashboard: React.FC = () => {
             icon={<Newspaper className="w-4 h-4" />}
             variant="info"
             onClick={() => setSelectedModule('news-feed')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -219,7 +181,7 @@ export const Dashboard: React.FC = () => {
             icon={<Calendar className="w-4 h-4" />}
             variant="danger"
             onClick={() => setSelectedModule('economic-calendar')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -229,7 +191,7 @@ export const Dashboard: React.FC = () => {
             icon={<TrendingUp className="w-4 h-4" />}
             variant="success"
             onClick={() => setSelectedModule('strategy-performance')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -239,7 +201,7 @@ export const Dashboard: React.FC = () => {
             icon={<PieChart className="w-4 h-4" />}
             variant="default"
             onClick={() => setSelectedModule('portfolio-distribution')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
 
           <CompactModule
@@ -249,128 +211,74 @@ export const Dashboard: React.FC = () => {
             icon={<History className="w-4 h-4" />}
             variant="default"
             onClick={() => setSelectedModule('recent-trades')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
-          />
-
-          <CompactModule
-            title="Hızlı Eylemler"
-            value="Bot Başlat"
-            subtitle="Yeni yapılandır"
-            icon={<Zap className="w-4 h-4" />}
-            variant="info"
-            onClick={() => setSelectedModule('quick-actions')}
-            className="w-full h-[45px] text-sm flex flex-col justify-center items-center"
+            className="w-full h-[54px] text-sm flex flex-col justify-center items-center p-2"
           />
         </div>
 
-        {/* Orta kısım: Ek modüller ve bilgiler */}
-        <div className="flex-1 p-2">
-          <div className="h-full space-y-2">
-            {/* Piyasa Özeti */}
-            <Card className="p-3">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Piyasa Özeti</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="flex justify-between">
-                    <span>BTC/USDT</span>
-                    <span className="text-green-600">+2.4%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>ETH/USDT</span>
-                    <span className="text-red-600">-1.2%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>BNB/USDT</span>
-                    <span className="text-green-600">+0.8%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>ADA/USDT</span>
-                    <span className="text-green-600">+3.1%</span>
-                  </div>
+        {/* Orta kısım: Trading Grafiği - Sol ve AI Yöneticisi arasında */}
+        <div className="flex-1 p-3">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold">Trading Grafiği</CardTitle>
+                <div className="flex items-center gap-2">
+                  <select className="text-xs border rounded px-2 py-1 bg-background">
+                    <option value="BINANCE:BTCUSDT">BTCUSDT</option>
+                    <option value="BINANCE:ETHUSDT">ETHUSDT</option>
+                    <option value="BINANCE:BNBUSDT">BNBUSDT</option>
+                  </select>
+                  <select className="text-xs border rounded px-2 py-1 bg-background">
+                    <option value="1m">1m</option>
+                    <option value="5m">5m</option>
+                    <option value="15m">15m</option>
+                    <option value="1h">1h</option>
+                    <option value="4h">4h</option>
+                    <option value="1d">1d</option>
+                  </select>
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <Maximize2 className="w-4 h-4" />
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Günlük Özet */}
-            <Card className="p-3">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Günlük Özet</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span>Toplam İşlem</span>
-                    <Badge variant="outline">47</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Başarılı İşlem</span>
-                    <Badge variant="outline" className="bg-green-50 text-green-700">32</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Ortalama Kar</span>
-                    <span className="text-green-600">$26.5</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>En Yüksek Kar</span>
-                    <span className="text-green-600">$125</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Aktif Pozisyonlar */}
-            <Card className="p-3">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Aktif Pozisyonlar</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span>BTC/USDT Long</span>
-                    <span className="text-green-600">+$340</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>ETH/USDT Short</span>
-                    <span className="text-red-600">-$125</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Grid Bot Pozisyonları</span>
-                    <span className="text-blue-600">12 açık</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-2">
+              <div className="h-[calc(100%-60px)] bg-muted rounded-md flex items-center justify-center">
+                <TradingViewWidget 
+                  symbol="BINANCE:BTCUSDT" 
+                  width="100%" 
+                  height="100%" 
+                />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Sağ taraf: AI Trading Yöneticisi - 320px genişlik (uzatıldı) */}
-        <div className="w-[320px] flex flex-col">
+        {/* Sağ taraf: AI Trading Yöneticisi - 280px genişlik */}
+        <div className="w-[280px] flex flex-col">
           {/* AI Trading Yöneticisi - Uzatıldı */}
           <div className="flex-1 mb-2">
             <TradingAssistant />
           </div>
           
-          {/* Kalıcı Bildirim Kutusu - %20 küçültüldü */}
+          {/* Kalıcı Bildirim Kutusu - %20 kısaltıldı */}
           <Card className="mx-2 mb-2">
-            <CardHeader className="pb-1 px-2 py-1">
+            <CardHeader className="pb-0 px-2 py-1">
               <div className="flex items-center gap-1">
                 <Bell className="w-3 h-3" />
-                <CardTitle className="text-[10px]">Bildirimler</CardTitle>
+                <CardTitle className="text-[9px] font-medium">Bildirimler</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-2">
-              <ScrollArea className="h-24">
+            <CardContent className="p-2 pt-1">
+              <ScrollArea className="h-20">
                 <div className="space-y-1">
                   {notifications.slice(0, 3).map((notification) => (
                     <div 
                       key={notification.id}
-                      className="text-[10px] p-1 rounded-md bg-muted/50 border"
+                      className="text-[9px] p-1 rounded-md bg-muted/50 border"
                     >
                       <div className="flex justify-between items-start">
-                        <span className="flex-1 pr-1">{notification.message}</span>
-                        <span className="text-muted-foreground whitespace-nowrap">{notification.time}</span>
+                        <span className="flex-1 pr-1 leading-3">{notification.message}</span>
+                        <span className="text-muted-foreground whitespace-nowrap text-[8px]">{notification.time}</span>
                       </div>
                     </div>
                   ))}
@@ -380,11 +288,11 @@ export const Dashboard: React.FC = () => {
                       {notifications.slice(3).map((notification) => (
                         <div 
                           key={notification.id}
-                          className="text-[10px] p-1 rounded-md bg-muted/30 border opacity-80"
+                          className="text-[9px] p-1 rounded-md bg-muted/30 border opacity-80"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="flex-1 pr-1">{notification.message}</span>
-                            <span className="text-muted-foreground whitespace-nowrap">{notification.time}</span>
+                            <span className="flex-1 pr-1 leading-3">{notification.message}</span>
+                            <span className="text-muted-foreground whitespace-nowrap text-[8px]">{notification.time}</span>
                           </div>
                         </div>
                       ))}
