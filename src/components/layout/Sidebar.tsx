@@ -94,12 +94,16 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
         variant="ghost"
         size="icon"
         className={`fixed top-4 z-[100] bg-card border border-border shadow-lg hover:bg-muted hover:shadow-xl transition-all ${
-          isSidebarOpen ? 'left-[240px]' : 'left-4'
+          isSidebarOpen ? 'left-[256px]' : 'left-4'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
-        {isSidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+        {isSidebarOpen ? (
+          <ChevronLeft className="h-4 w-4" />
+        ) : (
+          <ChevronRight className="h-4 w-4" />
+        )}
       </Button>
 
       {/* Sidebar */}
