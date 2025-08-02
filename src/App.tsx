@@ -22,8 +22,9 @@ const Summary = lazy(() => import('./pages/Summary'))
 const Test = lazy(() => import('./pages/Test'))
 const WebSocketTest = lazy(() => import('./pages/WebSocketTest'))
 const APage = lazy(() => import('./pages/APage'))
+const DebugPage = lazy(() => import('./pages/DebugPage'))
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'summary' | 'settings' | 'project-analysis' | 'test' | 'websocket-test' | 'a-page'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'summary' | 'settings' | 'project-analysis' | 'test' | 'websocket-test' | 'a-page' | 'debug'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -193,6 +194,12 @@ function App() {
         return (
           <Suspense fallback={<LoadingFallback />}>
             <APage />
+          </Suspense>
+        )
+      case 'debug':
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <DebugPage />
           </Suspense>
         )
       default:

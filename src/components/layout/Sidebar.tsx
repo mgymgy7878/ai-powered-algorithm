@@ -40,6 +40,11 @@ interface NavigationItem {
 export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningStrategiesCount = 0 }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   
+  // Force sidebar open for debugging
+  useEffect(() => {
+    setIsSidebarOpen(true)
+  }, [])
+  
   // Memoize navigation items to prevent unnecessary re-renders
   const navigation = useMemo<NavigationItem[]>(() => {
     const items = [
@@ -50,11 +55,12 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'portfolio', label: 'Portföy', icon: PieChart },
       { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
       { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
-      { id: 'summary', label: '📊 Özet', icon: FileText },
-      { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck },
-      { id: 'test', label: '🧪 Test', icon: TestTube },
-      { id: 'websocket-test', label: '📡 WebSocket Test', icon: Wifi },
-      { id: 'a-page', label: '🅰️ A Sayfası', icon: Circle },
+      { id: 'summary', label: 'Özet', icon: FileText },
+      { id: 'project-analysis', label: 'Proje Durumu', icon: ClipboardCheck },
+      { id: 'test', label: 'Test Sayfası', icon: TestTube },
+      { id: 'websocket-test', label: 'WebSocket Test', icon: Wifi },
+      { id: 'a-page', label: 'A Sayfası', icon: Circle },
+      { id: 'debug', label: '🔴 DEBUG', icon: Settings },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
     
@@ -107,13 +113,13 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       </Button>
 
       {/* Sidebar */}
-      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-card border-r border-border h-screen flex flex-col`}>
+      <div className={`${isSidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 bg-card border-r border-border h-screen flex flex-col shadow-lg ${isSidebarOpen ? 'overflow-visible' : 'overflow-hidden'}`}>
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold text-primary">AI Trader</h1>
           <p className="text-sm text-muted-foreground mt-1">Algoritmik Trading Platformu</p>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2" role="navigation" aria-label="Ana navigasyon">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Ana navigasyon">
           {navigation.map((item) => {
             const Icon = item.icon
             const isActive = currentView === item.id
