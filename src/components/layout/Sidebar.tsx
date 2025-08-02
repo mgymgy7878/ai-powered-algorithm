@@ -88,21 +88,21 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
 
   return (
     <>
-      {/* Toggle Button - Menüyü Gizle/Göster butonu */}
+      {/* Toggle Button - Menüyü Gizle/Göster butonu - biraz sola kaydırıldı */}
       <Button
         onClick={handleToggle}
         variant="ghost"
         size="icon"
         className={`fixed top-2 z-[100] bg-card border border-border shadow-md hover:bg-muted hover:shadow-lg transition-all ${
-          isSidebarOpen ? 'left-[240px]' : 'left-2'
+          isSidebarOpen ? 'left-[210px]' : 'left-2'
         }`}
         title={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
         {isSidebarOpen ? (
-          <ChevronLeft className="w-4 h-4" />
+          <span className="text-sm">&lt;</span>
         ) : (
-          <ChevronRight className="w-4 h-4" />
+          <span className="text-sm">&gt;</span>
         )}
       </Button>
 
