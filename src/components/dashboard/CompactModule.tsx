@@ -46,7 +46,7 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
   return (
     <Card 
       className={cn(
-        'p-3 h-[60px] transition-all duration-200 cursor-pointer select-none',
+        'p-2 h-[48px] transition-all duration-200 cursor-pointer select-none',
         variantStyles[variant],
         isClickable && 'hover:shadow-sm',
         className
@@ -54,27 +54,27 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
       onClick={onClick}
     >
       <div className="flex items-center justify-between h-full">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {icon && (
-            <div className="flex-shrink-0 w-4 h-4 text-muted-foreground">
+            <div className="flex-shrink-0 w-3 h-3 text-muted-foreground">
               {icon}
             </div>
           )}
           
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xs font-medium text-muted-foreground truncate">
+            <div className="flex items-center gap-1">
+              <h3 className="text-[10px] font-medium text-muted-foreground truncate">
                 {title}
               </h3>
               {badge && (
-                <Badge variant="outline" className="text-[10px] h-4 px-1">
+                <Badge variant="outline" className="text-[9px] h-3 px-0.5">
                   {badge}
                 </Badge>
               )}
             </div>
             
             {subtitle && (
-              <p className="text-xs text-muted-foreground/70 truncate">
+              <p className="text-[9px] text-muted-foreground/70 truncate">
                 {subtitle}
               </p>
             )}
@@ -83,7 +83,7 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
 
         <div className="flex-shrink-0 text-right">
           <span className={cn(
-            'text-sm font-semibold',
+            'text-xs font-semibold',
             valueVariantStyles[variant]
           )}>
             {value}

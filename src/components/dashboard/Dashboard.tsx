@@ -29,19 +29,19 @@ interface DetailPanelProps {
 }
 
 const DetailPanel: React.FC<DetailPanelProps> = ({ title, children, onClose }) => (
-  <Card className="w-80 max-h-80 overflow-y-auto bg-background border shadow-lg">
-    <CardHeader className="pb-2">
+  <Card className="w-72 max-h-72 overflow-y-auto bg-background border shadow-lg">
+    <CardHeader className="pb-1">
       <div className="flex items-center justify-between">
-        <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+        <CardTitle className="text-xs font-semibold">{title}</CardTitle>
         <button 
           onClick={onClose}
-          className="text-muted-foreground hover:text-foreground text-sm"
+          className="text-muted-foreground hover:text-foreground text-xs"
         >
           ✕
         </button>
       </div>
     </CardHeader>
-    <CardContent className="pt-0">
+    <CardContent className="pt-0 p-3">
       {children}
     </CardContent>
   </Card>
@@ -64,9 +64,9 @@ export const Dashboard: React.FC = () => {
   const getDetailPosition = () => {
     return {
       position: 'absolute' as const,
-      top: '84px',
-      right: '20px',
-      zIndex: 40
+      top: '68px',
+      right: '16px',
+      zIndex: 50
     };
   };
 
@@ -74,77 +74,84 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-background">
-      {/* Üst metrik kartları */}
-      <div className="absolute top-2 left-[200px] right-[300px] z-30 px-2 flex items-center gap-2 overflow-x-auto">
+      {/* Üst metrik kartları - düzenleme */}
+      <div className="absolute top-1 left-[200px] right-[270px] z-30 px-1 flex items-center gap-1 overflow-x-hidden">
         <CompactModule
-          title="Portföy Değeri"
+          title="Portföy"
           value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
-          icon={<DollarSign className="w-4 h-4" />}
+          icon={<DollarSign className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('portfolio')}
+          className="w-[110px] h-[48px] p-2"
         />
         <CompactModule
           title="Günlük K/Z"
           value={`$${(portfolioData?.dailyPnl ?? 0).toLocaleString()}`}
-          icon={<TrendingUp className="w-4 h-4" />}
+          icon={<TrendingUp className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('daily-pnl')}
+          className="w-[110px] h-[48px] p-2"
         />
         <CompactModule
           title="Toplam K/Z"
           value={`$${(portfolioData?.totalPnl ?? 0).toLocaleString()}`}
-          icon={<TrendingUp className="w-4 h-4" />}
+          icon={<TrendingUp className="w-3 h-3" />}
           variant="success"
           onClick={() => setSelectedModule('total-pnl')}
+          className="w-[110px] h-[48px] p-2"
         />
         <CompactModule
-          title="Başarı Oranı"
+          title="Başarı"
           value={`${portfolioData.winRate}%`}
-          icon={<Target className="w-4 h-4" />}
+          icon={<Target className="w-3 h-3" />}
           variant="info"
           onClick={() => setSelectedModule('win-rate')}
+          className="w-[90px] h-[48px] p-2"
         />
         <CompactModule
-          title="Aktif Stratejiler"
+          title="Stratejiler"
           value={portfolioData.activeStrategies}
-          icon={<Bot className="w-4 h-4" />}
+          icon={<Bot className="w-3 h-3" />}
           variant="default"
           onClick={() => setSelectedModule('active-strategies')}
+          className="w-[100px] h-[48px] p-2"
         />
       </div>
 
-      {/* Bildirim paneli */}
-      <div className="absolute top-2 right-4 w-[280px] z-40">
+      {/* Bildirim paneli - küçültülmüş */}
+      <div className="absolute top-1 right-4 w-[260px] z-40">
         <NotificationCenter />
       </div>
 
-      {/* AI Trading Yöneticisi */}
-      <div className="absolute top-16 right-4 w-[280px] h-[460px] z-30">
+      {/* AI Trading Yöneticisi - küçültülmüş */}
+      <div className="absolute top-14 right-4 w-[260px] h-[420px] z-30">
         <TradingAssistant />
       </div>
 
-      {/* Ana dashboard modülleri */}
-      <div className="pt-16 px-4 pb-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-1 mb-6">
+      {/* Ana dashboard modülleri - küçültülmüş */}
+      <div className="pt-14 px-2 pb-2">
+        <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-1 mb-4">
           {/* AI Tahmin Paneli */}
           <CompactModule
             title="AI Tahmin"
             value="▲ %76"
-            subtitle="BTCUSDT Yükseliş"
-            icon={<Bot className="w-4 h-4" />}
+            subtitle="BTCUSDT"
+            icon={<Bot className="w-3 h-3" />}
             variant="success"
             badge="Güçlü"
             onClick={() => setSelectedModule('ai-prediction')}
+            className="h-[52px] p-2"
           />
 
           {/* Risk Uyarı Kartları */}
           <CompactModule
             title="Risk Uyarısı"
             value="Orta"
-            subtitle="3 aktif pozisyon"
-            icon={<AlertTriangle className="w-4 h-4" />}
+            subtitle="3 pozisyon"
+            icon={<AlertTriangle className="w-3 h-3" />}
             variant="warning"
             onClick={() => setSelectedModule('risk-alerts')}
+            className="h-[52px] p-2"
           />
 
           {/* Canlı Haber Akışı */}
@@ -152,67 +159,73 @@ export const Dashboard: React.FC = () => {
             title="Son Haber"
             value="Fed Kararı"
             subtitle="2 saat önce"
-            icon={<Newspaper className="w-4 h-4" />}
+            icon={<Newspaper className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('news-feed')}
+            className="h-[52px] p-2"
           />
 
           {/* Ekonomik Takvim */}
           <CompactModule
-            title="Ekonomik Takvim"
+            title="Ekonomik"
             value="CPI Verisi"
             subtitle="Yarın 16:30"
-            icon={<Calendar className="w-4 h-4" />}
+            icon={<Calendar className="w-3 h-3" />}
             variant="warning"
             onClick={() => setSelectedModule('economic-calendar')}
+            className="h-[52px] p-2"
           />
 
           {/* Grafik Formasyon & Teknik Sinyal */}
           <CompactModule
-            title="Teknik Sinyal"
+            title="Teknik"
             value="Doji"
-            subtitle="ETHUSDT 4H"
-            icon={<Activity className="w-4 h-4" />}
+            subtitle="ETH 4H"
+            icon={<Activity className="w-3 h-3" />}
             variant="info"
             onClick={() => setSelectedModule('technical-signals')}
+            className="h-[52px] p-2"
           />
 
           {/* Strateji Performansı */}
           <CompactModule
-            title="Strateji Performansı"
+            title="Performans"
             value="+12.3%"
             subtitle="Bu hafta"
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon={<TrendingUp className="w-3 h-3" />}
             variant="success"
             onClick={() => setSelectedModule('strategy-performance')}
+            className="h-[52px] p-2"
           />
 
           {/* Portföy Dağılımı */}
           <CompactModule
-            title="Portföy Dağılımı"
+            title="Dağılım"
             value="65% USDT"
             subtitle="35% Kripto"
-            icon={<PieChart className="w-4 h-4" />}
+            icon={<PieChart className="w-3 h-3" />}
             variant="default"
             onClick={() => setSelectedModule('portfolio-distribution')}
+            className="h-[52px] p-2"
           />
 
           {/* Son İşlemler */}
           <CompactModule
-            title="Son İşlemler"
+            title="İşlemler"
             value="12"
             subtitle="Bugün"
-            icon={<History className="w-4 h-4" />}
+            icon={<History className="w-3 h-3" />}
             variant="default"
             onClick={() => setSelectedModule('recent-trades')}
+            className="h-[52px] p-2"
           />
         </div>
 
-        {/* Gelişmiş Grafik Paneli */}
-        <div className="mb-6">
+        {/* Gelişmiş Grafik Paneli - optimize edilmiş */}
+        <div className="mb-4">
           <TradingChart
             symbol={chartSymbol}
-            height={280}
+            height={320}
             isFullscreen={isChartFullscreen}
             onFullscreenChange={setIsChartFullscreen}
           />
@@ -224,12 +237,12 @@ export const Dashboard: React.FC = () => {
         <div style={getDetailPosition()}>
           {selectedModule === 'ai-prediction' && (
             <DetailPanel title="AI Tahminleri" onClose={closeDetailPanel}>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-2 text-xs">
                 <div className="flex justify-between items-center">
                   <span>BTCUSDT</span>
-                  <Badge variant="outline" className="bg-green-50 text-green-700">▲ %76 Güven</Badge>
+                  <Badge variant="outline" className="bg-green-50 text-green-700 text-[9px]">▲ %76</Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-[10px] text-muted-foreground">
                   • Destek: $42,800<br/>
                   • Direnç: $45,200<br/>
                   • Hedef: $47,000
@@ -237,9 +250,9 @@ export const Dashboard: React.FC = () => {
                 
                 <div className="flex justify-between items-center">
                   <span>ETHUSDT</span>
-                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700">→ %52 Nötr</Badge>
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 text-[9px]">→ %52</Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-[10px] text-muted-foreground">
                   • Destek: $2,650<br/>
                   • Direnç: $2,750<br/>
                   • Trend: Yatay
@@ -250,18 +263,18 @@ export const Dashboard: React.FC = () => {
 
           {selectedModule === 'risk-alerts' && (
             <DetailPanel title="Risk Uyarıları" onClose={closeDetailPanel}>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                  <span>BTC pozisyonu %85 marjin kullanımında</span>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <AlertTriangle className="w-3 h-3 text-yellow-600" />
+                  <span className="text-[10px]">BTC pozisyonu %85 marjin</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-600" />
-                  <span>Grid stratejisi son 4 işlemde zarar etti</span>
+                <div className="flex items-center gap-1.5">
+                  <AlertTriangle className="w-3 h-3 text-red-600" />
+                  <span className="text-[10px]">Grid strateji 4 zarar</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                  <span>Yüksek volatilite algılandı</span>
+                <div className="flex items-center gap-1.5">
+                  <AlertTriangle className="w-3 h-3 text-yellow-600" />
+                  <span className="text-[10px]">Yüksek volatilite</span>
                 </div>
               </div>
             </DetailPanel>
@@ -269,18 +282,18 @@ export const Dashboard: React.FC = () => {
 
           {selectedModule === 'news-feed' && (
             <DetailPanel title="Canlı Haberler" onClose={closeDetailPanel}>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-2 text-xs">
                 <div>
-                  <div className="font-medium">Fed faiz kararı açıklandı</div>
-                  <div className="text-xs text-muted-foreground">2 saat önce • Pozitif etki</div>
+                  <div className="font-medium text-[10px]">Fed faiz kararı açıklandı</div>
+                  <div className="text-[9px] text-muted-foreground">2 saat önce • Pozitif</div>
                 </div>
                 <div>
-                  <div className="font-medium">Bitcoin ETF onayı bekleniyor</div>
-                  <div className="text-xs text-muted-foreground">4 saat önce • Pozitif etki</div>
+                  <div className="font-medium text-[10px]">Bitcoin ETF onayı</div>
+                  <div className="text-[9px] text-muted-foreground">4 saat önce • Pozitif</div>
                 </div>
                 <div>
-                  <div className="font-medium">USDT market cap artışı</div>
-                  <div className="text-xs text-muted-foreground">1 gün önce • Nötr etki</div>
+                  <div className="font-medium text-[10px]">USDT market cap artışı</div>
+                  <div className="text-[9px] text-muted-foreground">1 gün önce • Nötr</div>
                 </div>
               </div>
             </DetailPanel>
@@ -288,23 +301,23 @@ export const Dashboard: React.FC = () => {
 
           {selectedModule === 'economic-calendar' && (
             <DetailPanel title="Ekonomik Takvim" onClose={closeDetailPanel}>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <div>
-                    <div className="font-medium">CPI Verisi (ABD)</div>
-                    <div className="text-xs text-muted-foreground">Yarın 16:30</div>
+                    <div className="font-medium text-[10px]">CPI Verisi (ABD)</div>
+                    <div className="text-[9px] text-muted-foreground">Yarın 16:30</div>
                   </div>
-                  <Badge variant="outline" className="bg-red-50 text-red-700">Yüksek Etki</Badge>
+                  <Badge variant="outline" className="bg-red-50 text-red-700 text-[8px] h-4">Yüksek</Badge>
                 </div>
                 <div className="flex justify-between">
                   <div>
-                    <div className="font-medium">İşsizlik Verisi</div>
-                    <div className="text-xs text-muted-foreground">Cuma 14:30</div>
+                    <div className="font-medium text-[10px]">İşsizlik Verisi</div>
+                    <div className="text-[9px] text-muted-foreground">Cuma 14:30</div>
                   </div>
-                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Orta Etki</Badge>
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 text-[8px] h-4">Orta</Badge>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-[9px] text-muted-foreground">
                     ⏰ CPI veri açıklamasına <strong>14:25:30</strong> kaldı
                   </div>
                 </div>

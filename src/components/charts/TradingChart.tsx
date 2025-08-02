@@ -152,10 +152,10 @@ export const TradingChart: React.FC<TradingChartProps> = ({
   const ChartContent = () => (
     <>
       {/* Başlık ve Kontroller */}
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-5 h-5 text-primary" />
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-gray-800">
               Grafik Analizi
             </h3>
@@ -164,7 +164,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {/* Popüler Semboller */}
             <div className="hidden md:flex gap-1">
               {popularSymbols.slice(0, 3).map((sym) => (
@@ -172,7 +172,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({
                   key={sym.value}
                   variant={currentSymbol === sym.value ? "default" : "outline"}
                   size="sm"
-                  className="text-xs h-7"
+                  className="text-[10px] h-6 px-2"
                   onClick={() => handleSymbolChange(sym.value)}
                 >
                   {sym.label}
@@ -182,7 +182,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({
 
             {/* Timeframe Seçici */}
             <Select value={timeframe} onValueChange={setTimeframe}>
-              <SelectTrigger className="w-20 h-8 text-xs">
+              <SelectTrigger className="w-16 h-6 text-[10px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -201,13 +201,13 @@ export const TradingChart: React.FC<TradingChartProps> = ({
             <Button
               variant="outline"
               size="sm"
-              className="h-8 w-8 p-0"
+              className="h-6 w-6 p-0"
               onClick={toggleFullscreen}
             >
               {isFullscreen ? (
-                <Minimize2 className="w-4 h-4" />
+                <Minimize2 className="w-3 h-3" />
               ) : (
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="w-3 h-3" />
               )}
             </Button>
           </div>
@@ -216,10 +216,10 @@ export const TradingChart: React.FC<TradingChartProps> = ({
         {/* Sembol Arama */}
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400" />
             <Input
               placeholder="BTCUSDT, AAPL, XAUUSD..."
-              className="pl-10 h-8 text-xs"
+              className="pl-7 h-6 text-[10px]"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {
@@ -231,7 +231,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({
           </div>
           <Button
             size="sm"
-            className="h-8"
+            className="h-6 text-[10px] px-2"
             onClick={() => searchInput.trim() && handleSymbolChange(searchInput)}
             disabled={!searchInput.trim()}
           >
@@ -245,9 +245,9 @@ export const TradingChart: React.FC<TradingChartProps> = ({
         <div className="relative">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
-              <div className="flex flex-col items-center gap-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                <span className="text-xs text-gray-600">Grafik yükleniyor...</span>
+              <div className="flex flex-col items-center gap-1">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                <span className="text-[10px] text-gray-600">Grafik yükleniyor...</span>
               </div>
             </div>
           )}
