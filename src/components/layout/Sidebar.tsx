@@ -19,7 +19,8 @@ import {
   ClipboardCheck,
   FileText,
   TestTube,
-  Wifi
+  Wifi,
+  Circle
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -53,6 +54,7 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck },
       { id: 'test', label: '🧪 Test', icon: TestTube },
       { id: 'websocket-test', label: '📡 WebSocket Test', icon: Wifi },
+      { id: 'a-page', label: '🅰️ A Sayfası', icon: Circle },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
     
