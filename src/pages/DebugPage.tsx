@@ -1,142 +1,83 @@
-import React, { useState, useEffect } from 'react'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { AppView } from '../App'
+import React, { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
-interface DebugPageProps {
-  currentView?: AppView
-  onViewChange?: (view: AppView) => void
-}
-
-const DebugPage: React.FC<DebugPageProps> = ({ currentView, onViewChange }) => {
-  const [windowState, setWindowState] = useState<any>({})
-  const [notificationTest, setNotificationTest] = useState('')
-
+export default function DebugPage() {
+  const [logs, setLogs] = useState<string[]>([])
+  
   useEffect(() => {
-    // Window durumunu kontrol et
-    const checkWindow = () => {
-      setWindowState({
-        pushNotification: typeof (window as any).pushNotification,
-        location: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString()
-      })
+    // Mevcut console.log'ları yakala
+    const originalLog = console.log
+    const logMessages: string[] = []
+    
+    console.log = (...args) => {
+      logMessages.push(args.join(' '))
+      setLogs([...logMessages])
+      originalLog(...args)
     }
-
-    checkWindow()
-    const interval = setInterval(checkWindow, 2000)
-    return () => clearInterval(interval)
+    
+    return () => {
+      console.log = originalLog
+    }
   }, [])
-
-  const testNotification = () => {
-    const message = `Test bildirimi: ${new Date().toLocaleTimeString('tr-TR')}`
-    if (typeof (window as any).pushNotification === 'function') {
-      ;(window as any).pushNotification(message, 'info')
-      setNotificationTest('✅ Bildirim gönderildi')
-    } else {
-      setNotificationTest('❌ pushNotification fonksiyonu bulunamadı')
-    }
+  
+  const clearLogs = () => {
+    setLogs([])
   }
-
-  const allViews: AppView[] = [
-    'dashboard', 'strategies', 'backtest', 'live', 'portfolio', 
-    'analysis', 'economic', 'summary', 'settings', 'project-analysis', 
-    'test', 'websocket-test', 'a-page', 'debug'
-  ]
-
+  
+  const testNavigation = () => {
+    console.log('🧪 Test Navigation: Current location:', window.location.href)
+    console.log('🧪 Test Navigation: Available functions:', Object.keys(window))
+  }
+  
   return (
-    <div className="p-6 space-y-6 h-screen bg-red-50">
-      <div className="mb-6">
-        <h1 className="text-4xl font-bold text-red-600">🔴 DEBUG SAYFASI</h1>
-        <p className="text-lg mt-2">
-          Bu sayfa sistem durumunu ve hataları kontrol etmek için oluşturulmuştur.
-        </p>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold mb-2">Debug Sayfası</h1>
+        <p className="text-muted-foreground">Sistem debug bilgileri ve konsol logları</p>
       </div>
-
-      {/* Mevcut View Bilgisi */}
+      
+      <div className="flex gap-4">
+        <Button onClick={clearLogs} variant="outline">
+          Logları Temizle
+        </Button>
+        <Button onClick={testNavigation} variant="outline">
+          Navigasyon Test Et
+        </Button>
+      </div>
+      
       <Card>
         <CardHeader>
-          <CardTitle>Sayfa Durumu</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="flex items-center gap-2">
-            <strong>Mevcut View:</strong>
-            <Badge variant="default">{currentView || 'bilinmiyor'}</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <strong>URL:</strong>
-            <code className="text-xs bg-muted px-2 py-1 rounded">{windowState.location}</code>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Bildirim Sistemi Testi */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Bildirim Sistemi</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
-            <strong>pushNotification Durumu:</strong>
-            <Badge variant={windowState.pushNotification === 'function' ? 'default' : 'destructive'}>
-              {windowState.pushNotification || 'undefined'}
-            </Badge>
-          </div>
-          <Button onClick={testNotification} variant="outline">
-            Bildirim Testi Gönder
-          </Button>
-          {notificationTest && (
-            <p className="text-sm">{notificationTest}</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Navigation Testi */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Navigation Test - Tüm Sayfalar</CardTitle>
+          <CardTitle>Konsol Logları ({logs.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            {allViews.map((view) => (
-              <Button
-                key={view}
-                variant={currentView === view ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  console.log(`🔗 Debug page - Navigating to: ${view}`)
-                  if (onViewChange) {
-                    onViewChange(view)
-                  } else {
-                    console.error('onViewChange is not provided')
-                  }
-                }}
-                className="text-xs"
-              >
-                {view}
-              </Button>
-            ))}
+          <div className="max-h-96 overflow-y-auto bg-black text-green-400 p-4 rounded text-sm font-mono">
+            {logs.length === 0 ? (
+              <p>Henüz log mesajı yok...</p>
+            ) : (
+              logs.map((log, index) => (
+                <div key={index} className="mb-1">
+                  {log}
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
-
-      {/* Sistem Bilgileri */}
+      
       <Card>
         <CardHeader>
           <CardTitle>Sistem Bilgileri</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-sm space-y-1">
-            <div><strong>User Agent:</strong> {windowState.userAgent}</div>
-            <div><strong>Son Güncelleme:</strong> {windowState.timestamp}</div>
-            <div><strong>React Mode:</strong> {process.env.NODE_ENV}</div>
-            <div><strong>Sayfa Yükleme Zamanı:</strong> {new Date().toLocaleString('tr-TR')}</div>
+          <div className="space-y-2 text-sm">
+            <p><strong>URL:</strong> {window.location.href}</p>
+            <p><strong>User Agent:</strong> {navigator.userAgent}</p>
+            <p><strong>Screen:</strong> {screen.width}x{screen.height}</p>
+            <p><strong>Viewport:</strong> {window.innerWidth}x{window.innerHeight}</p>
           </div>
         </CardContent>
       </Card>
     </div>
   )
 }
-
-export default DebugPage

@@ -21,9 +21,12 @@ import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import APISettings from './components/settings/APISettings'
 import ProjectStatusPage from './pages/Summary'
 import SimpleTestPage from './pages/SimpleTestPage'
+import Proje from './pages/Proje'
+import A from './pages/A'
+import DebugPage from './pages/DebugPage'
 
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test' | 'proje' | 'a' | 'debug'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -152,6 +155,12 @@ function App() {
         return <ProjectStatusPage />
       case 'test':
         return <SimpleTestPage />
+      case 'proje':
+        return <Proje />
+      case 'a':
+        return <A />
+      case 'debug':
+        return <DebugPage />
       default:
         return <SimpleDashboard />
     }

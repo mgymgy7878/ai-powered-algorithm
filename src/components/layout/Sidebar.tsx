@@ -19,7 +19,8 @@ import {
   ClipboardCheck,
   TestTube,
   Zap,
-  FileText
+  FileText,
+  Bug
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -56,6 +57,9 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
       { id: 'project-status', label: 'Proje Durumu', icon: ClipboardCheck },
       { id: 'test', label: 'Test', icon: TestTube },
+      { id: 'proje', label: 'Proje', icon: FileText },
+      { id: 'a', label: 'A Sayfası', icon: Zap },
+      { id: 'debug', label: 'Debug', icon: Bug },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
     
