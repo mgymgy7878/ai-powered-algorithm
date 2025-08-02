@@ -80,7 +80,9 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         <div className="flex-1 flex items-center justify-center">
           <span 
             className={cn(
-              'text-lg font-bold leading-none text-center',
+              // Dinamik yazı boyutu - kart boyutuna göre ayarlanır
+              className?.includes('text-[10px]') ? 'text-sm' : 'text-lg',
+              'font-bold leading-none text-center',
               valueVariantStyles[variant]
             )}
             title={String(value)}
