@@ -1,45 +1,43 @@
-# AI Destekli Algoritmik Trading Platformu - PRD
+# 🤖 AI Trading Assistant - Yeni Nesil Trading Platformu
 
-## Proje Özeti
-MatrixIQ Algo Modülü'nden esinlenen, Cursor Agent seviyesinde yapay zeka desteği sunan Windows masaüstü algoritmik trading IDE'si.
+## Misyon
+Yapay zeka destekli, kullanıcı dostu bir trading platformu oluşturmak. Platform, hem yeni başlayanlar hem de profesyonel traderlar için optimize edilmiş akıllı trading çözümleri sunacak.
 
-## Temel Özellikler
-- **AI Destekli Strateji Üretimi**: Doğal dil ile strateji tanımlama ve otomatik C# kod üretimi
-- **Cursor-benzeri Kod Editörü**: Akıllı kod tamamlama, hata düzeltme ve optimizasyon
-- **MatrixIQ Uyumlu Arayüz**: Tanıdık strateji yönetimi ve backtest sonuçları
-- **Gerçek Zamanlı AI Pilot**: Piyasa koşullarına göre otomatik strateji geçişi
-- **Türkçe Lokalizasyon**: Tam Türkçe arayüz ve AI etkileşimi
+## Ana Özellikler
+
+### 🧠 AI Trading Asistanı
+- Gerçek zamanlı piyasa analizi
+- Akıllı sinyal üretimi
+- Risk yönetimi önerileri
+- Doğal dil ile etkileşim
+
+### 📈 Akıllı Dashboard
+- Portföy performans özeti
+- Canlı piyasa verileri
+- AI tahminleri ve öneriler
+- Risk seviyesi göstergeleri
+
+### 🎯 Strateji Yöneticisi
+- Önceden tanımlı trading stratejileri
+- Kişiselleştirilebilir parametreler
+- Backtest ve optimizasyon
+- Otomatik strateji önerileri
+
+### 📊 Piyasa Analizi
+- Teknik analiz araçları
+- Haber etkisi değerlendirmesi
+- Sentiment analizi
+- Ekonomik gösterge takibi
+
+## Tasarım Felsefesi
+- **Sadelik**: Karmaşık finansal verileri basit, anlaşılır arayüzlerle sunmak
+- **Akıllılık**: AI'ın gücünü kullanarak kullanıcı deneyimini iyileştirmek
+- **Güvenilirlik**: Güvenli ve stabil trading ortamı sağlamak
+- **Erişilebilirlik**: Her seviyeden kullanıcıya hitap etmek
 
 ## Teknoloji Stack
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **UI Kütüphanesi**: shadcn/ui components
-- **AI Entegrasyonu**: OpenAI GPT-4o, Anthropic Claude
-- **İkonlar**: Phosphor Icons
-- **Bildirimler**: Sonner
-- **Veri Saklama**: Spark KV Store
-
-## Mevcut Durum
-- ✅ Temel UI framework kurulumu tamamlandı
-- ✅ Strateji üretici komponenti geliştirildi
-- ✅ AI entegrasyonu için tip tanımlamaları eklendi
-- ✅ Paylaşılan tip sistemi oluşturuldu
-- ✅ Temel hata düzeltmeleri yapıldı
-
-## Düzeltilen Hatalar
-1. **Spark Global Type Tanımı**: `window.spark` için TypeScript tip tanımlamaları eklendi
-2. **Komponent Prop Uyumsuzluğu**: AIAssistant bileşeninde prop isim uyumsuzluğu düzeltildi
-3. **Veri Tipi Tutarsızlığı**: TradingStrategy interface'i bütün bileşenler için standartlaştırıldı
-4. **İndikatör Tipi Uyumsuzluğu**: string[] vs Indicator[] uyumsuzluğu çözüldü
-
-## Sonraki Adımlar
-1. Gerçek AI API entegrasyonlarının test edilmesi
-2. Backtest motorunun geliştirilmesi  
-3. Canlı veri akışı entegrasyonu
-4. AI pilot modülünün geliştirilmesi
-5. Kapsamlı test senaryolarının oluşturulması
-
-## Kullanıcı Deneyimi
-- Modern, minimalist arayüz tasarımı
-- Cursor benzeri AI asistan deneyimi
-- MatrixIQ'ya aşina kullanıcılar için tanıdık workflow
-- Tam yerelleştirme ile Türkçe kullanıcı deneyimi
+- React 18 + TypeScript
+- Tailwind CSS + shadcn/ui
+- Spark KV storage
+- Real-time WebSocket connections
+- AI APIs (OpenAI/Claude)
