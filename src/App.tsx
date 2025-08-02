@@ -21,13 +21,16 @@ import { EconomicCalendar } from './components/economic/EconomicCalendar'
 import APISettings from './components/settings/APISettings'
 import ProjectStatusPage from './pages/Summary'
 import SimpleTestPage from './pages/SimpleTestPage'
-import Proje from './pages/Proje'
-import A from './pages/A'
-import DebugPage from './pages/DebugPage'
-import TestDisplay from './pages/TestDisplay'
+import TestPageComponent from './pages/Test'
+import ProjePageComponent from './pages/Proje'
+import APageComponent from './pages/A'
+import DebugPageComponent from './pages/DebugPage'
+import TestDisplayComponent from './pages/TestDisplay'
+import MenuTestComponent from './pages/MenuTest'
+import SystemHealthComponent from './pages/SystemHealth'
 
 
-export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test' | 'proje' | 'a' | 'debug' | 'test-display'
+export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfolio' | 'analysis' | 'economic' | 'settings' | 'project-status' | 'test' | 'proje' | 'a' | 'debug' | 'test-display' | 'menu-test' | 'system-health'
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
@@ -182,19 +185,25 @@ function App() {
           return <ProjectStatusPage />
         case 'test':
           console.log('✅ Rendering Test Page')
-          return <SimpleTestPage />
+          return <TestPageComponent />
         case 'proje':
           console.log('✅ Rendering Proje Page')
-          return <Proje />
+          return <ProjePageComponent />
         case 'a':
           console.log('✅ Rendering A Page')
-          return <A />
+          return <APageComponent />
         case 'debug':
           console.log('✅ Rendering Debug Page')
-          return <DebugPage />
+          return <DebugPageComponent />
         case 'test-display':
           console.log('✅ Rendering Test Display')
-          return <TestDisplay />
+          return <TestDisplayComponent />
+        case 'menu-test':
+          console.log('✅ Rendering Menu Test')
+          return <MenuTestComponent />
+        case 'system-health':
+          console.log('✅ Rendering System Health')
+          return <SystemHealthComponent />
         default:
           console.log('⚠️ Default view, rendering Dashboard')
           return <SimpleDashboard />

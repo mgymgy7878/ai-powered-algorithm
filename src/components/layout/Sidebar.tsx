@@ -20,7 +20,9 @@ import {
   TestTube,
   Zap,
   FileText,
-  Bug
+  Bug,
+  CheckCircle,
+  Heart
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -60,6 +62,8 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
       { id: 'proje', label: 'Proje', icon: FileText },
       { id: 'a', label: 'A Sayfası', icon: Zap },
       { id: 'test-display', label: 'Test Display', icon: TestTube },
+      { id: 'menu-test', label: 'Menü Test', icon: CheckCircle },
+      { id: 'system-health', label: 'Sistem Sağlığı', icon: Heart },
       { id: 'debug', label: 'Debug', icon: Bug },
       { id: 'settings', label: 'API Ayarları', icon: Settings },
     ] as NavigationItem[]
