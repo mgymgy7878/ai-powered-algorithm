@@ -8,9 +8,11 @@ import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Input } from '../ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { toast } from 'sonner'
-import { Play, Pause, Square, AlertTriangle, Plus } from 'lucide-react'
+import { Play, Pause, Square, AlertTriangle, Plus, Wifi } from 'lucide-react'
 import { TradingChart, ChartData } from '../charts/TradingChart'
+import { LiveDataMonitor } from './LiveDataMonitor'
 import { binanceService } from '../../services/binanceService'
 import { dataService } from '../../services/dataService'
 import { APISettings as APISettingsType } from '../../types/api'
@@ -302,6 +304,7 @@ export function LiveTrading() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold">Canlı Trading</h2>
@@ -311,248 +314,121 @@ export function LiveTrading() {
           <Badge variant={autoTrading ? "default" : "outline"} className="px-3 py-1">
             {autoTrading ? 'Oto Trading AÇIK' : 'Oto Trading KAPALI'}
           </Badge>
-          <Badge variant={isBinanceConfigured ? "default" : "destructive"} className="px-3 py-1">
+          <Badge variant={isBinanceConfigured ? "default" : "destructive"} className="px-3 py-1 flex items-center gap-1">
+            <Wifi className="w-3 h-3" />
             {isBinanceConfigured ? 'Binance Bağlı' : 'Binance Bağlı Değil'}
           </Badge>
         </div>
       </div>
 
-      {/* Özet Kartları */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL)}
-              </div>
-              <div className="text-sm text-muted-foreground">Toplam P&L</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{formatCurrency(totalCapital)}</div>
-              <div className="text-sm text-muted-foreground">Toplam Sermaye</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-accent">{runningCount}</div>
-              <div className="text-sm text-muted-foreground">Aktif Strateji</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">
-                {totalCapital > 0 ? ((totalPnL / totalCapital) * 100).toFixed(2) : '0.00'}%
-              </div>
-              <div className="text-sm text-muted-foreground">Toplam ROI</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Tabs for different views */}
+      <Tabs defaultValue="strategies" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="strategies">Stratejiler</TabsTrigger>
+          <TabsTrigger value="live-data">Canlı Veri</TabsTrigger>
+          <TabsTrigger value="controls">Kontroller</TabsTrigger>
+        </TabsList>
 
-      {!isBinanceConfigured && (
-        <Card className="border-destructive">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              <span className="font-medium">Binance API Ayarları Gerekli</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Canlı trading için Binance Futures API anahtarlarınızı ayarlar sayfasından yapılandırın.
-            </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="mt-2"
-              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-settings'))}
-            >
-              API Ayarlarına Git
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Trading Kontrolleri */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Trading Kontrolleri</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label htmlFor="auto-trading">Otomatik Trading</Label>
-                <p className="text-sm text-muted-foreground">
-                  AI'ın piyasa koşullarına göre stratejileri otomatik başlatıp durdurmasına izin ver
-                </p>
-              </div>
-              <Switch
-                id="auto-trading"
-                checked={autoTrading}
-                onCheckedChange={setAutoTrading}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label htmlFor="risk-management">Risk Yönetimi</Label>
-                <p className="text-sm text-muted-foreground">
-                  Otomatik pozisyon boyutlandırma ve devre kesicileri etkinleştir
-                </p>
-              </div>
-              <Switch
-                id="risk-management"
-                checked={riskManagement}
-                onCheckedChange={setRiskManagement}
-              />
-            </div>
+        <TabsContent value="strategies" className="space-y-6">
+          {/* Özet Kartları */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                    {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Toplam P&L</div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">{formatCurrency(totalCapital)}</div>
+                  <div className="text-sm text-muted-foreground">Toplam Sermaye</div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-accent">{runningCount}</div>
+                  <div className="text-sm text-muted-foreground">Aktif Strateji</div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">
+                    {totalCapital > 0 ? ((totalPnL / totalCapital) * 100).toFixed(2) : '0.00'}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">Toplam ROI</div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {riskManagement && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-              <div className="space-y-2">
-                <Label>Maksimum Kayıp Yüzdesi (%)</Label>
-                <Input
-                  type="number"
-                  value={maxDrawdown}
-                  onChange={(e) => setMaxDrawdown(parseFloat(e.target.value) || 20)}
-                  min="1"
-                  max="50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Maksimum Pozisyon Boyutu ($)</Label>
-                <Input
-                  type="number"
-                  value={maxPositionSize}
-                  onChange={(e) => setMaxPositionSize(parseFloat(e.target.value) || 10000)}
-                  min="100"
-                />
-              </div>
-            </div>
+          {!isBinanceConfigured && (
+            <Card className="border-destructive">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="h-5 w-5" />
+                  <span className="font-medium">Binance API Ayarları Gerekli</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Canlı trading için Binance Futures API anahtarlarınızı ayarlar sayfasından yapılandırın.
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-settings'))}
+                >
+                  API Ayarlarına Git
+                </Button>
+              </CardContent>
+            </Card>
           )}
-          
-          {!riskManagement && (
-            <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              <span className="text-sm text-destructive">
-                Risk yönetimi devre dışı. Bu önemli kayıplara yol açabilir.
-              </span>
-            </div>
+
+          {/* Market Verileri */}
+          {marketData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Piyasa Verileri</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2 items-center">
+                  {/* Piyasa verilerini güvenli şekilde göster */}
+                  {(marketData || []).slice(0, 6).map((market) => market && market.symbol ? (
+                    <div key={market.symbol} className="text-center p-3 bg-muted rounded-lg">
+                      <div className="font-medium">{market.symbol}</div>
+                      <div className="text-lg font-semibold">${(market.price || 0).toFixed(2)}</div>
+                      <div className={`text-sm ${(market.change24h || 0) >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                        {(market.change24h || 0) >= 0 ? '+' : ''}{(market.change24h || 0).toFixed(2)}%
+                      </div>
+                    </div>
+                  ) : null)}
+                  {/* Piyasa verisi yoksa yükleme durumu göster */}
+                  {(!marketData || marketData.length === 0) && (
+                    <div className="col-span-full text-center py-8 text-muted-foreground">
+                      <p>Piyasa verileri yükleniyor...</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Market Verileri */}
-      {marketData.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Piyasa Verileri</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2 items-center">
-              {/* Piyasa verilerini güvenli şekilde göster */}
-              {(marketData || []).slice(0, 6).map((market) => market && market.symbol ? (
-                <div key={market.symbol} className="text-center p-3 bg-muted rounded-lg">
-                  <div className="font-medium">{market.symbol}</div>
-                  <div className="text-lg font-semibold">${(market.price || 0).toFixed(2)}</div>
-                  <div className={`text-sm ${(market.change24h || 0) >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                    {(market.change24h || 0) >= 0 ? '+' : ''}{(market.change24h || 0).toFixed(2)}%
-                  </div>
-                </div>
-              ) : null)}
-              {/* Piyasa verisi yoksa yükleme durumu göster */}
-              {(!marketData || marketData.length === 0) && (
-                <div className="col-span-full text-center py-8 text-muted-foreground">
-                  <p>Piyasa verileri yükleniyor...</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Grafik */}
-      {chartData && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Grafik Analizi</CardTitle>
-              <Select value={selectedSymbol} onValueChange={setSelectedSymbol}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {symbols.map((symbol) => (
-                    <SelectItem key={symbol} value={symbol}>
-                      {symbol}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <TradingChart
-              data={chartData}
-              width={800}
-              height={400}
-              symbol={selectedSymbol}
-              timeframe="1h"
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Aktif Stratejiler */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold">Aktif Stratejiler ({liveStrategies.length})</h3>
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Strateji Ekle
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Yeni Canlı Strateji Ekle</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Strateji</Label>
-                  <Select 
-                    value={newStrategyForm.strategyId} 
-                    onValueChange={(value) => setNewStrategyForm(prev => ({ ...prev, strategyId: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Strateji seçin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {strategies.map((strategy) => (
-                        <SelectItem key={strategy.id} value={strategy.id}>
-                          {strategy.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>İşlem Çifti</Label>
-                  <Select 
-                    value={newStrategyForm.symbol} 
-                    onValueChange={(value) => setNewStrategyForm(prev => ({ ...prev, symbol: value }))}
-                  >
-                    <SelectTrigger>
+          {/* Grafik */}
+          {chartData && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Grafik Analizi</CardTitle>
+                  <Select value={selectedSymbol} onValueChange={setSelectedSymbol}>
+                    <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -564,228 +440,372 @@ export function LiveTrading() {
                     </SelectContent>
                   </Select>
                 </div>
+              </CardHeader>
+              <CardContent>
+                <TradingChart
+                  data={chartData}
+                  width={800}
+                  height={400}
+                  symbol={selectedSymbol}
+                  timeframe="1h"
+                />
+              </CardContent>
+            </Card>
+          )}
 
-                <div className="space-y-2">
-                  <Label>Tahsis Edilen Sermaye ($)</Label>
-                  <Input
-                    type="number"
-                    value={newStrategyForm.allocatedCapital}
-                    onChange={(e) => setNewStrategyForm(prev => ({ 
-                      ...prev, 
-                      allocatedCapital: parseFloat(e.target.value) || 1000 
-                    }))}
-                    min="100"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Kaldıraç (Futures)</Label>
-                  <Select 
-                    value={newStrategyForm.leverage.toString()} 
-                    onValueChange={(value) => setNewStrategyForm(prev => ({ 
-                      ...prev, 
-                      leverage: parseInt(value) 
-                    }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1x</SelectItem>
-                      <SelectItem value="2">2x</SelectItem>
-                      <SelectItem value="3">3x</SelectItem>
-                      <SelectItem value="5">5x</SelectItem>
-                      <SelectItem value="10">10x</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Risk Seviyesi</Label>
-                  <Select 
-                    value={newStrategyForm.riskLevel} 
-                    onValueChange={(value: LiveStrategy['riskLevel']) => 
-                      setNewStrategyForm(prev => ({ ...prev, riskLevel: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Düşük</SelectItem>
-                      <SelectItem value="medium">Orta</SelectItem>
-                      <SelectItem value="high">Yüksek</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button onClick={addLiveStrategy} className="w-full">
-                  Strateji Ekle
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-        
-        {liveStrategies.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Play className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">Aktif strateji yok</h3>
-              <p className="text-muted-foreground">Test edilmiş stratejilerinizi canlı trading için dağıtın</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {liveStrategies.map((strategy) => (
-              <Card key={strategy.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="flex items-center gap-2">
-                        {strategy.name}
-                        <Badge variant="outline">{strategy?.symbol || 'N/A'}</Badge>
-                        <Badge className={getStatusColor(strategy.status)}>
-                          {strategy.status === 'running' ? 'Çalışıyor' : 
-                           strategy.status === 'paused' ? 'Duraklatıldı' : 'Durduruldu'}
-                        </Badge>
-                        <Badge variant="outline" className={getRiskColor(strategy.riskLevel)}>
-                          {strategy.riskLevel === 'low' ? 'Düşük' : 
-                           strategy.riskLevel === 'medium' ? 'Orta' : 'Yüksek'} risk
-                        </Badge>
-                        {strategy.leverage && strategy.leverage > 1 && (
-                          <Badge variant="outline">{strategy.leverage}x</Badge>
-                        )}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Sermaye: {formatCurrency(strategy.allocatedCapital)}
-                        {strategy.positionSize !== 0 && (
-                          <> • Pozisyon: {strategy.positionSize?.toFixed(4)} {(strategy.symbol || '').replace('USDT', '')}</>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {strategy.status !== 'running' ? (
-                        <Button
-                          size="sm"
-                          onClick={() => startStrategy(strategy.id)}
-                          disabled={!isBinanceConfigured}
-                        >
-                          <Play className="h-4 w-4 mr-1" />
-                          Başlat
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => pauseStrategy(strategy.id)}
-                        >
-                          <Pause className="h-4 w-4 mr-1" />
-                          Duraklat
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => stopStrategy(strategy.id)}
+          {/* Aktif Stratejiler */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">Aktif Stratejiler ({liveStrategies.length})</h3>
+              <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Strateji Ekle
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Yeni Canlı Strateji Ekle</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Strateji</Label>
+                      <Select 
+                        value={newStrategyForm.strategyId} 
+                        onValueChange={(value) => setNewStrategyForm(prev => ({ ...prev, strategyId: value }))}
                       >
-                        <Square className="h-4 w-4 mr-1" />
-                        Durdur
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => removeStrategy(strategy.id)}
-                      >
-                        Kaldır
-                      </Button>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Strateji seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {strategies.map((strategy) => (
+                            <SelectItem key={strategy.id} value={strategy.id}>
+                              {strategy.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className={`text-lg font-semibold ${strategy.pnl >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                        {strategy.pnl >= 0 ? '+' : ''}{formatCurrency(strategy.pnl)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">P&L</div>
-                    </div>
-                    
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className="text-lg font-semibold">
-                        {strategy.trades}
-                      </div>
-                      <div className="text-xs text-muted-foreground">İşlemler</div>
-                    </div>
-                    
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className="text-lg font-semibold text-accent">
-                        {(strategy.winRate ?? 0).toFixed(1)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">Başarı Oranı</div>
-                    </div>
-                    
-                    <div className="text-center p-3 bg-muted rounded-lg">
-                      <div className="text-lg font-semibold text-primary">
-                        {(((strategy.pnl ?? 0) / (strategy.allocatedCapital ?? 1)) * 100).toFixed(2)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">ROI</div>
-                    </div>
-                  </div>
-                  
-                  {strategy.lastSignal && (
-                    <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium text-primary">Son Sinyal</div>
-                          <div className="text-sm text-muted-foreground">{strategy.lastSignal}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm text-muted-foreground">
-                            {strategy.lastTradeTime && new Date(strategy.lastTradeTime).toLocaleTimeString('tr-TR')}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* AI Piyasa Uyarıları */}
-      <Card>
-        <CardHeader>
-          <CardTitle>AI Piyasa Uyarıları</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 bg-accent rounded-full animate-pulse"></div>
-                <span className="font-medium text-accent">Optimal Piyasa Koşulları</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                BTC/USDT'de yüksek volatilite tespit edildi. RSI stratejileri optimal performans gösteriyor.
-              </p>
+                    <div className="space-y-2">
+                      <Label>İşlem Çifti</Label>
+                      <Select 
+                        value={newStrategyForm.symbol} 
+                        onValueChange={(value) => setNewStrategyForm(prev => ({ ...prev, symbol: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {symbols.map((symbol) => (
+                            <SelectItem key={symbol} value={symbol}>
+                              {symbol}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Tahsis Edilen Sermaye ($)</Label>
+                      <Input
+                        type="number"
+                        value={newStrategyForm.allocatedCapital}
+                        onChange={(e) => setNewStrategyForm(prev => ({ 
+                          ...prev, 
+                          allocatedCapital: parseFloat(e.target.value) || 1000 
+                        }))}
+                        min="100"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Kaldıraç (Futures)</Label>
+                      <Select 
+                        value={newStrategyForm.leverage.toString()} 
+                        onValueChange={(value) => setNewStrategyForm(prev => ({ 
+                          ...prev, 
+                          leverage: parseInt(value) 
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1x</SelectItem>
+                          <SelectItem value="2">2x</SelectItem>
+                          <SelectItem value="3">3x</SelectItem>
+                          <SelectItem value="5">5x</SelectItem>
+                          <SelectItem value="10">10x</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Risk Seviyesi</Label>
+                      <Select 
+                        value={newStrategyForm.riskLevel} 
+                        onValueChange={(value: LiveStrategy['riskLevel']) => 
+                          setNewStrategyForm(prev => ({ ...prev, riskLevel: value }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Düşük</SelectItem>
+                          <SelectItem value="medium">Orta</SelectItem>
+                          <SelectItem value="high">Yüksek</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button onClick={addLiveStrategy} className="w-full">
+                      Strateji Ekle
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             
-            {liveStrategies.some(s => s.pnl < -500) && (
-              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-destructive" />
-                  <span className="font-medium text-destructive">Risk Uyarısı</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Bazı stratejilerde artan kayıp tespit edildi. Pozisyon boyutunu azaltmayı düşünün.
-                </p>
+            {liveStrategies.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Play className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Aktif strateji yok</h3>
+                  <p className="text-muted-foreground">Test edilmiş stratejilerinizi canlı trading için dağıtın</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {liveStrategies.map((strategy) => (
+                  <Card key={strategy.id}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <CardTitle className="flex items-center gap-2">
+                            {strategy.name}
+                            <Badge variant="outline">{strategy?.symbol || 'N/A'}</Badge>
+                            <Badge className={getStatusColor(strategy.status)}>
+                              {strategy.status === 'running' ? 'Çalışıyor' : 
+                               strategy.status === 'paused' ? 'Duraklatıldı' : 'Durduruldu'}
+                            </Badge>
+                            <Badge variant="outline" className={getRiskColor(strategy.riskLevel)}>
+                              {strategy.riskLevel === 'low' ? 'Düşük' : 
+                               strategy.riskLevel === 'medium' ? 'Orta' : 'Yüksek'} risk
+                            </Badge>
+                            {strategy.leverage && strategy.leverage > 1 && (
+                              <Badge variant="outline">{strategy.leverage}x</Badge>
+                            )}
+                          </CardTitle>
+                          <p className="text-sm text-muted-foreground">
+                            Sermaye: {formatCurrency(strategy.allocatedCapital)}
+                            {strategy.positionSize !== 0 && (
+                              <> • Pozisyon: {strategy.positionSize?.toFixed(4)} {(strategy.symbol || '').replace('USDT', '')}</>
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          {strategy.status !== 'running' ? (
+                            <Button
+                              size="sm"
+                              onClick={() => startStrategy(strategy.id)}
+                              disabled={!isBinanceConfigured}
+                            >
+                              <Play className="h-4 w-4 mr-1" />
+                              Başlat
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => pauseStrategy(strategy.id)}
+                            >
+                              <Pause className="h-4 w-4 mr-1" />
+                              Duraklat
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => stopStrategy(strategy.id)}
+                          >
+                            <Square className="h-4 w-4 mr-1" />
+                            Durdur
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => removeStrategy(strategy.id)}
+                          >
+                            Kaldır
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className={`text-lg font-semibold ${strategy.pnl >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                            {strategy.pnl >= 0 ? '+' : ''}{formatCurrency(strategy.pnl)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">P&L</div>
+                        </div>
+                        
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold">
+                            {strategy.trades}
+                          </div>
+                          <div className="text-xs text-muted-foreground">İşlemler</div>
+                        </div>
+                        
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold text-accent">
+                            {(strategy.winRate ?? 0).toFixed(1)}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">Başarı Oranı</div>
+                        </div>
+                        
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold text-primary">
+                            {(((strategy.pnl ?? 0) / (strategy.allocatedCapital ?? 1)) * 100).toFixed(2)}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">ROI</div>
+                        </div>
+                      </div>
+                      
+                      {strategy.lastSignal && (
+                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-primary">Son Sinyal</div>
+                              <div className="text-sm text-muted-foreground">{strategy.lastSignal}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm text-muted-foreground">
+                                {strategy.lastTradeTime && new Date(strategy.lastTradeTime).toLocaleTimeString('tr-TR')}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* AI Piyasa Uyarıları */}
+          <Card>
+            <CardHeader>
+              <CardTitle>AI Piyasa Uyarıları</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 bg-accent rounded-full animate-pulse"></div>
+                    <span className="font-medium text-accent">Optimal Piyasa Koşulları</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    BTC/USDT'de yüksek volatilite tespit edildi. RSI stratejileri optimal performans gösteriyor.
+                  </p>
+                </div>
+                
+                {liveStrategies.some(s => s.pnl < -500) && (
+                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-destructive" />
+                      <span className="font-medium text-destructive">Risk Uyarısı</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Bazı stratejilerde artan kayıp tespit edildi. Pozisyon boyutunu azaltmayı düşünün.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="live-data">
+          <LiveDataMonitor />
+        </TabsContent>
+
+        <TabsContent value="controls" className="space-y-6">{/* Trading Kontrolleri */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Trading Kontrolleri</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="auto-trading">Otomatik Trading</Label>
+                    <p className="text-sm text-muted-foreground">
+                      AI'ın piyasa koşullarına göre stratejileri otomatik başlatıp durdurmasına izin ver
+                    </p>
+                  </div>
+                  <Switch
+                    id="auto-trading"
+                    checked={autoTrading}
+                    onCheckedChange={setAutoTrading}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="risk-management">Risk Yönetimi</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Otomatik pozisyon boyutlandırma ve devre kesicileri etkinleştir
+                    </p>
+                  </div>
+                  <Switch
+                    id="risk-management"
+                    checked={riskManagement}
+                    onCheckedChange={setRiskManagement}
+                  />
+                </div>
+              </div>
+
+              {riskManagement && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label>Maksimum Kayıp Yüzdesi (%)</Label>
+                    <Input
+                      type="number"
+                      value={maxDrawdown}
+                      onChange={(e) => setMaxDrawdown(parseFloat(e.target.value) || 20)}
+                      min="1"
+                      max="50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Maksimum Pozisyon Boyutu ($)</Label>
+                    <Input
+                      type="number"
+                      value={maxPositionSize}
+                      onChange={(e) => setMaxPositionSize(parseFloat(e.target.value) || 10000)}
+                      min="100"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {!riskManagement && (
+                <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  <span className="text-sm text-destructive">
+                    Risk yönetimi devre dışı. Bu önemli kayıplara yol açabilir.
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

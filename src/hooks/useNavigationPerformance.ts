@@ -1,47 +1,34 @@
 import { useEffect, useRef } from 'react'
 
-interface PerformanceMetrics {
-  viewChangeTime: number
-  renderTime: number
-  totalTime: number
-}
-
-export const useNavigationPerformance = (currentView: string) => {
-  const startTimeRef = useRef<number>(0)
-  const metricsRef = useRef<Map<string, PerformanceMetrics>>(new Map())
+export function useNavigationPerformance(currentView: string) {
+  const navigationStartTime = useRef<number>(Date.now())
+  const lastView = useRef<string>('')
 
   useEffect(() => {
-    // Mark start time when view changes
-    startTimeRef.current = performance.now()
-
-    return () => {
-      // Calculate metrics on cleanup
-      const endTime = performance.now()
-      const totalTime = endTime - startTimeRef.current
-
-      const metrics: PerformanceMetrics = {
-        viewChangeTime: totalTime,
-        renderTime: totalTime,
-        totalTime
+    if (lastView.current !== currentView) {
+      const loadTime = Date.now() - navigationStartTime.current
+      
+      // Performance monitoring
+      console.log(`Navigation to ${currentView} took ${loadTime}ms`)
+      
+      // Track navigation performance
+      if (loadTime > 1000) {
+        console.warn(`Slow navigation detected: ${currentView} (${loadTime}ms)`)
+        
+        // Send notification if available
+        if ((window as any).pushNotification) {
+          ;(window as any).pushNotification(
+            `⚠️ Sayfa yavaş yüklendi: ${currentView} (${loadTime}ms)`, 
+            'warning'
+          )
+        }
       }
-
-      metricsRef.current.set(currentView, metrics)
-
-      // Log performance metrics in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`📊 Navigation Performance - ${currentView}:`, {
-          'View Change Time': `${totalTime.toFixed(2)}ms`,
-          'Average': metricsRef.current.size > 0 
-            ? `${Array.from(metricsRef.current.values())
-                .reduce((acc, m) => acc + m.totalTime, 0) / metricsRef.current.size}ms`
-            : 'N/A'
-        })
-      }
+      
+      // Update refs
+      lastView.current = currentView
+      navigationStartTime.current = Date.now()
     }
   }, [currentView])
 
-  return {
-    getMetrics: () => metricsRef.current,
-    clearMetrics: () => metricsRef.current.clear()
-  }
+  return { navigationStartTime: navigationStartTime.current }
 }
