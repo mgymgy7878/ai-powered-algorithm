@@ -46,56 +46,57 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
   return (
     <Card 
       className={cn(
-        'px-2 py-1.5 min-h-[64px] max-h-[64px] transition-all duration-200 cursor-pointer select-none border-2 shadow-sm overflow-hidden flex',
+        'px-3 py-2 transition-all duration-200 cursor-pointer select-none border-2 shadow-sm overflow-hidden flex',
         variantStyles[variant],
         isClickable && 'hover:shadow-md hover:scale-[1.01]',
+        // Varsayılan boyut - override edilebilir
+        !className?.includes('h-') && 'h-[90px]',
         className
       )}
       onClick={onClick}
     >
       <div className="flex flex-col h-full justify-between w-full">
         {/* Üst kısım: Başlık ve ikon */}
-        <div className="flex items-center justify-between gap-1 mb-1">
-          <div className="flex items-center gap-1 min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
             {icon && (
-              <div className="flex-shrink-0 w-3 h-3">
+              <div className="flex-shrink-0 w-4 h-4">
                 {icon}
               </div>
             )}
-            <h3 className="text-[10px] font-bold leading-tight truncate" title={title}>
+            <h3 className="text-xs font-semibold leading-tight truncate" title={title}>
               {title}
             </h3>
           </div>
           
           {badge && (
-            <Badge variant="outline" className="text-[8px] h-3 px-1 py-0 leading-none bg-white/90 border-current">
+            <Badge variant="outline" className="text-[9px] h-4 px-1.5 py-0 leading-none bg-white/90 border-current">
               {badge}
             </Badge>
           )}
         </div>
         
-        {/* Alt kısım: Değer ve alt başlık */}
-        <div className="flex items-end justify-between gap-1">
-          <div className="min-w-0 flex-1">
-            {subtitle && (
-              <p className="text-[9px] text-muted-foreground/80 leading-tight truncate mb-0.5" title={subtitle}>
-                {subtitle}
-              </p>
+        {/* Orta kısım: Ana değer */}
+        <div className="flex-1 flex items-center justify-center">
+          <span 
+            className={cn(
+              'text-lg font-bold leading-none text-center',
+              valueVariantStyles[variant]
             )}
-          </div>
-          
-          <div className="flex-shrink-0 text-right">
-            <span 
-              className={cn(
-                'text-sm font-bold leading-none whitespace-nowrap',
-                valueVariantStyles[variant]
-              )}
-              title={String(value)}
-            >
-              {value}
-            </span>
-          </div>
+            title={String(value)}
+          >
+            {value}
+          </span>
         </div>
+        
+        {/* Alt kısım: Alt başlık */}
+        {subtitle && (
+          <div className="mt-1">
+            <p className="text-xs text-muted-foreground/80 leading-tight truncate text-center" title={subtitle}>
+              {subtitle}
+            </p>
+          </div>
+        )}
       </div>
     </Card>
   );

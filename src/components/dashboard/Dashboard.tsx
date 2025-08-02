@@ -119,13 +119,14 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Layout Bölgesi 2: Ana İçerik - L Şekilli Yerleşim */}
+      {/* Layout Bölgesi 2: Ana İçerik - Optimized L Şekilli Yerleşim */}
       <div className="flex">
-        {/* Sol taraf: L Şekilli Grid Layout */}
-        <div className="flex-1 p-4">
-          {/* L Şekli Layout: Üst kartlar + Sağda grafik + Sol alt kartlar */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 h-full">
-            {/* ÜST SIRA - 3 Kart (Standardize edilmiş boyutlar) */}
+        {/* Sol taraf: L Şekilli Grid Layout - Optimize edilmiş */}
+        <div className="flex-1 p-3">
+          {/* Perfect L-Shape Layout: 4x4 Grid with chart spanning 2x3 area */}
+          <div className="grid grid-cols-4 gap-2 h-[calc(100vh-140px)]">
+            
+            {/* ÜST SIRA - 4 kart (eşit boyut, hizalı) */}
             <CompactModule
               title="AI Tahmin"
               value="▲ %76"
@@ -134,7 +135,7 @@ export const Dashboard: React.FC = () => {
               variant="success"
               badge="Güçlü"
               onClick={() => setSelectedModule('ai-prediction')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
             <CompactModule
@@ -144,7 +145,7 @@ export const Dashboard: React.FC = () => {
               icon={<AlertTriangle className="w-4 h-4" />}
               variant="warning"
               onClick={() => setSelectedModule('risk-alerts')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
             <CompactModule
@@ -154,10 +155,9 @@ export const Dashboard: React.FC = () => {
               icon={<Newspaper className="w-4 h-4" />}
               variant="info"
               onClick={() => setSelectedModule('news-feed')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
-            {/* İKİNCİ SIRA - Sol 2 kart + Sağda Grafik */}
             <CompactModule
               title="Ekonomik Takvim"
               value="CPI Verisi"
@@ -165,9 +165,10 @@ export const Dashboard: React.FC = () => {
               icon={<Calendar className="w-4 h-4" />}
               variant="danger"
               onClick={() => setSelectedModule('economic-calendar')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
+            {/* İKİNCİ SIRA - Sol 1 kart + GRAFIK (2 sütun) + Sağ 1 kart */}
             <CompactModule
               title="Teknik Sinyal"
               value="Doji Formasyon"
@@ -175,11 +176,11 @@ export const Dashboard: React.FC = () => {
               icon={<Activity className="w-4 h-4" />}
               variant="info"
               onClick={() => setSelectedModule('technical-signals')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
-            {/* GRAFIK PANELİ - Sağda, 2 satır kaplayan alan */}
-            <div className="row-span-2 lg:row-span-2 md:col-span-2 lg:col-span-1 bg-white rounded-xl shadow-sm border border-border p-3">
+            {/* GRAFIK PANELİ - Ortada, 2x3 alan (2 sütun, 3 satır) */}
+            <div className="col-span-2 row-span-3 bg-white rounded-xl shadow-sm border border-border p-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <input
@@ -187,7 +188,7 @@ export const Dashboard: React.FC = () => {
                     value={chartSymbol}
                     onChange={(e) => setChartSymbol(e.target.value.toUpperCase())}
                     placeholder="BINANCE:BTCUSDT"
-                    className="text-sm px-2 py-1 border rounded-md w-32 lg:w-40"
+                    className="text-xs px-2 py-1 border rounded-md w-28"
                   />
                   <select 
                     className="text-xs px-2 py-1 border rounded-md"
@@ -210,13 +211,12 @@ export const Dashboard: React.FC = () => {
               </div>
               <TradingChart
                 symbol={chartSymbol}
-                height={260}
+                height={300}
                 isFullscreen={isChartFullscreen}
                 onFullscreenChange={setIsChartFullscreen}
               />
             </div>
 
-            {/* ÜÇÜNCÜ SIRA - Sol 2 kart + Grafik devam ediyor */}
             <CompactModule
               title="Strateji Performans"
               value="+12.3%"
@@ -224,9 +224,10 @@ export const Dashboard: React.FC = () => {
               icon={<TrendingUp className="w-4 h-4" />}
               variant="success"
               onClick={() => setSelectedModule('strategy-performance')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
+            {/* ÜÇÜNCÜ SIRA - Sol 1 kart + Grafik devam + Sağ 1 kart */}
             <CompactModule
               title="Portföy Dağılım"
               value="65% USDT"
@@ -234,10 +235,11 @@ export const Dashboard: React.FC = () => {
               icon={<PieChart className="w-4 h-4" />}
               variant="default"
               onClick={() => setSelectedModule('portfolio-distribution')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
-            {/* DÖRDÜNCÜ SIRA - Alt son kartlar */}
+            {/* Grafik paneli burada devam ediyor (row-span-3) */}
+
             <CompactModule
               title="Son İşlemler"
               value="12 İşlem"
@@ -245,9 +247,10 @@ export const Dashboard: React.FC = () => {
               icon={<History className="w-4 h-4" />}
               variant="default"
               onClick={() => setSelectedModule('recent-trades')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
+            {/* DÖRDÜNCÜ SIRA - Sol 1 kart + Grafik bitiyor + Sağ 1 kart */}
             <CompactModule
               title="Hızlı Eylem"
               value="Strateji Başlat"
@@ -255,10 +258,20 @@ export const Dashboard: React.FC = () => {
               icon={<Zap className="w-4 h-4" />}
               variant="info"
               onClick={() => setSelectedModule('quick-actions')}
-              className="min-w-[200px] h-[96px] text-base"
+              className="h-[90px] text-sm"
             />
 
-            {/* Grafik paneli buraya kadar uzanıyor */}
+            {/* Grafik paneli burada son buluyor */}
+
+            <CompactModule
+              title="Sistem Durumu"
+              value="Aktif"
+              subtitle="Tüm botlar çalışıyor"
+              icon={<Activity className="w-4 h-4" />}
+              variant="success"
+              onClick={() => setSelectedModule('system-status')}
+              className="h-[90px] text-sm"
+            />
           </div>
         </div>
 
@@ -288,6 +301,7 @@ export const Dashboard: React.FC = () => {
                 {selectedModule === 'total-pnl' && 'Toplam K/Z'}
                 {selectedModule === 'win-rate' && 'Başarı Oranı'}
                 {selectedModule === 'active-strategies' && 'Aktif Stratejiler'}
+                {selectedModule === 'system-status' && 'Sistem Durumu'}
               </h3>
               <button 
                 onClick={closeDetailPanel}
@@ -586,6 +600,32 @@ export const Dashboard: React.FC = () => {
                   <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
                     ⚙️ Toplam {portfolioData?.activeStrategies} strateji aktif<br/>
                     🔋 Ortalama CPU kullanımı: %12
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'system-status' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span>API Bağlantısı</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">✓ Aktif</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Websocket</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">✓ Bağlı</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>AI Asistanı</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">✓ Online</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Backtest Motoru</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">✓ Hazır</Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-green-50 p-2 rounded">
+                    🟢 Tüm sistemler normal çalışıyor<br/>
+                    ⚡ Uptime: 4d 12h 25m<br/>
+                    📡 Son güncelleme: 2 saniye önce
                   </div>
                 </div>
               )}
