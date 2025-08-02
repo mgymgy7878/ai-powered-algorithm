@@ -85,7 +85,7 @@ class AIWatchService {
     }
   }
 
-  // Watchlist takibi - her 30 saniyede bir
+  // Watchlist takibi - her 15 saniyede bir (daha sık)
   startWatchlistTracking(symbols: string[]) {
     this.stopModule('watchlist')
     
@@ -115,12 +115,12 @@ class AIWatchService {
       } catch (error) {
         console.error('Watchlist tracking error:', error)
       }
-    }, 30000)
+    }, 15000)
     
     this.intervals.set('watchlist', interval)
   }
 
-  // AI tahmin modülü - her 15 saniyede bir
+  // AI tahmin modülü - her 10 saniyede bir (daha sık)
   startPredictionTracking(symbols: string[]) {
     this.stopModule('prediction')
     
@@ -140,12 +140,12 @@ class AIWatchService {
       } catch (error) {
         console.error('Prediction tracking error:', error)
       }
-    }, 15000)
+    }, 10000)
     
     this.intervals.set('prediction', interval)
   }
 
-  // Teknik sinyal takibi - her 20 saniyede bir
+  // Teknik sinyal takibi - her 15 saniyede bir
   startTechnicalSignalsTracking(symbols: string[]) {
     this.stopModule('signals')
     
@@ -171,12 +171,12 @@ class AIWatchService {
       } catch (error) {
         console.error('Technical signals tracking error:', error)
       }
-    }, 20000)
+    }, 15000)
     
     this.intervals.set('signals', interval)
   }
 
-  // Risk uyarı takibi - her 45 saniyede bir
+  // Risk uyarı takibi - her 30 saniyede bir
   startRiskAlertsTracking() {
     this.stopModule('risk')
     
@@ -188,11 +188,12 @@ class AIWatchService {
         const riskScenarios = [
           { level: 'medium' as const, title: 'Yüksek Pozisyon Riski', description: 'BTC pozisyonu portföyün %65ını oluşturuyor' },
           { level: 'high' as const, title: 'Volatilite Uyarısı', description: 'Son 24 saatte %15 oynaklık artışı' },
-          { level: 'low' as const, title: 'Likidite Kontrolü', description: 'Acil durum fonu %12 seviyesinde' }
+          { level: 'low' as const, title: 'Likidite Kontrolü', description: 'Acil durum fonu %12 seviyesinde' },
+          { level: 'critical' as const, title: 'Margin Uyarısı', description: 'Margin kullanımı %85e ulaştı' }
         ]
         
         // Random bir uyarı seç
-        if (Math.random() > 0.7) {
+        if (Math.random() > 0.6) {
           const scenario = riskScenarios[Math.floor(Math.random() * riskScenarios.length)]
           alerts.push({
             ...scenario,
@@ -204,12 +205,12 @@ class AIWatchService {
       } catch (error) {
         console.error('Risk alerts tracking error:', error)
       }
-    }, 45000)
+    }, 30000)
     
     this.intervals.set('risk', interval)
   }
 
-  // Haber takibi - her 60 saniyede bir
+  // Haber takibi - her 45 saniyede bir
   startNewsTracking() {
     this.stopModule('news')
     
@@ -222,7 +223,9 @@ class AIWatchService {
           'Bitcoin ETF onayı için SEC toplantısı',
           'Ethereum 2.0 güncelleme tarihi açıklandı',
           'Tesla Bitcoin satışı hakkında açıklama yaptı',
-          'Binance yeni altcoin listesi duyurdu'
+          'Binance yeni altcoin listesi duyurdu',
+          'Fed faiz kararı kripto piyasalarını etkiledi',
+          'DeFi protokollerinde hacim artışı görülüyor'
         ]
         
         const randomNews = demoNews[Math.floor(Math.random() * demoNews.length)]
@@ -231,17 +234,17 @@ class AIWatchService {
         news.push({
           id: Date.now().toString(),
           title: randomNews,
-          source: 'CoinDesk',
+          source: ['CoinDesk', 'CoinTelegraph', 'Binance News', 'CryptoSlate'][Math.floor(Math.random() * 4)],
           timestamp: new Date(),
           sentiment,
-          impact: 'medium'
+          impact: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high'
         })
         
         this.notify('news', news)
       } catch (error) {
         console.error('News tracking error:', error)
       }
-    }, 60000)
+    }, 45000)
     
     this.intervals.set('news', interval)
   }

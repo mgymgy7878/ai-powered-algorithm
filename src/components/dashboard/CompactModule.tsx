@@ -57,9 +57,9 @@ export function CompactModule({
   return (
     <Card
       className={cn(
-        "h-16 p-3 cursor-pointer transition-all duration-200 border hover:shadow-sm",
+        "h-[56px] max-w-[280px] p-2 cursor-pointer transition-all duration-200 border hover:shadow-sm",
         getStatusColor(),
-        isHovered && "scale-[1.02]"
+        isHovered && "scale-[1.01]"
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -78,22 +78,22 @@ export function CompactModule({
 
           {/* İçerik */}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h4 className="text-xs font-medium text-muted-foreground truncate">
+            <div className="flex items-center gap-1">
+              <h4 className="text-[10px] font-medium text-muted-foreground truncate">
                 {title}
               </h4>
               {badge && (
-                <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                <Badge variant="secondary" className="text-[8px] px-1 py-0 h-3">
                   {badge}
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold truncate">
+            <div className="flex items-center gap-1 mt-0.5">
+              <span className="text-xs font-semibold truncate">
                 {loading ? '...' : value}
               </span>
               {subtitle && (
-                <span className="text-[10px] text-muted-foreground truncate">
+                <span className="text-[9px] text-muted-foreground truncate">
                   {subtitle}
                 </span>
               )}

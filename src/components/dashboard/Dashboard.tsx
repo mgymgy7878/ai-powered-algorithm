@@ -182,163 +182,171 @@ export function Dashboard() {
     return { value: "Ekonomik Olaylar Takip Ediliyor", status: 'neutral' as const }
   }
 
-  // Render detail panel content
+  // Render detail panel content - KOMPAKT VERSİYON
   const renderDetailContent = (module: string) => {
     switch (module) {
       case 'watchlist':
         return (
-          <div className="space-y-4">
-            {watchlistData.map((item, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="font-semibold">{item.symbol}</h4>
-                    <p className="text-2xl font-bold">${item.price.toLocaleString()}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant={item.change24h >= 0 ? "default" : "destructive"}>
-                      {item.change24h >= 0 ? '+' : ''}{item.change24h.toFixed(2)}%
-                    </Badge>
-                    <p className="text-sm text-muted-foreground mt-1">Vol: {item.volume}</p>
-                  </div>
+          <div className="space-y-2">
+            {watchlistData.slice(0, 3).map((item, index) => (
+              <div key={index} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
+                <div>
+                  <h4 className="text-sm font-semibold">{item.symbol}</h4>
+                  <p className="text-xs text-muted-foreground">${item.price.toLocaleString()}</p>
                 </div>
-                {item.prediction && (
-                  <div className="mt-3 p-3 bg-muted rounded-lg">
-                    <div className="flex items-center gap-2">
-                      {item.prediction.direction === 'up' ? <TrendingUp className="w-4 h-4 text-green-600" /> : 
-                       item.prediction.direction === 'down' ? <TrendingDown className="w-4 h-4 text-red-600" /> : 
-                       <Activity className="w-4 h-4 text-yellow-600" />}
-                      <span className="text-sm font-medium">AI Tahmini: %{item.prediction.confidence}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">{item.prediction.reason}</p>
-                  </div>
-                )}
-              </Card>
+                <div className="text-right">
+                  <Badge variant={item.change24h >= 0 ? "default" : "destructive"} className="text-xs">
+                    {item.change24h >= 0 ? '+' : ''}{item.change24h.toFixed(2)}%
+                  </Badge>
+                  {item.prediction && (
+                    <p className="text-xs text-muted-foreground mt-1">AI: %{item.prediction.confidence}</p>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         )
       
       case 'prediction':
         return (
-          <div className="space-y-4">
-            {predictionData.map((item, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex items-center gap-3">
-                  {item.direction === 'up' ? <TrendingUp className="w-5 h-5 text-green-600" /> : 
-                   item.direction === 'down' ? <TrendingDown className="w-5 h-5 text-red-600" /> : 
-                   <Activity className="w-5 h-5 text-yellow-600" />}
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{item.symbol}</h4>
-                    <p className="text-sm text-muted-foreground">{item.reason}</p>
-                  </div>
-                  <Badge variant="outline">%{item.confidence}</Badge>
+          <div className="space-y-2">
+            {predictionData.slice(0, 3).map((item, index) => (
+              <div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                {item.direction === 'up' ? <TrendingUp className="w-4 h-4 text-green-600" /> : 
+                 item.direction === 'down' ? <TrendingDown className="w-4 h-4 text-red-600" /> : 
+                 <Activity className="w-4 h-4 text-yellow-600" />}
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold">{item.symbol}</h4>
+                  <p className="text-xs text-muted-foreground">{item.reason}</p>
                 </div>
-              </Card>
+                <Badge variant="outline" className="text-xs">%{item.confidence}</Badge>
+              </div>
             ))}
           </div>
         )
       
       case 'signals':
         return (
-          <div className="space-y-4">
-            {signalsData.map((signal, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="font-semibold">{signal.symbol}</h4>
-                    <p className="text-sm text-muted-foreground">{signal.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant={signal.type === 'buy' ? "default" : signal.type === 'sell' ? "destructive" : "secondary"}>
-                      {signal.indicator} {signal.type.toUpperCase()}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">Güçlülük: %{signal.strength.toFixed(0)}</p>
-                  </div>
+          <div className="space-y-2">
+            {signalsData.slice(0, 3).map((signal, index) => (
+              <div key={index} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
+                <div>
+                  <h4 className="text-sm font-semibold">{signal.symbol}</h4>
+                  <p className="text-xs text-muted-foreground">{signal.description}</p>
                 </div>
-              </Card>
+                <div className="text-right">
+                  <Badge variant={signal.type === 'buy' ? "default" : signal.type === 'sell' ? "destructive" : "secondary"} className="text-xs">
+                    {signal.indicator} {signal.type.toUpperCase()}
+                  </Badge>
+                  <p className="text-xs text-muted-foreground mt-1">%{signal.strength.toFixed(0)}</p>
+                </div>
+              </div>
             ))}
           </div>
         )
       
       case 'risk':
         return (
-          <div className="space-y-4">
-            {riskData.map((alert, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className={`w-5 h-5 ${
-                    alert.level === 'critical' ? 'text-red-600' :
-                    alert.level === 'high' ? 'text-orange-600' :
-                    alert.level === 'medium' ? 'text-yellow-600' : 'text-blue-600'
-                  }`} />
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{alert.title}</h4>
-                    <p className="text-sm text-muted-foreground">{alert.description}</p>
-                    <p className="text-xs text-muted-foreground mt-2">{alert.timestamp.toLocaleTimeString()}</p>
-                  </div>
-                  <Badge variant={
-                    alert.level === 'critical' ? "destructive" :
-                    alert.level === 'high' ? "destructive" :
-                    alert.level === 'medium' ? "default" : "secondary"
-                  }>
-                    {alert.level.toUpperCase()}
-                  </Badge>
+          <div className="space-y-2">
+            {riskData.slice(0, 3).map((alert, index) => (
+              <div key={index} className="flex items-start gap-2 p-2 bg-muted/50 rounded-md">
+                <AlertTriangle className={`w-4 h-4 ${
+                  alert.level === 'critical' ? 'text-red-600' :
+                  alert.level === 'high' ? 'text-orange-600' :
+                  alert.level === 'medium' ? 'text-yellow-600' : 'text-blue-600'
+                }`} />
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold">{alert.title}</h4>
+                  <p className="text-xs text-muted-foreground">{alert.description}</p>
                 </div>
-              </Card>
+                <Badge variant={alert.level === 'critical' || alert.level === 'high' ? "destructive" : "default"} className="text-xs">
+                  {alert.level.toUpperCase()}
+                </Badge>
+              </div>
             ))}
           </div>
         )
       
       case 'news':
         return (
-          <div className="space-y-4">
-            {newsData.map((news, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex items-start gap-3">
-                  <Newspaper className="w-5 h-5 text-blue-600" />
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{news.title}</h4>
-                    <p className="text-sm text-muted-foreground">{news.source} - {news.timestamp.toLocaleTimeString()}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant={news.sentiment === 'positive' ? "default" : news.sentiment === 'negative' ? "destructive" : "secondary"}>
-                      {news.sentiment}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{news.impact} etki</p>
-                  </div>
+          <div className="space-y-2">
+            {newsData.slice(0, 3).map((news, index) => (
+              <div key={index} className="flex items-start gap-2 p-2 bg-muted/50 rounded-md">
+                <Newspaper className="w-4 h-4 text-blue-600" />
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold">{news.title}</h4>
+                  <p className="text-xs text-muted-foreground">{news.source} - {news.timestamp.toLocaleTimeString()}</p>
                 </div>
-              </Card>
+                <Badge variant={news.sentiment === 'positive' ? "default" : news.sentiment === 'negative' ? "destructive" : "secondary"} className="text-xs">
+                  {news.sentiment}
+                </Badge>
+              </div>
             ))}
           </div>
         )
       
       case 'economic':
         return (
-          <div className="space-y-4">
-            {economicData.map((event, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-purple-600" />
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{event.title}</h4>
-                    <p className="text-sm text-muted-foreground">{event.country} - {event.time.toLocaleString()}</p>
-                    {event.forecast && (
-                      <p className="text-xs text-muted-foreground">
-                        Beklenti: {event.forecast} {event.actual && `| Gerçek: ${event.actual}`}
-                      </p>
-                    )}
-                  </div>
-                  <Badge variant={event.importance === 'high' ? "destructive" : event.importance === 'medium' ? "default" : "secondary"}>
-                    {event.importance}
-                  </Badge>
+          <div className="space-y-2">
+            {economicData.slice(0, 3).map((event, index) => (
+              <div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                <Calendar className="w-4 h-4 text-purple-600" />
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold">{event.title}</h4>
+                  <p className="text-xs text-muted-foreground">{event.country} - {event.time.toLocaleString()}</p>
                 </div>
-              </Card>
+                <Badge variant={event.importance === 'high' ? "destructive" : event.importance === 'medium' ? "default" : "secondary"} className="text-xs">
+                  {event.importance}
+                </Badge>
+              </div>
             ))}
           </div>
         )
       
+      case 'performance':
+        return (
+          <div className="space-y-2">
+            <div className="p-2 bg-muted/50 rounded-md">
+              <h4 className="text-sm font-semibold">Toplam Performans</h4>
+              <p className="text-xs text-muted-foreground">Son 24 saat: +$1,250.50 (+2.4%)</p>
+            </div>
+            <div className="p-2 bg-muted/50 rounded-md">
+              <h4 className="text-sm font-semibold">Aktif Stratejiler</h4>
+              <p className="text-xs text-muted-foreground">Grid Bot, RSI Scalper, DCA Bot</p>
+            </div>
+          </div>
+        )
+      
+      case 'portfolio':
+        return (
+          <div className="space-y-2">
+            <div className="p-2 bg-muted/50 rounded-md">
+              <h4 className="text-sm font-semibold">Ana Varlıklar</h4>
+              <p className="text-xs text-muted-foreground">BTC: 45%, ETH: 25%, USDT: 20%</p>
+            </div>
+            <div className="p-2 bg-muted/50 rounded-md">
+              <h4 className="text-sm font-semibold">Altcoinler</h4>
+              <p className="text-xs text-muted-foreground">ADA, BNB, DOT, LINK, UNI</p>
+            </div>
+          </div>
+        )
+      
+      case 'trades':
+        return (
+          <div className="space-y-2">
+            <div className="p-2 bg-muted/50 rounded-md">
+              <h4 className="text-sm font-semibold">BTCUSDT ALIM</h4>
+              <p className="text-xs text-muted-foreground">2 dakika önce - $43,250.00</p>
+            </div>
+            <div className="p-2 bg-muted/50 rounded-md">
+              <h4 className="text-sm font-semibold">ETHUSDT SATIM</h4>
+              <p className="text-xs text-muted-foreground">8 dakika önce - $2,640.00</p>
+            </div>
+          </div>
+        )
+      
       default:
-        return <div>Detay bilgisi bulunamadı</div>
+        return <div className="text-sm text-muted-foreground">Detay bilgisi bulunamadı</div>
     }
   }
 
@@ -374,9 +382,9 @@ export function Dashboard() {
         <TradingAssistant />
       </div>
       
-      {/* Ana İçerik - Kompakt Modüler Tasarım */}
+      {/* Ana İçerik - Ultra Kompakt Grid Tasarım */}
       <div className="pl-4 pr-[300px] pt-12 pb-4">
-        <div className="space-y-2 mt-2 max-w-2xl">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 mt-2 max-w-6xl">
           
           {/* İşlem Çifti Takip Listesi */}
           <CompactModule
@@ -466,23 +474,23 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Detay Paneli */}
+      {/* Detay Paneli - Kompakt */}
       <Sheet open={!!selectedModule} onOpenChange={() => setSelectedModule(null)}>
-        <SheetContent className="w-[600px] sm:max-w-[600px]">
+        <SheetContent className="w-[400px] sm:max-w-[400px]">
           <SheetHeader>
-            <SheetTitle>
-              {selectedModule === 'watchlist' && '📊 İşlem Çiftleri Detayı'}
-              {selectedModule === 'prediction' && '🧠 AI Tahmin Detayı'}
-              {selectedModule === 'signals' && '📈 Teknik Sinyaller Detayı'}
-              {selectedModule === 'risk' && '⚠️ Risk Uyarıları Detayı'}
-              {selectedModule === 'news' && '📰 Canlı Haberler Detayı'}
-              {selectedModule === 'economic' && '📅 Ekonomik Takvim Detayı'}
+            <SheetTitle className="text-sm">
+              {selectedModule === 'watchlist' && '📊 İşlem Çiftleri'}
+              {selectedModule === 'prediction' && '🧠 AI Tahminleri'}
+              {selectedModule === 'signals' && '📈 Teknik Sinyaller'}
+              {selectedModule === 'risk' && '⚠️ Risk Uyarıları'}
+              {selectedModule === 'news' && '📰 Canlı Haberler'}
+              {selectedModule === 'economic' && '📅 Ekonomik Takvim'}
               {selectedModule === 'performance' && '🎯 Strateji Performansı'}
               {selectedModule === 'portfolio' && '🥧 Portföy Dağılımı'}
               {selectedModule === 'trades' && '📋 Son İşlemler'}
             </SheetTitle>
           </SheetHeader>
-          <div className="mt-6 max-h-[calc(100vh-120px)] overflow-auto">
+          <div className="mt-4 max-h-[calc(100vh-120px)] overflow-auto">
             {selectedModule && renderDetailContent(selectedModule)}
           </div>
         </SheetContent>
