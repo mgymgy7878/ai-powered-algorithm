@@ -65,8 +65,12 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Layout Bölgesi 1: Üst Metrik Kartları */}
-      <div className="h-14 flex items-center justify-between px-4 border-b border-border">
-        <div className="flex items-center gap-2 overflow-x-auto">
+      <div className="h-14 flex items-center px-4 border-b border-border">
+        {/* Sol boşluk menü butonu için */}
+        <div className="w-16 flex-shrink-0"></div>
+        
+        {/* Metrik kartları - menü butonunun sağından başlar */}
+        <div className="flex items-center gap-2 overflow-x-auto flex-1">
           <CompactModule
             title="Portföy"
             value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
@@ -109,8 +113,8 @@ export const Dashboard: React.FC = () => {
           />
         </div>
 
-        {/* Bildirim paneli - sağ üst köşe */}
-        <div className="w-[240px]">
+        {/* Bildirim paneli - genişletildi, stratejiler modülüne kadar uzanıyor */}
+        <div className="w-[320px] flex-shrink-0">
           <NotificationCenter />
         </div>
       </div>
