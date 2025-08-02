@@ -3,7 +3,7 @@ import { TradingAssistant } from '../ai/TradingAssistant'
 import { NotificationCenter } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 import { CompactModule } from './CompactModule'
-import { TradingChartMini } from '../chart/TradingChartMini'
+import { SimpleChart } from '../chart/SimpleChart'
 import { TradingChartFull } from '../chart/TradingChartFull'
 import { useSymbolStore } from '../../store/useSymbolStore'
 import { useAIWatch, MarketData, TechnicalSignal, RiskAlert, NewsItem, EconomicEvent } from '../../services/aiWatchService'
@@ -479,7 +479,7 @@ export function Dashboard() {
 
         {/* Multi-Asset TradingView Benzeri Grafik Paneli */}
         <div className="mt-6 max-w-6xl">
-          <TradingChartMini
+          <SimpleChart
             height={180}
             onFullscreenClick={() => toggleFullscreen()}
           />
@@ -488,7 +488,22 @@ export function Dashboard() {
 
       {/* Fullscreen Chart Modal */}
       {isFullscreen && (
-        <TradingChartFull onClose={() => toggleFullscreen()} />
+        <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+          <div className="w-full h-full p-8">
+            <div className="w-full h-full border rounded-lg bg-muted/20 flex items-center justify-center">
+              <div className="text-center">
+                <Activity className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">Gelişmiş Grafik</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Chart kütüphanesi yükleniyor...
+                </p>
+                <Button onClick={() => toggleFullscreen()} variant="outline">
+                  Kapat
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Detay Paneli - Kompakt */}

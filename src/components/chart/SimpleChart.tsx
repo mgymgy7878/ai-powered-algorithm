@@ -1,22 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { createChart } from 'lightweight-charts'
+import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { Maximize2, Search, TrendingUp, TrendingDown } from 'lucide-react'
-import { getChartData, ChartData, AssetInfo } from '@/services/chartDataResolver'
+import { Maximize2, Search, TrendingUp, TrendingDown, Activity } from 'lucide-react'
+import { getChartData, ChartData } from '@/services/chartDataResolver'
 import { useSymbolStore } from '@/store/useSymbolStore'
 
-interface TradingChartMiniProps {
+interface SimpleChartProps {
   height?: number
   onFullscreenClick?: () => void
 }
 
-export function TradingChartMini({ height = 180, onFullscreenClick }: TradingChartMiniProps) {
-  const chartContainerRef = useRef<HTMLDivElement>(null)
-  const chartRef = useRef<any>(null)
-  const seriesRef = useRef<any>(null)
+export function SimpleChart({ height = 180, onFullscreenClick }: SimpleChartProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   
   const { 
     currentSymbol, 
@@ -33,73 +30,107 @@ export function TradingChartMini({ height = 180, onFullscreenClick }: TradingCha
   const [chartData, setChartData] = useState<ChartData[]>([])
   const [priceChange, setPriceChange] = useState({ value: 0, percentage: 0 })
 
-  // Initialize chart
-  useEffect(() => {
-    if (!chartContainerRef.current) return
+  // Canvas çizim fonksiyonu
+  const drawChart = () => {
+    const canvas = canvasRef.current
+    if (!canvas || chartData.length === 0) return
     
-    try {
-      const chart = createChart(chartContainerRef.current, {
-        width: chartContainerRef.current.clientWidth,
-        height: height,
-        layout: {
-          background: { color: '#ffffff' },
-          textColor: '#333',
-        },
-        grid: {
-          vertLines: { color: '#f0f0f0' },
-          horzLines: { color: '#f0f0f0' },
-        },
-        crosshair: {
-          mode: 1,
-        },
-        rightPriceScale: {
-          borderColor: '#e0e0e0',
-        },
-        timeScale: {
-          borderColor: '#e0e0e0',
-          timeVisible: true,
-          secondsVisible: false,
-        },
-      })
-
-      if (typeof chart.addCandlestickSeries === 'function') {
-        const candlestickSeries = chart.addCandlestickSeries({
-          upColor: '#22c55e',
-          downColor: '#ef4444',
-          borderDownColor: '#ef4444',
-          borderUpColor: '#22c55e',
-          wickDownColor: '#ef4444',
-          wickUpColor: '#22c55e',
-        })
-
-        seriesRef.current = candlestickSeries
-      }
-
-      chartRef.current = chart
-
-      // Handle resize
-      const handleResize = () => {
-        if (chartContainerRef.current && chartRef.current) {
-          chartRef.current.applyOptions({
-            width: chartContainerRef.current.clientWidth,
-          })
-        }
-      }
-
-      window.addEventListener('resize', handleResize)
-
-      return () => {
-        window.removeEventListener('resize', handleResize)
-        if (chart && typeof chart.remove === 'function') {
-          chart.remove()
-        }
-      }
-    } catch (error) {
-      // Chart initialization hatası - geçici olarak görmezden gel
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    
+    // Canvas boyutlarını ayarla
+    const rect = canvas.getBoundingClientRect()
+    canvas.width = rect.width * window.devicePixelRatio
+    canvas.height = rect.height * window.devicePixelRatio
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+    
+    const padding = 20
+    const chartWidth = rect.width - padding * 2
+    const chartHeight = rect.height - padding * 2
+    
+    // Fiyat aralığını hesapla
+    const prices = chartData.map(d => d.close)
+    const minPrice = Math.min(...prices)
+    const maxPrice = Math.max(...prices)
+    const priceRange = maxPrice - minPrice
+    
+    // Background
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, rect.width, rect.height)
+    
+    // Grid çizgileri
+    ctx.strokeStyle = '#f0f0f0'
+    ctx.lineWidth = 1
+    
+    // Yatay grid
+    for (let i = 0; i <= 5; i++) {
+      const y = padding + (chartHeight / 5) * i
+      ctx.beginPath()
+      ctx.moveTo(padding, y)
+      ctx.lineTo(rect.width - padding, y)
+      ctx.stroke()
     }
-  }, [height])
+    
+    // Dikey grid
+    for (let i = 0; i <= 10; i++) {
+      const x = padding + (chartWidth / 10) * i
+      ctx.beginPath()
+      ctx.moveTo(x, padding)
+      ctx.lineTo(x, rect.height - padding)
+      ctx.stroke()
+    }
+    
+    // Fiyat çizgisi
+    ctx.strokeStyle = '#3b82f6'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    
+    chartData.forEach((point, index) => {
+      const x = padding + (chartWidth / (chartData.length - 1)) * index
+      const y = padding + chartHeight - ((point.close - minPrice) / priceRange) * chartHeight
+      
+      if (index === 0) {
+        ctx.moveTo(x, y)
+      } else {
+        ctx.lineTo(x, y)
+      }
+    })
+    
+    ctx.stroke()
+    
+    // Son fiyat noktası
+    if (chartData.length > 0) {
+      const lastPoint = chartData[chartData.length - 1]
+      const x = padding + chartWidth
+      const y = padding + chartHeight - ((lastPoint.close - minPrice) / priceRange) * chartHeight
+      
+      ctx.fillStyle = priceChange.value >= 0 ? '#22c55e' : '#ef4444'
+      ctx.beginPath()
+      ctx.arc(x, y, 4, 0, 2 * Math.PI)
+      ctx.fill()
+    }
+    
+    // Fiyat etiketi
+    ctx.fillStyle = '#333'
+    ctx.font = '12px Inter'
+    ctx.textAlign = 'right'
+    
+    // Min/Max fiyat etiketi
+    ctx.fillText(maxPrice.toFixed(2), rect.width - padding - 5, padding + 15)
+    ctx.fillText(minPrice.toFixed(2), rect.width - padding - 5, rect.height - padding - 5)
+  }
 
-  // Load chart data
+  // Canvas resize handler
+  useEffect(() => {
+    const handleResize = () => {
+      setTimeout(drawChart, 100)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [chartData])
+
+  // Chart data yükleme
   useEffect(() => {
     const loadData = async () => {
       if (!currentSymbol) return
@@ -109,21 +140,9 @@ export function TradingChartMini({ height = 180, onFullscreenClick }: TradingCha
         const data = await getChartData(currentSymbol)
         
         if (data.length > 0) {
-          const formattedData = data.map(item => ({
-            time: Math.floor(item.time / 1000), // Convert to seconds
-            open: item.open,
-            high: item.high,
-            low: item.low,
-            close: item.close,
-          }))
-          
           setChartData(data)
           
-          if (seriesRef.current && typeof seriesRef.current.setData === 'function') {
-            seriesRef.current.setData(formattedData)
-          }
-          
-          // Calculate price change
+          // Fiyat değişimi hesapla
           if (data.length >= 2) {
             const current = data[data.length - 1].close
             const previous = data[data.length - 2].close
@@ -135,6 +154,9 @@ export function TradingChartMini({ height = 180, onFullscreenClick }: TradingCha
               percentage: changePercent
             })
           }
+          
+          // Chart çiz
+          setTimeout(drawChart, 100)
         }
       } catch (error) {
         console.error('Chart data yükleme hatası:', error)
@@ -145,6 +167,13 @@ export function TradingChartMini({ height = 180, onFullscreenClick }: TradingCha
 
     loadData()
   }, [currentSymbol, setLoading])
+
+  // Chart çizimi
+  useEffect(() => {
+    if (chartData.length > 0) {
+      drawChart()
+    }
+  }, [chartData])
 
   const handleSymbolSearch = (symbol: string) => {
     setSymbol(symbol)
@@ -263,14 +292,18 @@ export function TradingChartMini({ height = 180, onFullscreenClick }: TradingCha
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Chart Canvas */}
       <div className="relative">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         )}
-        <div ref={chartContainerRef} className="w-full" style={{ height: `${height}px` }} />
+        <canvas 
+          ref={canvasRef} 
+          className="w-full border rounded"
+          style={{ height: `${height}px` }}
+        />
       </div>
 
       {/* Current Price */}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { createChart, IChartApi, ISeriesApi } from 'lightweight-charts'
+import { createChart } from 'lightweight-charts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -24,9 +24,9 @@ interface TradingChartFullProps {
 
 export function TradingChartFull({ onClose }: TradingChartFullProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null)
-  const chartRef = useRef<IChartApi | null>(null)
-  const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
-  const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
+  const chartRef = useRef<any>(null)
+  const candleSeriesRef = useRef<any>(null)
+  const volumeSeriesRef = useRef<any>(null)
   
   const { 
     currentSymbol, 
@@ -63,71 +63,87 @@ export function TradingChartFull({ onClose }: TradingChartFullProps) {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: 500,
-      layout: {
-        background: { color: '#ffffff' },
-        textColor: '#333',
-      },
-      grid: {
-        vertLines: { color: '#f0f0f0' },
-        horzLines: { color: '#f0f0f0' },
-      },
-      crosshair: {
-        mode: 1,
-      },
-      rightPriceScale: {
-        borderColor: '#e0e0e0',
-      },
-      timeScale: {
-        borderColor: '#e0e0e0',
-        timeVisible: true,
-        secondsVisible: false,
-      },
-    })
+    console.log('Full chart initialization starting...')
+    
+    try {
+      const chart = createChart(chartContainerRef.current, {
+        width: chartContainerRef.current.clientWidth,
+        height: 500,
+        layout: {
+          background: { color: '#ffffff' },
+          textColor: '#333',
+        },
+        grid: {
+          vertLines: { color: '#f0f0f0' },
+          horzLines: { color: '#f0f0f0' },
+        },
+        crosshair: {
+          mode: 1,
+        },
+        rightPriceScale: {
+          borderColor: '#e0e0e0',
+        },
+        timeScale: {
+          borderColor: '#e0e0e0',
+          timeVisible: true,
+          secondsVisible: false,
+        },
+      })
 
-    // Candlestick series
-    const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#22c55e',
-      downColor: '#ef4444',
-      borderDownColor: '#ef4444',
-      borderUpColor: '#22c55e',
-      wickDownColor: '#ef4444',
-      wickUpColor: '#22c55e',
-    })
+      console.log('Full chart created successfully:', chart)
 
-    // Volume series
-    const volumeSeries = chart.addHistogramSeries({
-      color: '#94a3b8',
-      priceFormat: {
-        type: 'volume',
-      },
-      priceScaleId: 'left',
-      scaleMargins: {
-        top: 0.8,
-        bottom: 0,
-      },
-    })
-
-    chartRef.current = chart
-    candleSeriesRef.current = candlestickSeries
-    volumeSeriesRef.current = volumeSeries
-
-    // Handle resize
-    const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current) {
-        chartRef.current.applyOptions({
-          width: chartContainerRef.current.clientWidth,
+      // Candlestick series
+      if (typeof chart.addCandlestickSeries === 'function') {
+        const candlestickSeries = chart.addCandlestickSeries({
+          upColor: '#22c55e',
+          downColor: '#ef4444',
+          borderDownColor: '#ef4444',
+          borderUpColor: '#22c55e',
+          wickDownColor: '#ef4444',
+          wickUpColor: '#22c55e',
         })
+        candleSeriesRef.current = candlestickSeries
+        console.log('Full chart candlestick series created:', candlestickSeries)
       }
-    }
 
-    window.addEventListener('resize', handleResize)
+      // Volume series
+      if (typeof chart.addHistogramSeries === 'function') {
+        const volumeSeries = chart.addHistogramSeries({
+          color: '#94a3b8',
+          priceFormat: {
+            type: 'volume',
+          },
+          priceScaleId: 'left',
+          scaleMargins: {
+            top: 0.8,
+            bottom: 0,
+          },
+        })
+        volumeSeriesRef.current = volumeSeries
+        console.log('Full chart volume series created:', volumeSeries)
+      }
 
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      chart.remove()
+      chartRef.current = chart
+
+      // Handle resize
+      const handleResize = () => {
+        if (chartContainerRef.current && chartRef.current) {
+          chartRef.current.applyOptions({
+            width: chartContainerRef.current.clientWidth,
+          })
+        }
+      }
+
+      window.addEventListener('resize', handleResize)
+
+      return () => {
+        window.removeEventListener('resize', handleResize)
+        if (chart && typeof chart.remove === 'function') {
+          chart.remove()
+        }
+      }
+    } catch (error) {
+      console.error('Full chart initialization error:', error)
     }
   }, [])
 
@@ -157,11 +173,11 @@ export function TradingChartFull({ onClose }: TradingChartFullProps) {
           
           setChartData(data)
           
-          if (candleSeriesRef.current) {
+          if (candleSeriesRef.current && typeof candleSeriesRef.current.setData === 'function') {
             candleSeriesRef.current.setData(candleData)
           }
           
-          if (volumeSeriesRef.current) {
+          if (volumeSeriesRef.current && typeof volumeSeriesRef.current.setData === 'function') {
             volumeSeriesRef.current.setData(volumeData)
           }
           
