@@ -4,6 +4,7 @@ import { Badge } from '../ui/badge'
 import { TrendingUp, BarChart } from 'lucide-react'
 import { TradingAssistant } from '../ai/TradingAssistant'
 import { NotificationCenter } from '../ui/NotificationCenter'
+import { MarketDashboard } from '../market/MarketDashboard'
 import { useActivity } from '../../contexts/ActivityContext'
 
 export function Dashboard() {
@@ -82,6 +83,9 @@ export function Dashboard() {
       <div className="pl-4 pr-[300px] pt-14">
         {/* Ana Grafik ve Analiz Alanı */}
         <div className="grid grid-cols-1 gap-4 mt-2">
+          {/* Canlı Piyasa Verileri */}
+          <MarketDashboard />
+          
           {/* Portföy Performans Grafiği */}
           <Card>
             <CardHeader className="pb-1">

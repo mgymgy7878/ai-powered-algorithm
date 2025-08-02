@@ -305,11 +305,60 @@ class WebSocketService {
   }
 
   /**
+   * Bağlantı sağlığını kontrol et
+   */
+  getConnectionHealth(): { totalConnections: number, healthyConnections: number, issues: string[] } {
+    const total = this.connections.size
+    let healthy = 0
+    const issues: string[] = []
+    
+    for (const [streamId, ws] of this.connections) {
+      if (ws.readyState === WebSocket.OPEN) {
+        healthy++
+      } else {
+        issues.push(`${streamId}: ${this.getConnectionStatus(streamId)}`)
+      }
+    }
+    
+    return {
+      totalConnections: total,
+      healthyConnections: healthy,
+      issues
+    }
+  }
+
+  /**
    * Aktif bağlantıları listele
    */
   getActiveConnections(): string[] {
     return Array.from(this.connections.keys())
   }
+
+  /**
+   * Performans metriklerini getir
+   */
+  getPerformanceMetrics(): { 
+    totalConnections: number
+    dataReceived: number
+    reconnectAttempts: number
+    uptime: number
+  } {
+    const now = Date.now()
+    let totalReconnects = 0
+    
+    for (const attempts of this.reconnectAttempts.values()) {
+      totalReconnects += attempts
+    }
+    
+    return {
+      totalConnections: this.connections.size,
+      dataReceived: 0, // Bu metrik ayrı bir counter ile takip edilebilir
+      reconnectAttempts: totalReconnects,
+      uptime: now - (this.startTime || now)
+    }
+  }
+
+  private startTime = Date.now()
 }
 
 export const websocketService = new WebSocketService()
