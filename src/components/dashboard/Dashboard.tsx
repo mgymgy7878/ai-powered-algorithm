@@ -73,7 +73,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Üst sıra: Tüm temel göstergeler - sola hizalı, küçük, yatay */}
-      <div className="flex items-center gap-1 px-2 py-2 ml-8 border-b border-border bg-card/50 flex-shrink-0">
+      <div className="flex items-center gap-1 px-2 py-2 ml-[260px] border-b border-border bg-card/50 flex-shrink-0">
         <CompactModule
           title="Portföy Değeri"
           value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
@@ -130,7 +130,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Ana İçerik Alanı - Üst kutular görünür şekilde altında */}
-      <div className="flex flex-1 overflow-hidden pt-2">
+      <div className="flex flex-1 overflow-hidden pt-4">
         {/* Sol taraf: Diğer modüller alt alta - üsttekilerle aynı boyut */}
         <div className="w-[180px] p-2 space-y-2 overflow-y-auto">
           <CompactModule
