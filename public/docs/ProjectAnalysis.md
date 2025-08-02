@@ -147,12 +147,16 @@ src/
 - ✅ AI sohbet paneli optimizasyonu
 - ✅ Project analysis sayfası
 - ✅ Notification center geliştirmeleri
+- ✅ **Sürükle & Bırak Dashboard Sistemi** - react-grid-layout ile interaktif bileşen düzenleme
+- ✅ **Layout Kaydetme** - Kullanıcı düzenlemelerinin kalıcı saklanması
+- ✅ **Test Sayfası** - Sürükle & bırak özelliği için demo ve test ortamı
 
 ### 🔄 Aktif Geliştirme
 - 🔧 WebSocket stabilite iyileştirmeleri
 - 🔧 AI model seçici finalize
 - 🔧 Grafik tam ekran modu optimizasyonu
 - 🔧 Performance monitoring eklentileri
+- 🆕 **Sürükle & Bırak Sistemi Testi** - Test sayfasında canlı demo
 
 ---
 
@@ -164,4 +168,4 @@ Bu döküman projenin mevcut durumunu ve gelecek planlarını takip etmek için 
 
 ---
 
-**📍 Son Güncelleme:** ${new Date().toLocaleDateString('tr-TR')} - Dashboard grafik paneli ve proje durumu sayfası eklendi
+**📍 Son Güncelleme:** ${new Date().toLocaleDateString('tr-TR')} - Sürükle & Bırak dashboard sistemi eklendi, test sayfası ve interaktif bileşen düzenleme özellikleri entegre edildi

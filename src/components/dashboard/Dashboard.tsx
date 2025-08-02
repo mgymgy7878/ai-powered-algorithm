@@ -22,7 +22,9 @@ import {
   History,
   Zap,
   LayoutGrid, 
-  Maximize2
+  Maximize2,
+  Grid3X3,
+  Move
 } from 'lucide-react';
 
 interface DetailPanelProps {
@@ -54,7 +56,7 @@ export const Dashboard: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   const [chartSymbol, setChartSymbol] = useState('BINANCE:BTCUSDT');
-  const [viewMode, setViewMode] = useState<'classic' | 'draggable'>('draggable');
+  const [viewMode, setViewMode] = useKV<'classic' | 'draggable'>('dashboard-view-mode', 'draggable');
   
   const [portfolioData] = useKV('portfolio-data', {
     totalValue: 50000,
@@ -76,10 +78,63 @@ export const Dashboard: React.FC = () => {
 
   const closeDetailPanel = () => setSelectedModule(null);
 
+  // Sürükle-bırak modundaysa DraggableDashboard'ı render et
+  if (viewMode === 'draggable') {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        {/* Görünüm değiştirici */}
+        <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
+          <Button
+            variant={viewMode === 'classic' ? 'outline' : 'default'}
+            size="sm"
+            onClick={() => setViewMode('classic')}
+            className="flex items-center gap-2"
+          >
+            <Grid3X3 className="w-4 h-4" />
+            Klasik
+          </Button>
+          <Button
+            variant={viewMode === 'draggable' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('draggable')}
+            className="flex items-center gap-2"
+          >
+            <Move className="w-4 h-4" />
+            Sürükle & Bırak
+          </Button>
+        </div>
+        
+        <DraggableDashboard className="pt-16" />
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen bg-background">
+      {/* Görünüm değiştirici */}
+      <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
+        <Button
+          variant={viewMode === 'classic' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('classic')}
+          className="flex items-center gap-2"
+        >
+          <Grid3X3 className="w-4 h-4" />
+          Klasik
+        </Button>
+        <Button
+          variant={viewMode === 'draggable' ? 'outline' : 'default'}
+          size="sm"
+          onClick={() => setViewMode('draggable')}
+          className="flex items-center gap-2"
+        >
+          <Move className="w-4 h-4" />
+          Sürükle & Bırak
+        </Button>
+      </div>
+
       {/* Üst metrik kartları */}
-      <div className="absolute top-2 left-[60px] right-[300px] z-30 px-2 flex items-center gap-2 overflow-x-auto">
+      <div className="absolute top-2 left-[200px] right-[300px] z-30 px-2 flex items-center gap-2 overflow-x-auto">
         <CompactModule
           title="Portföy Değeri"
           value={`$${(portfolioData?.totalValue ?? 0).toLocaleString()}`}
