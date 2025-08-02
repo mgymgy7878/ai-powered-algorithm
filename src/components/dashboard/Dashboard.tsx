@@ -119,109 +119,146 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Layout Bölgesi 2: Ana İçerik */}
+      {/* Layout Bölgesi 2: Ana İçerik - L Şekilli Yerleşim */}
       <div className="flex">
-        {/* Sol taraf: Modüller */}
-        <div className="flex-1 p-3">
-          <div className="grid grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 mb-4">
-            {/* AI Tahmin Paneli */}
+        {/* Sol taraf: L Şekilli Grid Layout */}
+        <div className="flex-1 p-4">
+          {/* L Şekli Layout: Üst kartlar + Sağda grafik + Sol alt kartlar */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 h-full">
+            {/* ÜST SIRA - 3 Kart (Standardize edilmiş boyutlar) */}
             <CompactModule
               title="AI Tahmin"
               value="▲ %76"
-              subtitle="BTCUSDT"
-              icon={<Bot className="w-3 h-3" />}
+              subtitle="BTCUSDT Güçlü Yükseliş"
+              icon={<Bot className="w-4 h-4" />}
               variant="success"
               badge="Güçlü"
               onClick={() => setSelectedModule('ai-prediction')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Risk Uyarı Kartları */}
             <CompactModule
-              title="Risk"
-              value="Orta"
-              subtitle="3 pozisyon"
-              icon={<AlertTriangle className="w-3 h-3" />}
+              title="Risk Uyarı"
+              value="Orta Seviye"
+              subtitle="3 pozisyon izleniyor"
+              icon={<AlertTriangle className="w-4 h-4" />}
               variant="warning"
               onClick={() => setSelectedModule('risk-alerts')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Canlı Haber Akışı */}
             <CompactModule
-              title="Haber"
+              title="Canlı Haber"
               value="Fed Kararı"
-              subtitle="2 saat önce"
-              icon={<Newspaper className="w-3 h-3" />}
+              subtitle="2 saat önce açıklandı"
+              icon={<Newspaper className="w-4 h-4" />}
               variant="info"
               onClick={() => setSelectedModule('news-feed')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Ekonomik Takvim */}
+            {/* İKİNCİ SIRA - Sol 2 kart + Sağda Grafik */}
             <CompactModule
-              title="Ekonomik"
-              value="CPI"
-              subtitle="Yarın 16:30"
-              icon={<Calendar className="w-3 h-3" />}
+              title="Ekonomik Takvim"
+              value="CPI Verisi"
+              subtitle="Yarın 16:30 (Yüksek Etki)"
+              icon={<Calendar className="w-4 h-4" />}
               variant="danger"
               onClick={() => setSelectedModule('economic-calendar')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Grafik Formasyon & Teknik Sinyal */}
             <CompactModule
-              title="Teknik"
-              value="Doji"
-              subtitle="ETH 4H"
-              icon={<Activity className="w-3 h-3" />}
+              title="Teknik Sinyal"
+              value="Doji Formasyon"
+              subtitle="ETH 4H - Dönüş sinyali"
+              icon={<Activity className="w-4 h-4" />}
               variant="info"
               onClick={() => setSelectedModule('technical-signals')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Strateji Performansı */}
+            {/* GRAFIK PANELİ - Sağda, 2 satır kaplayan alan */}
+            <div className="row-span-2 lg:row-span-2 md:col-span-2 lg:col-span-1 bg-white rounded-xl shadow-sm border border-border p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={chartSymbol}
+                    onChange={(e) => setChartSymbol(e.target.value.toUpperCase())}
+                    placeholder="BINANCE:BTCUSDT"
+                    className="text-sm px-2 py-1 border rounded-md w-32 lg:w-40"
+                  />
+                  <select 
+                    className="text-xs px-2 py-1 border rounded-md"
+                    defaultValue="1h"
+                  >
+                    <option value="1m">1m</option>
+                    <option value="5m">5m</option>
+                    <option value="15m">15m</option>
+                    <option value="1h">1h</option>
+                    <option value="4h">4h</option>
+                    <option value="1D">1D</option>
+                  </select>
+                </div>
+                <button 
+                  onClick={() => setIsChartFullscreen(true)}
+                  className="p-1 hover:bg-gray-100 rounded-md"
+                >
+                  <Maximize2 className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+              <TradingChart
+                symbol={chartSymbol}
+                height={260}
+                isFullscreen={isChartFullscreen}
+                onFullscreenChange={setIsChartFullscreen}
+              />
+            </div>
+
+            {/* ÜÇÜNCÜ SIRA - Sol 2 kart + Grafik devam ediyor */}
             <CompactModule
-              title="Performans"
+              title="Strateji Performans"
               value="+12.3%"
-              subtitle="Bu hafta"
-              icon={<TrendingUp className="w-3 h-3" />}
+              subtitle="Bu hafta kazanç oranı"
+              icon={<TrendingUp className="w-4 h-4" />}
               variant="success"
               onClick={() => setSelectedModule('strategy-performance')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Portföy Dağılımı */}
             <CompactModule
-              title="Dağılım"
-              value="65%"
-              subtitle="USDT"
-              icon={<PieChart className="w-3 h-3" />}
+              title="Portföy Dağılım"
+              value="65% USDT"
+              subtitle="Stabil coin ağırlığı"
+              icon={<PieChart className="w-4 h-4" />}
               variant="default"
               onClick={() => setSelectedModule('portfolio-distribution')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
 
-            {/* Son İşlemler */}
+            {/* DÖRDÜNCÜ SIRA - Alt son kartlar */}
             <CompactModule
-              title="İşlemler"
-              value="12"
-              subtitle="Bugün"
-              icon={<History className="w-3 h-3" />}
+              title="Son İşlemler"
+              value="12 İşlem"
+              subtitle="Bugün gerçekleştirilen"
+              icon={<History className="w-4 h-4" />}
               variant="default"
               onClick={() => setSelectedModule('recent-trades')}
-              className="min-h-[76px] max-h-[76px]"
+              className="min-w-[200px] h-[96px] text-base"
             />
-          </div>
 
-          {/* Grafik Paneli - kompakt ve düzgün */}
-          <div className="w-full">
-            <TradingChart
-              symbol={chartSymbol}
-              height={340}
-              isFullscreen={isChartFullscreen}
-              onFullscreenChange={setIsChartFullscreen}
+            <CompactModule
+              title="Hızlı Eylem"
+              value="Strateji Başlat"
+              subtitle="Yeni bot yapılandır"
+              icon={<Zap className="w-4 h-4" />}
+              variant="info"
+              onClick={() => setSelectedModule('quick-actions')}
+              className="min-w-[200px] h-[96px] text-base"
             />
+
+            {/* Grafik paneli buraya kadar uzanıyor */}
           </div>
         </div>
 
@@ -244,6 +281,13 @@ export const Dashboard: React.FC = () => {
                 {selectedModule === 'technical-signals' && 'Teknik Sinyaller'}
                 {selectedModule === 'portfolio-distribution' && 'Portföy Dağılımı'}
                 {selectedModule === 'recent-trades' && 'Son İşlemler'}
+                {selectedModule === 'quick-actions' && 'Hızlı Eylemler'}
+                {selectedModule === 'strategy-performance' && 'Strateji Performansı'}
+                {selectedModule === 'portfolio' && 'Portföy Özeti'}
+                {selectedModule === 'daily-pnl' && 'Günlük K/Z'}
+                {selectedModule === 'total-pnl' && 'Toplam K/Z'}
+                {selectedModule === 'win-rate' && 'Başarı Oranı'}
+                {selectedModule === 'active-strategies' && 'Aktif Stratejiler'}
               </h3>
               <button 
                 onClick={closeDetailPanel}
@@ -399,6 +443,149 @@ export const Dashboard: React.FC = () => {
                       <div className="text-xs text-muted-foreground">RSI Bot • 12:30</div>
                     </div>
                     <span className="text-red-600 font-medium">-$25</span>
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'quick-actions' && (
+                <div className="space-y-3">
+                  <button className="w-full p-2 bg-green-50 text-green-700 rounded-md text-sm font-medium hover:bg-green-100">
+                    + Grid Bot Başlat
+                  </button>
+                  <button className="w-full p-2 bg-blue-50 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-100">
+                    + Scalping Bot
+                  </button>
+                  <button className="w-full p-2 bg-purple-50 text-purple-700 rounded-md text-sm font-medium hover:bg-purple-100">
+                    + RSI Stratejisi
+                  </button>
+                  <button className="w-full p-2 bg-orange-50 text-orange-700 rounded-md text-sm font-medium hover:bg-orange-100">
+                    🔄 Tüm Stratejileri Durdur
+                  </button>
+                </div>
+              )}
+
+              {selectedModule === 'strategy-performance' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Bu Hafta</span>
+                    <span className="text-green-600 font-medium">+12.3%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Bu Ay</span>
+                    <span className="text-green-600 font-medium">+28.7%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Bu Yıl</span>
+                    <span className="text-green-600 font-medium">+145.2%</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                    En İyi Performans: Grid Bot (%34.5)<br/>
+                    En Kötü: Manual Trading (-%4.2)
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'portfolio' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Toplam Değer</span>
+                    <span className="font-semibold">${portfolioData?.totalValue?.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Kullanılabilir Bakiye</span>
+                    <span>$32,500</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Pozisyonlarda</span>
+                    <span>$17,500</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                    ⚡ 24h Değişim: +2.1% ($1,050)<br/>
+                    📊 Risk Seviyesi: Orta
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'daily-pnl' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Grid Bot</span>
+                    <span className="text-green-600">+$780</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Scalper</span>
+                    <span className="text-green-600">+$470</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>RSI Bot</span>
+                    <span className="text-red-600">-$20</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-green-50 p-2 rounded">
+                    💰 Toplam Günlük: +${portfolioData?.dailyPnl?.toLocaleString()}<br/>
+                    📈 İşlem Sayısı: 47
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'total-pnl' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Başlangıç Sermaye</span>
+                    <span>$41,250</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Mevcut Toplam</span>
+                    <span className="font-semibold">$50,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Net K/Z</span>
+                    <span className="text-green-600 font-semibold">+$8,750</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-green-50 p-2 rounded">
+                    📊 ROI: +21.2%<br/>
+                    ⏱️ Ortalama günlük kazanç: $125
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'win-rate' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Kazanan İşlem</span>
+                    <span className="text-green-600">854</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Kaybeden İşlem</span>
+                    <span className="text-red-600">393</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Başarı Oranı</span>
+                    <span className="font-semibold text-blue-600">{portfolioData?.winRate}%</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
+                    🎯 En yüksek seri: 12 kazanç üst üste<br/>
+                    📉 En uzun kayıp: 4 işlem
+                  </div>
+                </div>
+              )}
+
+              {selectedModule === 'active-strategies' && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span>Grid Bot (BTCUSDT)</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">Çalışıyor</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Scalper (ETHUSDT)</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700">Çalışıyor</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>RSI Bot (BNBUSDT)</span>
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Beklemede</Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                    ⚙️ Toplam {portfolioData?.activeStrategies} strateji aktif<br/>
+                    🔋 Ortalama CPU kullanımı: %12
                   </div>
                 </div>
               )}
