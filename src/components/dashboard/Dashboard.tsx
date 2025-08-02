@@ -3,6 +3,7 @@ import { TradingAssistant } from '../ai/TradingAssistant'
 import { NotificationCenter } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 import { CompactModule } from './CompactModule'
+import { AdvancedTradingChart } from '../charts/AdvancedTradingChart'
 import { useAIWatch, MarketData, TechnicalSignal, RiskAlert, NewsItem, EconomicEvent } from '../../services/aiWatchService'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
@@ -471,6 +472,19 @@ export function Dashboard() {
             onClick={() => setSelectedModule('trades')}
           />
           
+        </div>
+
+        {/* TradingView Benzeri Gelişmiş Grafik Paneli */}
+        <div className="mt-6 max-w-6xl">
+          <AdvancedTradingChart
+            initialSymbol="BTCUSDT"
+            compactHeight={180}
+            expandedHeight={600}
+            onSignalClick={(signal) => {
+              console.log('Signal clicked:', signal)
+              // Sinyal detayını göstermek için modal açılabilir
+            }}
+          />
         </div>
       </div>
 
