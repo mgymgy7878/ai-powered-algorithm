@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -210,7 +209,12 @@ export default function Summary() {
                       {metric.status}
                     </Badge>
                   </div>
-                  <Progress value={metric.value} className="h-2" />
+                  <div className="bg-muted h-2 rounded">
+                    <div 
+                      className="bg-primary h-2 rounded"
+                      style={{ width: `${metric.value}%` }}
+                    />
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {metric.value}% / {metric.max}%
                   </div>
