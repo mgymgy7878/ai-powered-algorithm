@@ -16,19 +16,19 @@ interface CompactModuleProps {
 }
 
 const variantStyles = {
-  default: 'bg-gray-50 hover:bg-gray-100 border-gray-400 text-gray-900',
-  success: 'bg-green-50 hover:bg-green-100 border-green-500 text-green-900',
-  warning: 'bg-yellow-50 hover:bg-yellow-100 border-yellow-500 text-yellow-900',
-  danger: 'bg-red-50 hover:bg-red-100 border-red-500 text-red-900',
-  info: 'bg-blue-50 hover:bg-blue-100 border-blue-500 text-blue-900'
+  default: 'bg-gray-50 hover:bg-gray-100 border-gray-500 text-gray-900',
+  success: 'bg-green-50/80 hover:bg-green-100 border-green-600 text-green-900',
+  warning: 'bg-yellow-50/80 hover:bg-yellow-100 border-yellow-600 text-yellow-900',
+  danger: 'bg-red-50/80 hover:bg-red-100 border-red-600 text-red-900',
+  info: 'bg-blue-50/80 hover:bg-blue-100 border-blue-600 text-blue-900'
 };
 
 const valueVariantStyles = {
-  default: 'text-gray-900',
-  success: 'text-green-700',
-  warning: 'text-yellow-700',
-  danger: 'text-red-700',
-  info: 'text-blue-700'
+  default: 'text-gray-800',
+  success: 'text-green-800',
+  warning: 'text-yellow-800',
+  danger: 'text-red-800',
+  info: 'text-blue-800'
 };
 
 export const CompactModule: React.FC<CompactModuleProps> = ({
@@ -46,14 +46,14 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
   return (
     <Card 
       className={cn(
-        'px-2 py-1.5 min-h-[60px] max-h-[60px] transition-all duration-200 cursor-pointer select-none border-2 shadow-sm overflow-hidden',
+        'px-2 py-1.5 min-h-[64px] max-h-[64px] transition-all duration-200 cursor-pointer select-none border-2 shadow-sm overflow-hidden flex',
         variantStyles[variant],
-        isClickable && 'hover:shadow-md hover:scale-[1.02]',
+        isClickable && 'hover:shadow-md hover:scale-[1.01]',
         className
       )}
       onClick={onClick}
     >
-      <div className="flex flex-col h-full justify-between">
+      <div className="flex flex-col h-full justify-between w-full">
         {/* Üst kısım: Başlık ve ikon */}
         <div className="flex items-center justify-between gap-1 mb-1">
           <div className="flex items-center gap-1 min-w-0 flex-1">
@@ -62,13 +62,13 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
                 {icon}
               </div>
             )}
-            <h3 className="text-[10px] font-bold leading-tight truncate">
+            <h3 className="text-[10px] font-bold leading-tight truncate" title={title}>
               {title}
             </h3>
           </div>
           
           {badge && (
-            <Badge variant="outline" className="text-[8px] h-3 px-1 py-0 leading-none bg-white/80">
+            <Badge variant="outline" className="text-[8px] h-3 px-1 py-0 leading-none bg-white/90 border-current">
               {badge}
             </Badge>
           )}
@@ -78,7 +78,7 @@ export const CompactModule: React.FC<CompactModuleProps> = ({
         <div className="flex items-end justify-between gap-1">
           <div className="min-w-0 flex-1">
             {subtitle && (
-              <p className="text-[8px] text-muted-foreground/90 leading-tight truncate mb-0.5" title={subtitle}>
+              <p className="text-[9px] text-muted-foreground/80 leading-tight truncate mb-0.5" title={subtitle}>
                 {subtitle}
               </p>
             )}
