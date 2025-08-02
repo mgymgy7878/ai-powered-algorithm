@@ -39,21 +39,35 @@ interface NavigationItem {
 export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningStrategiesCount = 0 }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   
+  // Debug: Sidebar durumunu logla
+  useEffect(() => {
+    console.log('🔍 Sidebar Debug:', {
+      isOpen: isSidebarOpen,
+      currentView,
+      navigationItems: navigation.length
+    })
+  }, [isSidebarOpen, currentView, navigation])
+  
   // Memoize navigation items to prevent unnecessary re-renders
-  const navigation = useMemo<NavigationItem[]>(() => [
-    { id: 'dashboard', label: 'Anasayfa', icon: Home },
-    { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount || 0 },
-    { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount || 0 },
-    { id: 'backtest', label: 'Backtesting', icon: BarChart },
-    { id: 'portfolio', label: 'Portföy', icon: PieChart },
-    { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
-    { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
-    { id: 'websocket-test', label: '📡 WebSocket Test', icon: Wifi },
-    { id: 'summary', label: '📊 Özet', icon: FileText },
-    { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck },
-    { id: 'test', label: '🧪 Test', icon: TestTube },
-    { id: 'settings', label: 'API Ayarları', icon: Settings },
-  ], [strategyCount, runningStrategiesCount])
+  const navigation = useMemo<NavigationItem[]>(() => {
+    const items = [
+      { id: 'dashboard', label: 'Anasayfa', icon: Home },
+      { id: 'strategies', label: 'Stratejiler', icon: Cpu, badge: strategyCount || 0 },
+      { id: 'live', label: 'Çalışan Stratejiler', icon: Rocket, badge: runningStrategiesCount || 0 },
+      { id: 'backtest', label: 'Backtesting', icon: BarChart },
+      { id: 'portfolio', label: 'Portföy', icon: PieChart },
+      { id: 'analysis', label: 'Piyasa Analizi', icon: Search },
+      { id: 'economic', label: 'Ekonomik Takvim', icon: Calendar },
+      { id: 'summary', label: '📊 Özet', icon: FileText },
+      { id: 'project-analysis', label: '📋 Proje Durumu', icon: ClipboardCheck },
+      { id: 'test', label: '🧪 Test', icon: TestTube },
+      { id: 'websocket-test', label: '📡 WebSocket Test', icon: Wifi },
+      { id: 'settings', label: 'API Ayarları', icon: Settings },
+    ] as NavigationItem[]
+    
+    console.log('🔍 Navigation Items:', items.map(item => `${item.id} -> ${item.label}`))
+    return items
+  }, [strategyCount, runningStrategiesCount])
   
   // Memoize the toggle handler
   const handleToggle = useCallback(() => {
@@ -85,6 +99,9 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
         aria-label={isSidebarOpen ? 'Menüyü Gizle' : 'Menüyü Göster'}
       >
         {isSidebarOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
+        <span className="absolute top-full left-0 mt-1 text-xs bg-red-500 text-white px-1 rounded">
+          {isSidebarOpen ? 'AÇIK' : 'KAPALI'}
+        </span>
       </Button>
 
       {/* Sidebar */}
@@ -133,6 +150,7 @@ const NavigationButton = React.memo<{
   const Icon = item.icon
   
   const handleClick = useCallback(() => {
+    console.log(`🔗 Navigation clicked: ${item.id} -> ${item.label}`)
     onClick(item.id)
   }, [item.id, onClick])
   

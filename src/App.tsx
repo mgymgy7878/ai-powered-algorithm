@@ -53,6 +53,7 @@ function App() {
 
   // Optimized view change handler
   const handleViewChange = useCallback((newView: AppView) => {
+    console.log(`🔄 View change: ${currentView} -> ${newView}`)
     if (currentView !== newView) {
       setCurrentView(newView)
     }
@@ -110,6 +111,8 @@ function App() {
   }, [apiSettings])
 
   const renderView = () => {
+    console.log(`🎯 Rendering view: ${currentView}`)
+    
     const LoadingFallback = () => (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
