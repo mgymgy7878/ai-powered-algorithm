@@ -3,7 +3,9 @@ import { TradingAssistant } from '../ai/TradingAssistant'
 import { NotificationCenter } from '../ui/NotificationCenter'
 import { useActivity } from '../../contexts/ActivityContext'
 import { CompactModule } from './CompactModule'
-import { AdvancedTradingChart } from '../charts/AdvancedTradingChart'
+import { TradingChartMini } from '../chart/TradingChartMini'
+import { TradingChartFull } from '../chart/TradingChartFull'
+import { useSymbolStore } from '../../store/useSymbolStore'
 import { useAIWatch, MarketData, TechnicalSignal, RiskAlert, NewsItem, EconomicEvent } from '../../services/aiWatchService'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
@@ -24,6 +26,7 @@ import {
 export function Dashboard() {
   const { activities, addActivity } = useActivity()
   const { isActive, startWatching, stopWatching, subscribe, unsubscribe } = useAIWatch()
+  const { isFullscreen, toggleFullscreen } = useSymbolStore()
   
   // State for each module
   const [watchlistData, setWatchlistData] = useState<MarketData[]>([])
@@ -474,19 +477,19 @@ export function Dashboard() {
           
         </div>
 
-        {/* TradingView Benzeri Gelişmiş Grafik Paneli */}
+        {/* Multi-Asset TradingView Benzeri Grafik Paneli */}
         <div className="mt-6 max-w-6xl">
-          <AdvancedTradingChart
-            initialSymbol="BTCUSDT"
-            compactHeight={180}
-            expandedHeight={600}
-            onSignalClick={(signal) => {
-              console.log('Signal clicked:', signal)
-              // Sinyal detayını göstermek için modal açılabilir
-            }}
+          <TradingChartMini
+            height={180}
+            onFullscreenClick={() => toggleFullscreen()}
           />
         </div>
       </div>
+
+      {/* Fullscreen Chart Modal */}
+      {isFullscreen && (
+        <TradingChartFull onClose={() => toggleFullscreen()} />
+      )}
 
       {/* Detay Paneli - Kompakt */}
       <Sheet open={!!selectedModule} onOpenChange={() => setSelectedModule(null)}>
