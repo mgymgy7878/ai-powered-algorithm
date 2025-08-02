@@ -7,11 +7,14 @@ import { Loader2, FileText, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function ProjectAnalysis() {
+  console.log('📋 ProjectAnalysis component is being rendered!')
+  
   const [markdown, setMarkdown] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log('📋 ProjectAnalysis component has mounted!')
     const fetchMarkdown = async () => {
       try {
         setLoading(true)

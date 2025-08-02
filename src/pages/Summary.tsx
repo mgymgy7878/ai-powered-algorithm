@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -13,6 +13,12 @@ import {
 } from 'lucide-react'
 
 export default function Summary() {
+  console.log('📊 Summary component is being rendered!')
+  
+  useEffect(() => {
+    console.log('📊 Summary component has mounted!')
+  }, [])
+  
   // Mock data for demonstration
   const summaryData = {
     portfolioValue: 50000.00,

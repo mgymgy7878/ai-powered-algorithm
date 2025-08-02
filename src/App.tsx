@@ -23,6 +23,12 @@ export type AppView = 'dashboard' | 'strategies' | 'backtest' | 'live' | 'portfo
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
+  
+  // Debug için currentView değişikliklerini izle
+  useEffect(() => {
+    console.log('🎯 currentView changed to:', currentView)
+  }, [currentView])
+  
   const [strategies] = useKV<any[]>('trading-strategies', [])
   const [liveStrategies] = useKV<any[]>('live-strategies', [])
   const [apiSettings] = useKV<APISettingsType>('api-settings', {
@@ -95,7 +101,8 @@ function App() {
   }, [apiSettings])
 
   const renderView = () => {
-    console.log('Current view:', currentView) // Debug için
+    console.log('🎬 Current view in renderView:', currentView) // Debug için
+    console.log('🎪 Available pages: dashboard, strategies, backtest, live, portfolio, analysis, economic, summary, settings, project-analysis, test') // Debug için
     try {
       switch (currentView) {
         case 'dashboard':
@@ -113,15 +120,16 @@ function App() {
         case 'economic':
           return <EconomicCalendar />
         case 'summary':
-          console.log('Rendering Summary page')
+          console.log('📊 Rendering Summary page')
           return <Summary />
         case 'settings':
+          console.log('⚙️ Rendering APISettings page')
           return <APISettings />
         case 'project-analysis':
-          console.log('Rendering ProjectAnalysis page')
+          console.log('📋 Rendering ProjectAnalysis page')
           return <ProjectAnalysis />
         case 'test':
-          console.log('Rendering Test page')
+          console.log('🧪 Rendering Test page')
           return <Test />
         default:
           console.log('Rendering default Dashboard')

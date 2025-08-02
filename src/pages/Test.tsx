@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TestTube, CheckCircle, AlertTriangle } from 'lucide-react'
 
 export default function Test() {
+  console.log('🧪 Test component is being rendered!')
+  
+  useEffect(() => {
+    console.log('🧪 Test component has mounted!')
+  }, [])
+  
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">

@@ -82,16 +82,19 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
             const Icon = item.icon
             const isActive = currentView === item.id
             
+            console.log(`🎯 Menu item: ${item.id}, isActive: ${isActive}, currentView: ${currentView}`) // Debug log
+            
             return (
               <Button
                 key={item.id}
                 variant={isActive ? "default" : "ghost"}
                 className="w-full justify-start h-auto py-3 px-4"
                 onClick={() => {
-                  console.log('Navigating to:', item.id) // Debug log
-                  console.log('Previous view:', currentView) // Debug log
+                  console.log('🔄 Navigating to:', item.id) // Debug log
+                  console.log('📍 Previous view:', currentView) // Debug log
+                  console.log('🎯 Calling onViewChange with:', item.id) // Debug log
                   onViewChange(item.id as AppView)
-                  console.log('Navigation attempted to:', item.id) // Debug log
+                  console.log('✅ Navigation callback completed for:', item.id) // Debug log
                 }}
               >
                 <Icon className="h-5 w-5 mr-3" />
