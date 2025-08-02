@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CompactModule } from './CompactModule';
-import TradingViewWidget from '../chart/TradingViewWidget';
-import ChartModal from '../chart/ChartModal';
+import { TradingChart } from '../charts/TradingChart';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { TradingAssistant } from '../ai/TradingAssistant';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,14 +70,6 @@ export const Dashboard: React.FC = () => {
   };
 
   const closeDetailPanel = () => setSelectedModule(null);
-
-  const handleChartFullscreen = () => {
-    setIsChartFullscreen(true);
-  };
-
-  const handleChartClose = () => {
-    setIsChartFullscreen(false);
-  };
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -218,20 +209,14 @@ export const Dashboard: React.FC = () => {
 
         {/* Gelişmiş Grafik Paneli */}
         <div className="mb-6">
-          <TradingViewWidget
+          <TradingChart
             symbol={chartSymbol}
             height={280}
-            onFullscreenToggle={handleChartFullscreen}
+            isFullscreen={isChartFullscreen}
+            onFullscreenChange={setIsChartFullscreen}
           />
         </div>
       </div>
-
-      {/* Tam Ekran Grafik Modal */}
-      <ChartModal
-        isOpen={isChartFullscreen}
-        onClose={handleChartClose}
-        symbol={chartSymbol}
-      />
 
       {/* Detay panelleri */}
       {selectedModule && (

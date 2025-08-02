@@ -1,253 +1,285 @@
-import { useEffect, useRef, memo } from 'react'
-import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts'
-import type { IChartApi, ISeriesApi, UTCTimestamp, LineData, CandlestickData } from 'lightweight-charts'
-
-export interface TradeSignal {
-  time: UTCTimestamp
-  type: 'buy' | 'sell'
-  price: number
-  id: string
-}
-
-export interface ChartData {
-  candlesticks: CandlestickData[]
-  signals?: TradeSignal[]
-  volume?: Array<{ time: UTCTimestamp; value: number; color?: string }>
-}
+import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Maximize2, Minimize2, Search, TrendingUp } from '@phosphor-icons/react'
 
 interface TradingChartProps {
-  data: ChartData
-  width?: number
-  height?: number
   symbol?: string
-  timeframe?: string
-  onSignalClick?: (signal: TradeSignal) => void
+  width?: string | number
+  height?: string | number
+  isFullscreen?: boolean
+  onFullscreenChange?: (isFullscreen: boolean) => void
 }
 
-export const TradingChart = memo(function TradingChart({ 
-  data, 
-  width = 800, 
-  height = 400, 
-  symbol = 'BTCUSDT',
-  timeframe = '1h',
-  onSignalClick 
-}: TradingChartProps) {
-  const chartContainerRef = useRef<HTMLDivElement>(null)
-  const chartRef = useRef<IChartApi | null>(null)
-  const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
-  const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
-  const buySignalsRef = useRef<ISeriesApi<'Line'> | null>(null)
-  const sellSignalsRef = useRef<ISeriesApi<'Line'> | null>(null)
+export const TradingChart: React.FC<TradingChartProps> = ({
+  symbol = "BINANCE:BTCUSDT",
+  width = "100%",
+  height = 400,
+  isFullscreen = false,
+  onFullscreenChange
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const widgetRef = useRef<any>(null)
+  const [currentSymbol, setCurrentSymbol] = useState(symbol)
+  const [searchInput, setSearchInput] = useState("")
+  const [timeframe, setTimeframe] = useState("15")
+  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    if (!chartContainerRef.current) return
-
-    try {
-      // Grafik oluşturma
-      const chart = createChart(chartContainerRef.current, {
-        width,
-        height,
-        layout: {
-          backgroundColor: '#ffffff',
-          textColor: '#333',
-        },
-        grid: {
-          vertLines: { color: '#f0f0f0' },
-          horzLines: { color: '#f0f0f0' },
-        },
-        crosshair: {
-          mode: CrosshairMode.Normal,
-        },
-        rightPriceScale: {
-          borderColor: '#cccccc',
-          scaleMargins: {
-            top: 0.1,
-            bottom: 0.2,
-          },
-        },
-        timeScale: {
-          borderColor: '#cccccc',
-          timeVisible: true,
-          secondsVisible: false,
-        },
-      })
-
-      chartRef.current = chart
-
-      // Mum grafik serisi ekleme
-      const candlestickSeries = chart.addCandlestickSeries({
-        upColor: '#26a69a',
-        downColor: '#ef5350',
-        borderVisible: false,
-        wickUpColor: '#26a69a',
-        wickDownColor: '#ef5350',
-      })
-      candlestickSeriesRef.current = candlestickSeries
-
-      // Hacim serisi ekleme
-      if (data.volume && data.volume.length > 0) {
-        const volumeSeries = chart.addHistogramSeries({
-          color: '#26a69a',
-          priceFormat: {
-            type: 'volume',
-          },
-          priceScaleId: 'volume',
-          scaleMargins: {
-            top: 0.8,
-            bottom: 0,
-          },
-        })
-        volumeSeriesRef.current = volumeSeries
-        volumeSeries.setData(data.volume)
-      }
-
-      // Alım sinyalleri için çizgi serisi
-      const buySignals = chart.addLineSeries({
-        color: 'transparent',
-        lineWidth: 0,
-        crosshairMarkerVisible: false,
-        lastValueVisible: false,
-        priceLineVisible: false,
-      })
-      buySignalsRef.current = buySignals
-
-      // Satım sinyalleri için çizgi serisi  
-      const sellSignals = chart.addLineSeries({
-        color: 'transparent',
-        lineWidth: 0,
-        crosshairMarkerVisible: false,
-        lastValueVisible: false,
-        priceLineVisible: false,
-      })
-      sellSignalsRef.current = sellSignals
-
-      return () => {
-        try {
-          chart.remove()
-        } catch (error) {
-          console.error('Grafik temizlenirken hata:', error)
-        }
-      }
-    } catch (error) {
-      console.error('Grafik oluşturulurken hata:', error)
-    }
-  }, [width, height])
-
-  // Veri güncellemesi
-  useEffect(() => {
-    if (!chartRef.current || !candlestickSeriesRef.current) return
-
-    try {
-      // Mum verilerini güncelle
-      if (data.candlesticks.length > 0) {
-        candlestickSeriesRef.current.setData(data.candlesticks)
-      }
-
-      // Sinyalleri güncelle
-      if (data.signals && data.signals.length > 0) {
-        const buyData: LineData[] = []
-        const sellData: LineData[] = []
-
-        data.signals.forEach(signal => {
-          if (signal.type === 'buy') {
-            buyData.push({ time: signal.time, value: signal.price })
-          } else {
-            sellData.push({ time: signal.time, value: signal.price })
-          }
-        })
-
-        if (buySignalsRef.current) {
-          buySignalsRef.current.setData(buyData)
-        }
-        if (sellSignalsRef.current) {
-          sellSignalsRef.current.setData(sellData)
-        }
-
-        // Sinyalleri işaretleme
-        data.signals.forEach(signal => {
-          if (!chartRef.current) return
-          
-          try {
-            chartRef.current.addPriceLine({
-              price: signal.price,
-              color: signal.type === 'buy' ? '#26a69a' : '#ef5350',
-              lineWidth: 1,
-              lineStyle: LineStyle.Dashed,
-              axisLabelVisible: false,
-              title: `${signal.type.toUpperCase()} - ${signal.price.toFixed(2)}`,
-            })
-          } catch (error) {
-            console.error('Sinyal çizgisi eklenirken hata:', error)
-          }
-        })
-      }
-
-      // Grafik boyutunu otomatik ayarla
-      chartRef.current.timeScale().fitContent()
-    } catch (error) {
-      console.error('Grafik verileri güncellenirken hata:', error)
-    }
-  }, [data])
-
-  // Sinyal tıklama olayı
-  useEffect(() => {
-    if (!chartRef.current || !onSignalClick) return
-
-    const handleClick = (param: any) => {
+  // TradingView widget yükleme fonksiyonu
+  const loadTradingView = useCallback(() => {
+    if (!containerRef.current) return
+    
+    setIsLoading(true)
+    
+    // Önceki widget'ı temizle
+    if (widgetRef.current) {
       try {
-        if (!param.time || !data.signals) return
-
-        const clickedSignal = data.signals.find(signal => signal.time === param.time)
-        if (clickedSignal) {
-          onSignalClick(clickedSignal)
-        }
-      } catch (error) {
-        console.error('Sinyal tıklama işlenirken hata:', error)
+        widgetRef.current.remove()
+      } catch (e) {
+        console.log('Widget cleanup error:', e)
       }
     }
 
-    try {
-      chartRef.current.subscribeClick(handleClick)
+    // Container'ı temizle
+    containerRef.current.innerHTML = ''
 
-      return () => {
-        if (chartRef.current) {
-          try {
-            chartRef.current.unsubscribeClick(handleClick)
-          } catch (error) {
-            console.error('Tıklama olayı kaldırılırken hata:', error)
-          }
+    // Yeni widget container div'i oluştur
+    const widgetDiv = document.createElement('div')
+    widgetDiv.id = `tradingview-widget-${Date.now()}`
+    containerRef.current.appendChild(widgetDiv)
+
+    // TradingView script'i yükle veya mevcut olanı kullan
+    const loadWidget = () => {
+      // @ts-ignore
+      if (typeof window.TradingView !== 'undefined') {
+        try {
+          // @ts-ignore
+          widgetRef.current = new window.TradingView.widget({
+            autosize: true,
+            symbol: currentSymbol,
+            interval: timeframe,
+            timezone: "Etc/UTC",
+            theme: "light",
+            style: "1",
+            locale: "tr",
+            toolbar_bg: "#f1f3f6",
+            enable_publishing: false,
+            allow_symbol_change: true,
+            container_id: widgetDiv.id,
+            hide_side_toolbar: isFullscreen ? false : true,
+            hide_top_toolbar: false,
+            hide_legend: isFullscreen ? false : true,
+            studies: isFullscreen ? [] : [],
+            overrides: {
+              "paneProperties.background": "#ffffff",
+              "paneProperties.vertGridProperties.color": "#f0f0f0",
+              "paneProperties.horzGridProperties.color": "#f0f0f0"
+            },
+            onChartReady: () => {
+              setIsLoading(false)
+            }
+          })
+        } catch (error) {
+          console.error('TradingView widget creation error:', error)
+          setIsLoading(false)
         }
       }
-    } catch (error) {
-      console.error('Tıklama olayı eklenirken hata:', error)
     }
-  }, [data.signals, onSignalClick])
 
-  return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          <h3 className="text-lg font-semibold">{symbol}</h3>
-          <span className="text-sm text-muted-foreground">{timeframe}</span>
-        </div>
-        {data.signals && (
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-accent rounded-full"></div>
-              <span>Alım Sinyali ({data.signals.filter(s => s.type === 'buy').length})</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-destructive rounded-full"></div>
-              <span>Satım Sinyali ({data.signals.filter(s => s.type === 'sell').length})</span>
-            </div>
+    // TradingView script'i kontrol et
+    // @ts-ignore
+    if (typeof window.TradingView === 'undefined') {
+      const script = document.createElement("script")
+      script.src = "https://s3.tradingview.com/tv.js"
+      script.async = true
+      script.onload = loadWidget
+      script.onerror = () => {
+        console.error('TradingView script loading failed')
+        setIsLoading(false)
+      }
+      document.head.appendChild(script)
+    } else {
+      loadWidget()
+    }
+  }, [currentSymbol, timeframe, isFullscreen])
+
+  // Widget yükleme
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadTradingView()
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [loadTradingView])
+
+  // Sembol değişikliği
+  const handleSymbolChange = (newSymbol: string) => {
+    const processedSymbol = newSymbol.toUpperCase().trim()
+    
+    // Otomatik prefix ekleme
+    let finalSymbol = processedSymbol
+    if (!processedSymbol.includes(':')) {
+      if (processedSymbol.includes('USDT') || processedSymbol.includes('BTC')) {
+        finalSymbol = `BINANCE:${processedSymbol}`
+      } else if (processedSymbol.match(/^[A-Z]{1,4}$/)) {
+        finalSymbol = `NASDAQ:${processedSymbol}`
+      } else if (processedSymbol.includes('USD') && processedSymbol.length === 6) {
+        finalSymbol = `OANDA:${processedSymbol}`
+      }
+    }
+    
+    setCurrentSymbol(finalSymbol)
+    setSearchInput("")
+  }
+
+  // Tam ekran toggle
+  const toggleFullscreen = () => {
+    onFullscreenChange?.(!isFullscreen)
+  }
+
+  // Popüler semboller
+  const popularSymbols = [
+    { label: "BTC/USDT", value: "BINANCE:BTCUSDT" },
+    { label: "ETH/USDT", value: "BINANCE:ETHUSDT" },
+    { label: "AAPL", value: "NASDAQ:AAPL" },
+    { label: "TSLA", value: "NASDAQ:TSLA" },
+    { label: "XAU/USD", value: "OANDA:XAUUSD" },
+    { label: "EUR/USD", value: "OANDA:EURUSD" }
+  ]
+
+  const ChartContent = () => (
+    <>
+      {/* Başlık ve Kontroller */}
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            <h3 className="text-sm font-semibold text-gray-800">
+              Grafik Analizi
+            </h3>
+            <span className="text-xs text-gray-500 font-mono">
+              {currentSymbol}
+            </span>
           </div>
-        )}
-      </div>
-      <div 
-        ref={chartContainerRef} 
-        className="border rounded-lg overflow-hidden bg-white"
-        style={{ width: '100%', height: `${height}px` }}
-      />
-    </div>
+
+          <div className="flex items-center gap-2">
+            {/* Popüler Semboller */}
+            <div className="hidden md:flex gap-1">
+              {popularSymbols.slice(0, 3).map((sym) => (
+                <Button
+                  key={sym.value}
+                  variant={currentSymbol === sym.value ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs h-7"
+                  onClick={() => handleSymbolChange(sym.value)}
+                >
+                  {sym.label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Timeframe Seçici */}
+            <Select value={timeframe} onValueChange={setTimeframe}>
+              <SelectTrigger className="w-20 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1m</SelectItem>
+                <SelectItem value="5">5m</SelectItem>
+                <SelectItem value="15">15m</SelectItem>
+                <SelectItem value="30">30m</SelectItem>
+                <SelectItem value="60">1h</SelectItem>
+                <SelectItem value="240">4h</SelectItem>
+                <SelectItem value="D">1D</SelectItem>
+                <SelectItem value="W">1W</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Tam Ekran Butonu */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="w-4 h-4" />
+              ) : (
+                <Maximize2 className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Sembol Arama */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="BTCUSDT, AAPL, XAUUSD..."
+              className="pl-10 h-8 text-xs"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchInput.trim()) {
+                  handleSymbolChange(searchInput)
+                }
+              }}
+            />
+          </div>
+          <Button
+            size="sm"
+            className="h-8"
+            onClick={() => searchInput.trim() && handleSymbolChange(searchInput)}
+            disabled={!searchInput.trim()}
+          >
+            Ara
+          </Button>
+        </div>
+      </CardHeader>
+
+      {/* Grafik İçeriği */}
+      <CardContent className="p-0">
+        <div className="relative">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+              <div className="flex flex-col items-center gap-2">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                <span className="text-xs text-gray-600">Grafik yükleniyor...</span>
+              </div>
+            </div>
+          )}
+          <div
+            ref={containerRef}
+            style={{ 
+              width, 
+              height: isFullscreen ? 'calc(100vh - 180px)' : height,
+              minHeight: isFullscreen ? '600px' : '300px'
+            }}
+            className="rounded-b-lg overflow-hidden"
+          />
+        </div>
+      </CardContent>
+    </>
   )
-})
+
+  // Tam ekran modu
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white">
+        <Card className="h-full rounded-none border-0">
+          <ChartContent />
+        </Card>
+      </div>
+    )
+  }
+
+  // Normal mod
+  return (
+    <Card className="w-full shadow-md">
+      <ChartContent />
+    </Card>
+  )
+}
