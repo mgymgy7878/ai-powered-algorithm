@@ -1,383 +1,334 @@
-# AI Trading Platform - Proje Analizi
+# 📊 AI-Powered Algorithmic Trading Platform - Proje Analizi
+
+Bu dosya, Spark tabanlı AI destekli algoritmik trading platformunun kapsamlı analizini, mevcut özellikleri, teknik borçları ve gelecekteki geliştirme önerilerini içermektedir.
+
+---
 
 ## 🧠 Proje Özeti
 
-**AI Trading Platform**, algoritmik trading stratejileri geliştirmek, test etmek ve canlı ortamda çalıştırmak için tasarlanmış kapsamlı bir web uygulamasıdır. Platform, Matriks IQ Algo modülünden ilham alınarak geliştirilmiş ve Cursor benzeri yapay zeka destekli kod editörü özellikleriyle güçlendirilmiştir.
+**AI Destekli Algoritmik Trading IDE** - MatrixIQ Algo Modülünden esinlenen, Cursor Agent seviyesinde yapay zeka desteği sunan modern web tabanlı trading platformu. Kullanıcılar doğal dilde strateji tanımlayabilir, AI destekli kod editörü ile stratejilerini geliştirebilir ve gerçek zamanlı piyasa verisiyle test edebilirler.
 
-### Temel Hedefler:
-- **AI Destekli Strateji Geliştirme**: Kullanıcılar doğal dilde komutlar vererek trading stratejileri oluşturabilir
-- **Kapsamlı Backtesting**: Geliştirilen stratejilerin geçmiş verilerle test edilmesi
-- **Canlı Trading**: Gerçek zamanlı piyasa verisiyle otomatik işlem yapma
-- **Portfolio Yönetimi**: Detaylı portföy analizi ve risk yönetimi
-- **AI Trading Yöneticisi**: Piyasa koşullarını analiz eden ve strateji önerileri sunan AI asistan
+### 🎯 Temel Hedefler
+- **AI-First Yaklaşım**: Yapay zeka desteğiyle kod yazma, hata giderme ve optimizasyon
+- **Sezgisel UX**: MatrixIQ kullanıcılarına tanıdık, modern arayüz
+- **Gerçek Zamanlı İşlem**: Canlı piyasa verisi ve otomatik strateji yürütme
+- **Türkçe Yerelleştirme**: Tam Türkçe kullanıcı deneyimi
+
+---
 
 ## ⚙️ Kullanılan Teknolojiler
 
-### Frontend Framework & UI
-- **React 18** - Ana framework
-- **TypeScript** - Tip güvenliği
-- **Vite** - Build tool ve development server
-- **Tailwind CSS** - Styling framework
-- **shadcn/ui** - UI component library
-- **Radix UI** - Headless UI primitives
+### 🔧 Ana Framework ve Kütüphaneler
+- **React 19.0.0** - Modern UI bileşen mimarisi
+- **TypeScript** - Tip güvenli geliştirme
+- **Vite 6.3.5** - Hızlı build sistemi
+- **Tailwind CSS 4.0.17** - Utility-first CSS framework
+- **Spark Framework** - GitHub Spark altyapısı
 
-### State Management & Data
-- **GitHub Spark KV** - Persistent data storage
-- **React Context** - Activity management
-- **React Hooks** - State management (useState, useEffect, useKV)
+### 🎨 UI/UX Bileşenleri
+- **shadcn/ui** - Radix UI tabanlı modern bileşenler
+- **Lucide React 0.484.0** - İkon kütüphanesi
+- **Phosphor Icons 2.1.7** - İkon kütüphanesi
+- **Framer Motion 12.6.2** - Animasyon kütüphanesi
+- **Sonner 2.0.1** - Toast bildirimi sistemi
 
-### API Integrations
-- **OpenAI API** - GPT-4 destekli AI asistan
-- **Anthropic Claude API** - Alternatif AI model
-- **Binance API** - Kripto piyasa verileri ve trading
-- **Economic Calendar APIs** - Makroekonomik veriler
+### 📊 Veri Görselleştirme ve Grafikler
+- **Lightweight Charts 5.0.8** - Finansal grafikler için
+- **Recharts 2.15.1** - Genel grafik bileşenleri
+- **D3.js 7.9.0** - Gelişmiş veri görselleştirme
 
-### Fonts & Icons
-- **Inter Font** - Ana UI fontu
-- **JetBrains Mono** - Kod editörü için monospace font
-- **Phosphor Icons** - Icon set
-- **Lucide React** - Additional icons
+### 🤖 AI ve API Entegrasyonları
+- **Monaco Editor 0.52.2** - Kod editörü (VS Code benzeri)
+- **Crypto-JS 4.2.0** - Binance API signature için
+- **Marked 15.0.7** - Markdown parsing (AI yanıtları için)
+
+### 🔒 Güvenlik ve Doğrulama
+- **Zod 3.24.2** - Şema doğrulama
+- **React Hook Form 7.54.2** - Form yönetimi
+- **UUID 11.1.0** - Benzersiz kimlik üretimi
+
+---
 
 ## ✅ Mevcut Özellikler
 
-### 1. Dashboard (Anasayfa)
-- **Portfolio Metrics**: Portföy değeri, günlük/toplam K/Z, başarı oranı
-- **Live Statistics**: Aktif stratejiler, işlem sayıları
-- **Notification System**: Gerçek zamanlı bildirimler
-- **AI Trading Assistant**: Sohbet tabanlı AI yardımcısı
+### 📈 Dashboard ve Ana Panel
+- **Portföy Özeti**: Değer, günlük/toplam K/Z, başarı oranı gösterimi
+- **Performans Metrikleri**: Aktif stratejiler, işlem sayısı, drawdown
+- **AI Trading Yöneticisi**: Sağ üst panelde sabit AI sohbet kutusu
+- **Bildirim Sistemi**: Üst panelde sistem bildirimleri
+- **Responsive Tasarım**: Mobil uyumlu arayüz
 
-### 2. Strateji Yönetimi
-- **Strategy Library**: Hazır strateji şablonları
-- **Custom Strategies**: Kullanıcı tanımlı stratejiler
-- **Code Editor**: Syntax highlighting ile C# kod editörü
-- **AI Code Generation**: Doğal dil komutlarıyla kod üretimi
+### 🧠 AI Özellikler
+- **Multi-Model Desteği**: OpenAI GPT-4o ve Anthropic Claude entegrasyonu
+- **Doğal Dil İşleme**: Türkçe komutlarla strateji üretimi
+- **Akıllı Kod Tamamlama**: Monaco Editor tabanlı AI destekli editör
+- **Strateji Analizi**: AI tabanlı backtest sonuç yorumlama
+- **AI Trade Pilot**: Piyasa koşullarına göre otomatik strateji önerileri
 
-### 3. Backtesting Engine
-- **Historical Data**: Geçmiş piyasa verisi analizi
-- **Performance Metrics**: Sharpe ratio, max drawdown, kazanma oranı
-- **Visual Reports**: Grafik tabanlı sonuç görselleştirme
-- **Parameter Optimization**: Strateji parametrelerini optimize etme
+### 📊 Strateji Yönetimi
+- **Strateji Editörü**: C# tabanlı kod editörü
+- **Template Sistemi**: Hazır strateji şablonları
+- **Strateji Kütüphanesi**: Kullanıcı stratejileri ve paylaşım
+- **Backtest Motoru**: Geçmiş verilerle strateji testi
+- **Canlı İşlem**: Gerçek zamanlı strateji yürütme
 
-### 4. Live Trading
-- **Real-time Data**: Canlı piyasa veri akışı
-- **Auto Execution**: Otomatik emir gönderimi
-- **Risk Management**: Stop-loss, take-profit mekanizmaları
-- **Position Tracking**: Açık pozisyonları izleme
+### 🔗 Piyasa Veri Entegrasyonları
+- **Binance API**: Spot ve vadeli işlem verileri
+- **Gerçek Zamanlı Kline**: Mum grafik verileri
+- **Hesap Bilgileri**: Bakiye ve pozisyon takibi
+- **Emir Yönetimi**: Otomatik al/sat emirleri
+- **Ekonomik Takvim**: Makro ekonomik olaylar
 
-### 5. Portfolio Management
-- **Asset Allocation**: Varlık dağılımı görünümü
-- **P&L Analysis**: Detaylı kar/zarar analizi
-- **Risk Metrics**: Portfolio risk değerlendirmesi
-- **Transaction History**: İşlem geçmişi
+### ⚙️ Ayarlar ve Konfigürasyon
+- **API Yönetimi**: OpenAI, Claude, Binance anahtarları
+- **Model Seçimi**: AI sağlayıcı tercihleri
+- **Bildirim Ayarları**: Uyarı ve bildirim konfigürasyonu
+- **Güvenlik**: Testnet/mainnet geçişi
 
-### 6. Market Analysis
-- **Technical Indicators**: 50+ teknik gösterge
-- **Chart Analysis**: Multi-timeframe grafik analizi
-- **Market Scanner**: Piyasa tarayıcı
-- **Signal Detection**: Otomatik sinyal tespiti
-
-### 7. AI Trading Assistant
-- **Natural Language Processing**: Türkçe komut anlama
-- **Market Commentary**: Piyasa yorumu ve analiz
-- **Strategy Recommendations**: AI destekli strateji önerileri
-- **Real-time Notifications**: Anlık piyasa uyarıları
-
-### 8. Economic Calendar
-- **Economic Events**: Makroekonomik olaylar takibi
-- **Impact Analysis**: Olayların piyasa etkisi analizi
-- **Auto Trading Pause**: Önemli haberler öncesi otomatik durdurma
-
-### 9. API Settings
-- **Multi-Provider Support**: OpenAI, Claude, Binance API desteği
-- **Secure Storage**: API anahtarları güvenli saklama
-- **Connection Testing**: API bağlantı testleri
+---
 
 ## 🧱 Kod Yapısı ve Klasör Organizasyonu
 
 ```
 src/
 ├── components/
-│   ├── analysis/          # Market analiz bileşenleri
-│   ├── backtest/          # Backtesting motor
-│   ├── dashboard/         # Dashboard bileşenleri
-│   ├── economic/          # Ekonomik takvim
-│   ├── ai/               # AI asistan bileşenleri
-│   ├── layout/           # Layout bileşenleri (Sidebar, Navigation)
-│   ├── live/             # Canlı trading bileşenleri
-│   ├── portfolio/        # Portfolio yönetimi
-│   ├── settings/         # Ayarlar sayfaları
-│   ├── strategy/         # Strateji yönetimi
-│   └── ui/               # shadcn/ui bileşenleri
-├── contexts/
-│   └── ActivityContext.tsx  # Activity state management
+│   ├── ai/              # AI bileşenleri
+│   │   ├── TradingAssistant.tsx    # Ana AI sohbet paneli
+│   │   ├── AIConfiguration.tsx     # AI ayarları
+│   │   └── AITestPanel.tsx         # AI test arayüzü
+│   ├── strategy/        # Strateji yönetimi
+│   │   ├── StrategiesPage.tsx      # Strateji listesi
+│   │   ├── StrategyEditor.tsx      # Kod editörü
+│   │   ├── CodeEditor.tsx          # Monaco editör wrapper
+│   │   └── StrategyGenerator.tsx   # AI strateji üreteci
+│   ├── dashboard/       # Ana panel bileşenleri
+│   ├── charts/          # Grafik bileşenleri
+│   ├── settings/        # Ayar panelleri
+│   └── ui/              # shadcn/ui bileşenleri
 ├── services/
-│   ├── aiService.ts         # AI API service
-│   ├── binanceService.ts    # Binance API service
-│   └── economicService.ts   # Economic data service
+│   ├── aiService.ts     # AI API servisleri
+│   ├── binanceService.ts # Binance API entegrasyonu
+│   ├── backtestEngine.ts # Backtest motor
+│   └── dataService.ts   # Veri yönetimi
 ├── types/
-│   ├── api.ts              # API tip tanımları
-│   ├── strategy.ts         # Strateji tip tanımları
-│   └── trading.ts          # Trading tip tanımları
-├── lib/
-│   └── utils.ts            # Utility fonksiyonları
-├── App.tsx                 # Ana uygulama bileşeni
-├── main.tsx               # Entry point (değiştirilmez)
-└── index.css              # Global stiller
+│   ├── trading.ts       # Trading tip tanımları
+│   ├── api.ts           # API tip tanımları
+│   └── notification.ts  # Bildirim tipleri
+├── contexts/            # React Context'leri
+├── hooks/               # Custom hook'lar
+└── utils/               # Yardımcı fonksiyonlar
 ```
-
-## 🛠️ Teknik Borçlar ve Eksik Özellikler
-
-### Kritik Eksikler
-
-#### 1. **Gerçek Veri Entegrasyonu**
-- ❌ Backtesting için gerçek historical data yoktu
-- ❌ Canlı piyasa veri akışı tam implementasyon eksik
-- ❌ Binance API entegrasyonu tamamlanmadı
-
-#### 2. **Strateji Editörü**
-- ❌ Monaco/CodeMirror tabanlı advanced kod editörü eksik
-- ❌ Intellisense ve otomatik tamamlama özellikleri yok
-- ❌ Syntax error detection ve validation eksik
-- ❌ Code compilation ve execution engine yok
-
-#### 3. **AI Integration**
-- ❌ OpenAI/Claude API çağrıları tam implementasyonu eksik
-- ❌ Prompt engineering optimizasyonu yapılmadı
-- ❌ AI model response parsing ve validation eksik
-
-#### 4. **Database & Persistence**
-- ❌ Complex data queries için yerel SQLite database eksik
-- ❌ Historical data storage optimizasyonu yok
-- ❌ Data backup ve migration sistem yok
-
-### Performans Sorunları
-
-#### 1. **Frontend Performance**
-- ⚠️ Büyük veri setleri için virtualization eksik
-- ⚠️ Chart rendering optimizasyonu gerekli
-- ⚠️ Component memoization eksik
-
-#### 2. **Memory Management**
-- ⚠️ WebSocket connection pooling eksik
-- ⚠️ Large array handling optimization gerekli
-- ⚠️ Memory leak prevention eksik
-
-### Güvenlik Açıkları
-
-#### 1. **API Security**
-- 🔒 API key encryption strengthening gerekli
-- 🔒 Rate limiting implementation eksik
-- 🔒 Input validation ve sanitization eksik
-
-#### 2. **Data Security**
-- 🔒 Sensitive data masking eksik
-- 🔒 Audit logging eksik
-- 🔒 User session management eksik
-
-## 💡 Geliştirme Önerileri
-
-### Kısa Vadeli (1-2 Hafta)
-
-#### 1. **Core Functionality Tamamlama**
-```typescript
-// Öncelik 1: AI Service tam implementasyonu
-class AIService {
-  async generateStrategy(prompt: string): Promise<StrategyCode> {
-    // OpenAI/Claude API integration
-    // Error handling ve response validation
-    // Turkish language support
-  }
-}
-
-// Öncelik 2: Binance API entegrasyonu
-class BinanceService {
-  async getHistoricalData(symbol: string, timeframe: string): Promise<KlineData[]> {
-    // Rate limiting
-    // Error handling
-    // Data caching
-  }
-}
-```
-
-#### 2. **UI/UX Improvements**
-- **Loading States**: Tüm async operations için loading indicators
-- **Error Boundaries**: Component level error handling
-- **Toast Notifications**: User feedback sistemini güçlendirme
-- **Responsive Design**: Mobile optimization
-
-#### 3. **Code Quality**
-- **ESLint Rules**: Strict TypeScript rules
-- **Unit Testing**: Critical components için test coverage
-- **Code Documentation**: JSDoc comments
-- **Performance Monitoring**: Console warnings cleanup
-
-### Orta Vadeli (1-2 Ay)
-
-#### 1. **Advanced Features**
-```typescript
-// WebSocket real-time data
-class MarketDataService {
-  private ws: WebSocket;
-  
-  async subscribeToSymbol(symbol: string, callback: (data: MarketData) => void) {
-    // Real-time price updates
-    // Reconnection logic
-    // Data validation
-  }
-}
-
-// Advanced backtesting
-class BacktestEngine {
-  async runBacktest(strategy: Strategy, config: BacktestConfig): Promise<BacktestResult> {
-    // Multi-threading support
-    // Advanced metrics calculation
-    // Walk-forward analysis
-  }
-}
-```
-
-#### 2. **Data Management**
-```typescript
-// Local database integration
-class DatabaseService {
-  async storeHistoricalData(data: MarketData[]): Promise<void> {
-    // SQLite integration
-    // Data compression
-    // Query optimization
-  }
-}
-```
-
-#### 3. **AI Enhancements**
-```typescript
-// Advanced AI features
-class AITradeManager {
-  async analyzeMarketConditions(): Promise<MarketAnalysis> {
-    // Multi-model ensemble
-    // Sentiment analysis
-    // Risk assessment
-  }
-}
-```
-
-### Uzun Vadeli (3-6 Ay)
-
-#### 1. **Platform Expansion**
-- **Multi-Broker Support**: Interactive Brokers, MT4/MT5 integration
-- **Additional Markets**: Forex, stocks, commodities
-- **Portfolio Optimization**: Modern portfolio theory implementation
-- **Risk Management**: Advanced risk models
-
-#### 2. **Enterprise Features**
-- **User Management**: Multi-user support
-- **Team Collaboration**: Strategy sharing
-- **Audit Trails**: Comprehensive logging
-- **Compliance Tools**: Regulatory reporting
-
-#### 3. **Machine Learning**
-- **Predictive Models**: Price prediction algorithms
-- **Pattern Recognition**: Chart pattern detection
-- **Sentiment Analysis**: News and social media analysis
-- **Reinforcement Learning**: Self-improving strategies
-
-## 🗓️ Geliştirme Geçmişi ve Changelog
-
-### Sprint 1 (Başlangıç)
-- ✅ Proje kurulumu ve temel yapı
-- ✅ React + TypeScript + Vite setup
-- ✅ shadcn/ui component library entegrasyonu
-- ✅ Tailwind CSS tema konfigürasyonu
-
-### Sprint 2 (Core Components)
-- ✅ Sidebar navigation sistemi
-- ✅ Dashboard ana sayfa tasarımı
-- ✅ Strategy management sayfaları
-- ✅ Backtest engine foundation
-- ✅ Live trading interface
-
-### Sprint 3 (Data & Services)
-- ✅ GitHub Spark KV integration
-- ✅ API service abstractions
-- ✅ Type definitions (Strategy, Trading, API)
-- ✅ Context providers (Activity)
-
-### Sprint 4 (AI Integration)
-- ✅ AI Trading Assistant component
-- ✅ OpenAI/Claude API service skeleton
-- ✅ Natural language processing foundation
-- ✅ Chat interface implementation
-
-### Sprint 5 (UI/UX Polish)
-- ✅ Notification system
-- ✅ Portfolio metrics display
-- ✅ Economic calendar integration
-- ✅ API settings management
-- ✅ Responsive design improvements
-
-### Sprint 6 (Current - Bug Fixes & Optimization)
-- 🔄 AI service implementation completion
-- 🔄 Binance API integration finalization
-- 🔄 Code editor enhancements
-- 🔄 Performance optimizations
-- 🔄 Testing ve documentation
-
-## 📊 Proje Metrikleri
-
-### Kod İstatistikleri (Tahmini)
-- **Total Lines of Code**: ~15,000 LOC
-- **Components**: 40+ React components
-- **TypeScript Coverage**: 95%
-- **Custom Hooks**: 8+ hooks
-- **API Endpoints**: 20+ endpoints
-- **Type Definitions**: 50+ interfaces/types
-
-### Özellik Tamamlanma Oranı
-- **Core Infrastructure**: 90% ✅
-- **UI Components**: 85% ✅
-- **API Integration**: 60% 🔄
-- **AI Features**: 70% 🔄
-- **Testing**: 20% ❌
-- **Documentation**: 40% 🔄
-
-## 🎯 Sonraki Adımlar
-
-### Haftalık Hedefler
-
-#### Hafta 1
-1. **AI Service Implementation**
-   - OpenAI API integration completion
-   - Prompt engineering optimization
-   - Error handling improvements
-
-2. **Binance API Integration**
-   - Historical data fetching
-   - Real-time price streaming
-   - Order execution system
-
-#### Hafta 2
-1. **Code Editor Enhancement**
-   - Monaco editor integration
-   - Syntax highlighting
-   - Auto-completion features
-
-2. **Testing Implementation**
-   - Unit tests for core services
-   - Integration tests
-   - E2E testing setup
-
-#### Hafta 3-4
-1. **Performance Optimization**
-   - Component memoization
-   - Virtual scrolling
-   - Bundle size optimization
-
-2. **Production Readiness**
-   - Error monitoring
-   - Logging system
-   - Deployment configuration
 
 ---
 
-**Son Güncelleme**: 2024-12-20  
-**Versiyon**: 1.0.0-beta  
-**Geliştirici**: AI Trading Platform Team
+## 🛠️ Teknik Borç ve Eksik Özellikler
+
+### 🔴 Kritik Eksiklikler
+- [ ] **Gerçek AI API Entegrasyonu**: OpenAI/Claude API çağrıları mock
+- [ ] **Backtest Motoru**: Sadece UI var, gerçek hesaplama eksik
+- [ ] **Canlı Veri Akışı**: WebSocket bağlantıları kurulmamış
+- [ ] **Emir İletimi**: Binance emir gönderimi test edilmemiş
+- [ ] **Hata Yönetimi**: Global error boundary ve retry mekanizması
+
+### 🟡 Orta Öncelikli İyileştirmeler
+- [ ] **Performans Optimizasyonu**: Lazy loading ve memoization
+- [ ] **Offline Desteği**: ServiceWorker ve cache stratejisi
+- [ ] **Test Coverage**: Unit ve integration testleri eksik
+- [ ] **Dökümantasyon**: API dökümantasyonu ve kullanıcı rehberi
+- [ ] **Güvenlik**: API key şifreleme ve güvenli depolama
+
+### 🟢 Gelecek Özellikler
+- [ ] **Mobil Uygulama**: React Native port
+- [ ] **Plugin Sistemi**: Üçüncü parti entegrasyonlar
+- [ ] **Sosyal Özellikler**: Strateji paylaşımı ve topluluk
+- [ ] **Gelişmiş Analytics**: Machine learning tabanlı analizler
+- [ ] **Multi-Exchange**: Diğer kripto borsaları desteği
+
+---
+
+## 💡 İyileştirme Önerileri
+
+### 🚀 Performans İyileştirmeleri
+
+#### 1. **Code Splitting ve Lazy Loading**
+```typescript
+// Örnek: Lazy component loading
+const StrategyEditor = lazy(() => import('./components/strategy/StrategyEditor'))
+const BacktestEngine = lazy(() => import('./components/backtest/BacktestEngine'))
+```
+
+#### 2. **API Cache Stratejisi**
+```typescript
+// React Query ile cache yönetimi
+const { data: marketData } = useQuery(
+  ['market-data', symbol],
+  () => binanceService.getKlineData(symbol),
+  { staleTime: 30000, cacheTime: 300000 }
+)
+```
+
+#### 3. **Virtual Scrolling**
+- Büyük strateji listelerinde performans için
+- Chart verilerinde memory optimization
+
+### 🎨 UX/UI İyileştirmeleri
+
+#### 1. **AI Yanıt Akışı**
+```typescript
+// Streaming AI yanıtları için
+const streamAIResponse = async (prompt: string) => {
+  const stream = await openai.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }],
+    stream: true
+  })
+  
+  for await (const chunk of stream) {
+    // Real-time yanıt güncelleme
+    updateMessage(chunk.choices[0]?.delta?.content)
+  }
+}
+```
+
+#### 2. **Advanced Chart Interactions**
+- Drag & drop ile strateji parametresi ayarlama
+- Chart üzerinde annotation ve drawing tools
+- Multi-timeframe sync
+
+#### 3. **Keyboard Shortcuts**
+```typescript
+// Global keyboard shortcuts
+const shortcuts = {
+  'Ctrl+N': () => createNewStrategy(),
+  'Ctrl+R': () => runBacktest(),
+  'Ctrl+S': () => saveStrategy(),
+  'F5': () => refreshMarketData()
+}
+```
+
+### 🔧 Teknik İyileştirmeler
+
+#### 1. **WebSocket Connection Management**
+```typescript
+class WebSocketManager {
+  private connections = new Map<string, WebSocket>()
+  
+  subscribe(symbol: string, callback: (data: any) => void) {
+    const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_1m`)
+    ws.onmessage = (event) => callback(JSON.parse(event.data))
+    this.connections.set(symbol, ws)
+  }
+}
+```
+
+#### 2. **State Management Optimization**
+```typescript
+// Zustand ile global state
+interface TradingStore {
+  strategies: Strategy[]
+  activeStrategies: Strategy[]
+  marketData: MarketData
+  setStrategy: (strategy: Strategy) => void
+  updateMarketData: (data: MarketData) => void
+}
+```
+
+#### 3. **Error Recovery Patterns**
+```typescript
+// Exponential backoff retry
+const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn()
+    } catch (error) {
+      if (i === maxRetries - 1) throw error
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000))
+    }
+  }
+}
+```
+
+---
+
+## 🗓️ Geliştirme Geçmişi ve Changelog
+
+### v0.1.0 - İlk Geliştirme (Şubat 2024)
+- ✅ Temel React/TypeScript altyapısı kuruldu
+- ✅ shadcn/ui bileşen kütüphanesi entegre edildi
+- ✅ Spark framework entegrasyonu tamamlandı
+- ✅ Temel routing ve navigation yapısı oluşturuldu
+
+### v0.2.0 - AI Entegrasyonu (Şubat 2024)
+- ✅ OpenAI GPT-4o API entegrasyonu
+- ✅ Anthropic Claude API desteği
+- ✅ Monaco Editor entegrasyonu
+- ✅ AI destekli kod tamamlama prototipi
+
+### v0.3.0 - Trading İşlevselliği (Şubat 2024)
+- ✅ Binance API entegrasyonu
+- ✅ Kline data çekme servisleri
+- ✅ Temel strateji editörü
+- ✅ Mock backtest engine
+
+### v0.4.0 - UI İyileştirmeleri (Şubat 2024)
+- ✅ Dashboard metrik kutularını optimize edildi
+- ✅ AI Trading Yöneticisi paneli eklendi
+- ✅ Bildirim sistemi geliştirildi
+- ✅ Responsive tasarım iyileştirmeleri
+
+### 🚧 v0.5.0 - Planlanan (Mart 2024)
+- 🔄 Gerçek AI API çağrıları
+- 🔄 WebSocket veri akışı
+- 🔄 Canlı backtest motoru
+- 🔄 Strategy template sistemi
+
+### 🔮 v1.0.0 - Hedeflenen (Nisan 2024)
+- 📋 Production-ready deployment
+- 📋 Comprehensive testing suite
+- 📋 User documentation
+- 📋 Security audit
+
+---
+
+## 🚨 Bilinen Hatalar ve Sınırlamalar
+
+### 🔴 Kritik Hatalar
+1. **AI API Timeout**: Uzun AI yanıtlarında timeout oluşuyor
+2. **Memory Leak**: Chart bileşeninde cleanup eksikliği
+3. **Type Safety**: Bazı API yanıtlarında type assertion kullanılıyor
+
+### 🟡 Orta Seviye Sorunlar
+1. **Performance**: Büyük veri setlerinde yavaşlama
+2. **Error Handling**: Network hatalarında user feedback eksik
+3. **Mobile UX**: Küçük ekranlarda bazı bileşenler taşıyor
+
+### 🟢 Minör İyileştirmeler
+1. **Loading States**: Daha iyi loading indikatorları
+2. **Keyboard Navigation**: Accessibility iyileştirmeleri
+3. **Color Themes**: Dark/light mode geçişi
+
+---
+
+## 📝 Notlar ve Referanslar
+
+### 🔗 Önemli Linkler
+- [Spark Framework Docs](https://github.com/spark)
+- [MatrixIQ Algo Dokumentasyonu](https://www.matriksdata.com/algo)
+- [Binance API Docs](https://binance-docs.github.io/apidocs/)
+- [OpenAI API Reference](https://platform.openai.com/docs)
+
+### 📚 Geliştirici Notları
+- Monaco Editor için TypeScript definition'lar manuel olarak eklendi
+- Binance API signature'ı için crypto-js kullanılıyor
+- State management için Spark KV store tercih edildi
+- Responsive breakpoint'ler Tailwind default'ları takip ediyor
+
+### 🛡️ Güvenlik Notları
+- API anahtarları localStorage'da plaintext tutuluyor (⚠️ güvenlik riski)
+- CORS policy'leri development için gevşetilmiş
+- Production'da HTTPS ve secure headers gerekli
+
+---
+
+**Son Güncelleme**: {{ new Date().toLocaleDateString('tr-TR') }}  
+**Güncelleyen**: AI Development Team  
+**Proje Durumu**: 🚧 Aktif Geliştirme Aşamasında
