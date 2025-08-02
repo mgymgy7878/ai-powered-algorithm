@@ -39,15 +39,6 @@ interface NavigationItem {
 export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningStrategiesCount = 0 }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   
-  // Debug: Sidebar durumunu logla
-  useEffect(() => {
-    console.log('🔍 Sidebar Debug:', {
-      isOpen: isSidebarOpen,
-      currentView,
-      navigationItems: navigation.length
-    })
-  }, [isSidebarOpen, currentView, navigation])
-  
   // Memoize navigation items to prevent unnecessary re-renders
   const navigation = useMemo<NavigationItem[]>(() => {
     const items = [
@@ -68,6 +59,15 @@ export function Sidebar({ currentView, onViewChange, strategyCount = 0, runningS
     console.log('🔍 Navigation Items:', items.map(item => `${item.id} -> ${item.label}`))
     return items
   }, [strategyCount, runningStrategiesCount])
+  
+  // Debug: Sidebar durumunu logla
+  useEffect(() => {
+    console.log('🔍 Sidebar Debug:', {
+      isOpen: isSidebarOpen,
+      currentView,
+      navigationItems: navigation.length
+    })
+  }, [isSidebarOpen, currentView, navigation])
   
   // Memoize the toggle handler
   const handleToggle = useCallback(() => {
